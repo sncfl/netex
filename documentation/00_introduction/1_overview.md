@@ -44,7 +44,7 @@ This document is intended for a broad audience, ranging from technical experts t
 
 It addresses in particular:
 
-- CFL internal teams: business analysts, data managers, system architects, developers.
+- CFL internal teams : business analysts, data managers, system architects, developers.
 - Other mobility operators in Luxembourg : who may later align with or contribute to the profile.
 - Public authorities and institutional partners : ministries, municipalities, and transport agencies interested in interoperable data standards.
 - Third-party developers and service providers : who will use open data to build journey planners, passenger information systems, or mobility apps.
@@ -59,7 +59,7 @@ The profile is therefore written in a progressive and pedagogical way: it starts
 The CFL profile will be built progressively in several work packages, each covering a functional perimeter.
 
 - **WP 1 – NeTEx Timetable profile**  
-  Covers the core static offer: stops, network, timetable, service calendars, and common elements. This MVP focuses initially on CFL’s rail offer, but is designed to be multimodal from the outset.
+  Covers the core static offer : stops, network, timetable, service calendars, and common elements. This MVP focuses initially on CFL’s rail offer, but is designed to be multimodal from the outset.
 
 - **WP 2 – SIRI profile**  
   Covers real-time information through SIRI services (Estimated Timetable – ET, Situation Exchange – SX, Vehicle Monitoring – VM).
@@ -88,8 +88,8 @@ It defines how to structure and publish the static offer across these modes, inc
 
 ### Scope boundaries (WP1)
 
-- **Included:** multimodal coverage of CFL-operated services; modelling choices and identifiers harmonised across modes; cross-mode references and correspondences within CFL.
-- **Excluded:** real-time information (SIRI), detailed accessibility data, and fares/ticketing structures — these are addressed in subsequent work packages.
-- **Out of scope for WP1:** services operated by non-CFL operators (which may be aligned and integrated later through the open, collaborative process).
+- **Included :** multimodal coverage of CFL-operated services; modelling choices and identifiers harmonised across modes; cross-mode references and correspondences within CFL.
+- **Excluded :** real-time information (SIRI), detailed accessibility data, and fares/ticketing structures — these are addressed in subsequent work packages.
+- **Out of scope for WP1 :** services operated by non-CFL operators (which may be aligned and integrated later through the open, collaborative process).
 
-WP1 is an MVP: immediately usable by CFL producers and consumers of data, while forming a stable foundation for later extensions and external contributions.
+WP1 is an MVP : immediately usable by CFL producers and consumers of data, while forming a stable foundation for later extensions and external contributions.
