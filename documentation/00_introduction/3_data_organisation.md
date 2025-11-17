@@ -134,12 +134,13 @@ Each file has a clearly defined role:
 - All StopPlaces and Quays  
 - Coordinates and identifiers  
 
-#### **line_<LineId>.xml**
+#### **line_xyz.xml**
 - Line definition  
 - JourneyPatterns  
 - Logical-to-physical stop associations (ScheduledStopPoint → QuayRef)  
 - VehicleJourney definitions  
-- PassingTimes (timetable)  
+- PassingTimes (timetable)
+- xyz corresponds to the Line identifier  
 
 This structure ensures that timetable data can always be resolved against consistent references, avoiding duplication, ambiguity, or conflicts.
 
