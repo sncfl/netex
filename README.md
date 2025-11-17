@@ -1,6 +1,6 @@
 # CFL NeTEx Profile
 
-This workspace brings together all elements of the **CFL NeTEx Profile**, designed to harmonise and structure the modelling of timetable and real-time data used within CFL.  
+This workspace brings together all elements of the **CFL NeTEx Profile**, designed to harmonise and structure the modelling of timetable data used within CFL.  
 The profile is based on the CEN standards (NeTEx, Transmodel) while reflecting CFL’s operational requirements.
 
 ---
