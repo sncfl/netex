@@ -89,7 +89,7 @@ Auxiliary files for future work packages (e.g., accessibility, fares) may also b
 #### Multi-operator notes
 
 - In a national aggregated publication, **XML filenames MUST remain operator-neutral**; operator attribution is expressed in the data (OperatorRef, AuthorityRef, etc.).
-- If multiple operators publish independently, ZIP archive names (see §3.5.1) **may include the operator**, but XML filenames should remain neutral.
+- If multiple operators publish independently, ZIP archive names **may include the operator**, but XML filenames should remain neutral.
 - All operator codespaces (e.g. `LU:CFL`, `LU:RGTR`, `LU:TICE`) **must be declared in `resource.xml`** and used consistently.
 
 ---
