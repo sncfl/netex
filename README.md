@@ -1,7 +1,7 @@
-# CFL NeTEx/SIRI Profile
+# CFL NeTEx Profile
 
-This workspace brings together all elements of the **CFL NeTEx and SIRI Profile**, designed to harmonise and structure the modelling of timetable and real-time data used within CFL.  
-The profile is based on the CEN standards (NeTEx, SIRI, Transmodel) while reflecting CFL’s operational requirements.
+This workspace brings together all elements of the **CFL NeTEx Profile**, designed to harmonise and structure the modelling of timetable and real-time data used within CFL.  
+The profile is based on the CEN standards (NeTEx, Transmodel) while reflecting CFL’s operational requirements.
 
 ---
 
@@ -36,7 +36,7 @@ This content will be published progressively according to the timeline of the va
 
 ## Governance
 
-The content of this repository reflects the modelling work carried out as part of the **CFL NeTEx/SIRI Profile** initiative.
+The content of this repository reflects the modelling work carried out as part of the **CFL NeTEx Profile** initiative.
 
 Questions, clarification requests, and proposals for improvements can be submitted via the repository’s Issues.  
 Decisions relating to profile evolution are discussed in dedicated working sessions and incorporated into subsequent releases.
