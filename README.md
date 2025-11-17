@@ -1,35 +1,87 @@
-# Profil NeTEx Luxembourgeois
-Cet espace de travail regroupe l'ensemble des éléments du profil NeTEx Luxembourgeois
+# CFL NeTEx/SIRI Profile
+
+This workspace brings together all elements of the **CFL NeTEx and SIRI Profile**, designed to harmonise and structure the modelling of timetable and real-time data used within CFL.  
+The profile is based on the CEN standards (NeTEx, SIRI, Transmodel) while reflecting CFL’s operational requirements.
+
+---
 
 ## Structure
-Structure des dossiers A DEFINIR
 
-## Gouvernance
-A FINALISER
- 
-Toute personne peut poser des questions, faire des demandes de changement du profil Luxembourgeois de NeTEx en utilisant les Issues de cet espace de travail. 
- 
- 
+This repository contains two main areas:
+
+### documentation/
+
+This folder contains the introductory material:
+
+- general principles  
+- cross-cutting rules  
+- data organisation  
+- conventions  
+- publication principles
+
+It currently includes:  
+`0_index.md`, `1_overview.md`, `2_general_principles.md`, `3_data_organisation.md`  
+and will be expanded as the project progresses.
+
+### specifications/
+
+This folder is intended to host the detailed content of the CFL profile, including:
+
+- definitions of the modelled entities  
+- structural rules  
+- naming conventions  
+- modelling constraints  
+- rules applying to timetable and real-time data (NeTEx and SIRI)  
+- upcoming extensions (accessibility, fares, new modes)
+
+This content will be published progressively according to the timeline of the various work packages.
+
+---
+
+## Governance
+
+The content of this repository reflects the modelling work carried out as part of the **CFL NeTEx/SIRI Profile** initiative.
+
+Questions, clarification requests, and proposals for improvements can be submitted via the repository’s Issues.  
+Decisions relating to profile evolution are discussed in dedicated working sessions and incorporated into subsequent releases.
+
+---
 
 ## Contributions
 
-A FINALISER
+### Participation
 
-### Généralités
+Anyone interested may:
 
-Cet espace de travail est ouvert à tout contributeur. Cependant, si vous souhaitez participer aux débats sur les demandes de changement, merci de vous rapprocher de l'animatrice.
+- ask questions  
+- suggest improvements  
+- report inconsistencies  
+- propose content evolutions
 
-### Comment contribuer
-Pour toute question, commentaire ou ouvrir une discussion plus large, merci d'ouvrir un ticket dans les issues. Pour toute demande de changement, merci de bien vouloir noter que :
+Discussions take place primarily through Issues.
 
-- la branche main est dédiée à tous les changements liés au readme.md, les corrections de fautes de frappe, grammaire ou de syntaxe de la documentation et de l'ensemble des bugs ;
-- la branche next est dédiée à toutes les évolutions du profil (ex. ajout d'attributs dans un élément, ajout d'une section complète, etc.) et aux ajouts de nouveaux documents (ex. nouvelle partie du profil France, fichiers d'illustrations, etc.).
+### Branches
 
-### Processus de mise à jour des branches
-Dans la mesure où il a été choisi de travailler sur deux branches (voir point précédent), les mises à jour de la branche next à partir de main se feront comme suit :
+- **main**  
+  - README  
+  - minor fixes (spelling, grammar, small clarifications)  
+  - light structural or formatting adjustments  
 
-- Fréquence : une fois par mois????
-- Responsabilité : Release manager ????
-- Périmètre : tous les changements liés au readme.md, les corrections de fautes de frappe, grammaire ou de syntaxe de la documentation et de l'ensemble des bugs
-- Date de début : ???
-- Pas de date de fin
+- **next**  
+  - substantial evolutions  
+  - new sections  
+  - major reorganisations  
+  - significant updates to the profile
+
+### Branch synchronisation
+
+- **Frequency**: monthly  
+- **Responsible**: repository maintainer  
+- **Scope**: merging `main` into `next` for minor updates and structural alignments  
+
+---
+
+## Technical maintenance
+
+Technical maintenance of the repository (folder organisation, file structure, path consistency) is handled by the team responsible for the CFL profile.  
+The functional content is based on the analyses performed within the project and aligned with the NeTEx/SIRI standards.
