@@ -19,10 +19,6 @@ This folder contains the introductory material:
 - conventions  
 - publication principles
 
-It currently includes:  
-`0_index.md`, `1_overview.md`, `2_general_principles.md`, `3_data_organisation.md`  
-and will be expanded as the project progresses.
-
 ### specifications/
 
 This folder is intended to host the detailed content of the CFL profile, including:
