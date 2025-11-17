@@ -7,7 +7,7 @@ The profile is based on the CEN standards (NeTEx, Transmodel) while reflecting C
 
 ## Structure
 
-This repository contains two main areas:
+This repository contains two main areas :
 
 ### documentation/
 
@@ -71,9 +71,9 @@ Discussions take place primarily through Issues.
 
 ### Branch synchronisation
 
-- **Frequency**: monthly  
-- **Responsible**: repository maintainer  
-- **Scope**: merging `main` into `next` for minor updates and structural alignments  
+- **Frequency** : monthly  
+- **Responsible** : repository maintainer  
+- **Scope** : merging `main` into `next` for minor updates and structural alignments  
 
 ---
 
