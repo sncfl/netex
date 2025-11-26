@@ -1,4 +1,4 @@
-# 3. Organization of Data
+# 3. Organisation of Data
 
 ## 3.1 PublicationDelivery (the exchange envelope)
 
@@ -20,8 +20,15 @@ For WP1, the CFL profile applies the following rules:
 
 This approach keeps each file small, focused, and easy to validate.
 
-Although NeTEx allows combining multiple business frames inside a single `CompositeFrame`, the Luxembourg profile applies a **constrained, documented structure per file type** to simplify validation, maintenance and overall understanding.  
-The only exception concerns timetables: **several TimetableFrames may be grouped in the same file**, but only when they all refer to the same `Line`.
+Although NeTEx permits combining multiple business frames within a CompositeFrame, the Luxembourg WP1 profile applies a documented and predictable structure per file type. This approach is adopted to:
+
+- keep files **small**, **focused**, and **easy to validate** (XSD and Schematron);
+- simplify **interpretation**, **maintenance**, and onboarding for new contributors;
+- support **incremental updates** by allowing selective regeneration of specific files;
+- ensure **consistency** across all WP1 publications and future work packages;
+- reduce the risk of ambiguous or unintended cross-frame dependencies.
+
+This constrained structure remains fully compliant with NeTEx while providing clearer boundaries between responsibilities of each file.
 
 ## 3.2 CompositeFrames used in WP1
 
