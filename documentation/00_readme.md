@@ -1,19 +1,27 @@
-# Introduction to the CFL NeTEx Profile
+# Documentation
 
-This directory contains the introductory material for the CFL NeTEx Profile.  
-It provides the general context, objectives, scope, audience, and guiding principles underlying the development of the profile.
+This directory contains the written documentation for the CFL NeTEx/SIRI Profile.  
+It brings together the explanations, rules and modelling elements that support the construction of the profile.
 
-The introduction is organised into the following sections:
+## Structure
 
-- **1 – Overview**  
-  Context, motivation, objectives, target audience, and scope of the CFL NeTEx initiative.  
-  This section explains why CFL is creating a NeTEx profile and how this MVP fits into a broader multi-phase approach.
+The folder is organised as a set of **numbered Markdown files** placed at the root.  
+Each file covers a specific topic. The numbering indicates a suggested reading order and may evolve over time.
 
-- **2 – General principles**  
-  A high-level explanation of NeTEx, the concept of profiling, and the methodological choices made for developing the CFL profile.  
-  This section is intended for both non-specialists and technical readers who need a clear conceptual foundation before diving into the specifications.
+Two subdirectories provide additional material:
 
-  [TO BE COMPLETED]
+- **`media/`**  
+  Contains images and other visual assets used in the Markdown files.
 
-These sections provide a narrative and accessible introduction to the profile.  
-More technical content—such as data organisation, frames, delivery bundles, and the detailed CFL specifications is located in dedicated directories outside the introduction.
+- **`diagrams/`**  
+  Contains the source files and exported versions of diagrams referenced in the documentation.
+
+## Purpose
+
+The documentation in this folder describes:
+
+- the principles and conventions applied in the modelling work;
+- the organisation of the data and publication structure;
+- the elements used in the NeTEx and SIRI components of the profile.
+
+The content is updated as the modelling progresses.
