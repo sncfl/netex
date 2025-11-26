@@ -20,7 +20,7 @@ For the MVP, the CFL profile applies the following rules:
 
 This approach keeps each file small, focused, and easy to validate.
 
-Although NeTEx permits combining multiple business frames within a CompositeFrame, the Luxembourg WP1 profile applies a documented and predictable structure per file type. This approach is adopted to:
+Although NeTEx permits combining multiple business frames within a CompositeFrame, the CFL MVP profile applies a documented and predictable structure per file type. This approach is adopted to:
 
 - keep files **small**, **focused**, and **easy to validate** (XSD and Schematron);
 - simplify **interpretation**, **maintenance**, and onboarding for new contributors;
@@ -213,9 +213,9 @@ StopPlace Luxembourg
 
 ---
 
-### 3.5.3 Profile versioning (Luxembourg NeTEx Profile)
+### 3.5.3 Profile versioning (CFL NeTEx Profile)
 
-Beyond entity-level versioning, the Luxembourg NeTEx profile itself evolves.  
+Beyond entity-level versioning, the CFL NeTEx profile itself evolves.  
 A semantic versioning scheme communicates the type of changes and their impact.
 
 **Version number format:**  
