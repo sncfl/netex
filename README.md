@@ -9,28 +9,37 @@ The profile is based on the CEN standards (NeTEx, Transmodel) while reflecting C
 
 This repository contains two main areas :
 
-### documentation/
 
-This folder contains the introductory material:
+### `documentation/`
+This folder contains all documentation related to the Luxembourg profile, structured into thematic subdirectories:
 
-- general principles  
-- cross-cutting rules  
-- data organisation  
-- conventions  
-- publication principles
+- **00_introduction/**  
+  General principles  
+  Cross-cutting rules  
+  Data organisation  
+  Conventions  
+  Publication principles  
 
-### specifications/
-
-This folder is intended to host the detailed content of the CFL profile, including:
-
-- definitions of the modelled entities  
-- structural rules  
-- naming conventions  
-- modelling constraints  
-- rules applying to timetable and real-time data (NeTEx and SIRI)  
-- upcoming extensions (accessibility, fares, new modes)
+- **01_specifications/**  
+  Detailed content of the CFL profile, including:  
+  - definitions of the modelled entities  
+  - structural rules  
+  - naming conventions  
+  - modelling constraints  
+  - rules applying to timetable and real-time data (NeTEx and SIRI)  
+  - upcoming extensions (accessibility, fares, new modes)  
 
 This content will be published progressively according to the timeline of the various work packages.
+
+### `examples/`
+This folder hosts practical XML examples illustrating the modelling rules defined in the documentation, such as:
+
+- baseline deliveries  
+- timetable updates  
+- bikebox modelling  
+- other examples aligned with future extention of the scope
+
+These examples serve as reference material for implementers and internal CFL teams.
 
 ---
 
