@@ -1,92 +1,81 @@
 # CFL NeTEx Profile
 
-This workspace brings together all elements of the **CFL NeTEx Profile**, designed to harmonise and structure the modelling of timetable data used within CFL.  
-The profile is based on the CEN standards (NeTEx, Transmodel) while reflecting CFL’s operational requirements.
+This repository brings together all elements of the **CFL NeTEx Profile**.  
+Its purpose is to document and structure the modelling of timetable and real-time data used within CFL, based on the CEN standards (NeTEx, Transmodel) and adapted to Luxembourg’s operational needs.
 
 ---
 
 ## Structure
 
-This repository contains two main areas :
-
+The repository is organised into two main areas:
 
 ### `documentation/`
-This folder contains all documentation related to the Luxembourg profile, structured into thematic subdirectories:
+Contains all written material related to the Luxembourg profile.  
+The content is structured as **numbered Markdown files**, each describing a specific topic (general principles, data organisation, stops, timetable, accessibility, real-time components, etc.).
 
-- **00_introduction/**  
-  General principles  
-  Cross-cutting rules  
-  Data organisation  
-  Conventions  
-  Publication principles  
+Two subfolders provide supporting material:
 
-- **01_specifications/**  
-  Detailed content of the CFL profile, including:  
-  - definitions of the modelled entities  
-  - structural rules  
-  - naming conventions  
-  - modelling constraints  
-  - rules applying to timetable and real-time data (NeTEx and SIRI)  
-  - upcoming extensions (accessibility, fares, new modes)  
+- **`media/`** — images and visual assets used in the documentation  
+- **`diagrams/`** — diagram source files and exported figures
 
-This content will be published progressively according to the timeline of the various work packages.
+The documentation is updated progressively as the profile evolves.
 
 ### `examples/`
-This folder hosts practical XML examples illustrating the modelling rules defined in the documentation, such as:
+Contains practical XML examples illustrating how the modelling rules are applied.  
+These examples may include:
 
 - baseline deliveries  
 - timetable updates  
 - bikebox modelling  
-- other examples aligned with future extention of the scope
+- other examples added as the scope expands
 
-These examples serve as reference material for implementers and internal CFL teams.
+They serve as reference material for implementers and internal CFL teams.
 
 ---
 
 ## Governance
 
-The content of this repository reflects the modelling work carried out as part of the **CFL NeTEx Profile** initiative.
-
-Questions, clarification requests, and proposals for improvements can be submitted via the repository’s Issues.  
-Decisions relating to profile evolution are discussed in dedicated working sessions and incorporated into subsequent releases.
+The content of this repository reflects the modelling work carried out for the CFL NeTEx Profile.  
+Questions, requests for clarification and improvement proposals can be submitted via the repository’s Issues.  
+Decisions on profile evolution are discussed in dedicated working sessions and integrated into subsequent updates.
 
 ---
 
 ## Contributions
 
 ### Participation
-
-Anyone interested may:
+Contributors may:
 
 - ask questions  
-- suggest improvements  
-- report inconsistencies  
-- propose content evolutions
+- signal issues or inconsistencies  
+- propose improvements  
+- suggest content evolutions
 
-Discussions take place primarily through Issues.
+Discussion takes place primarily through Issues.
 
 ### Branches
 
 - **main**  
-  - README  
-  - minor fixes (spelling, grammar, small clarifications)  
-  - light structural or formatting adjustments  
+  - README and general information  
+  - minor edits (formatting, spelling, clarifications)  
+  - light structural adjustments  
 
 - **next**  
-  - substantial evolutions  
-  - new sections  
+  - substantial updates  
+  - new chapters  
   - major reorganisations  
-  - significant updates to the profile
+  - significant content additions
 
 ### Branch synchronisation
 
-- **Frequency** : monthly  
-- **Responsible** : repository maintainer  
-- **Scope** : merging `main` into `next` for minor updates and structural alignments  
+- **Frequency**: monthly  
+- **Performed by**: repository maintainer  
+- **Scope**: merge changes from `main` into `next` to keep both branches aligned
 
 ---
 
 ## Technical maintenance
 
-Technical maintenance of the repository (folder organisation, file structure, path consistency) is handled by the team responsible for the CFL profile.  
-The functional content is based on the analyses performed within the project and aligned with the NeTEx/SIRI standards.
+Technical maintenance (structure, links, file organisation) is handled by the team responsible for the CFL profile.  
+The functional content is based on the modelling work conducted within the project and follows the NeTEx and SIRI standards.
+
