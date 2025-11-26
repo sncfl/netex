@@ -4,7 +4,7 @@
 
 Each XML file is a NeTEx **PublicationDelivery**: an envelope containing one `CompositeFrame` and essential metadata (issuer, timestamp, description).
 
-For WP1, the CFL profile applies the following rules:
+For the MVP, the CFL profile applies the following rules:
 
 - **One PublicationDelivery per XML file.**
 - **One CompositeFrame per XML file.**
@@ -30,9 +30,9 @@ Although NeTEx permits combining multiple business frames within a CompositeFram
 
 This constrained structure remains fully compliant with NeTEx while providing clearer boundaries between responsibilities of each file.
 
-## 3.2 CompositeFrames used in WP1
+## 3.2 CompositeFrames used in the MVP
 
-WP1 relies on a limited subset of NeTEx frames.  
+The MVP profile relies on a limited subset of NeTEx frames.  
 Only the frames required for describing stops, service structures, calendars and timetables are included.
 
 | Frame                       | Scope / Content                                   | Key Entities                                           |
