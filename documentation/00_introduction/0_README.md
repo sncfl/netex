@@ -13,5 +13,7 @@ The introduction is organised into the following sections:
   A high-level explanation of NeTEx, the concept of profiling, and the methodological choices made for developing the CFL profile.  
   This section is intended for both non-specialists and technical readers who need a clear conceptual foundation before diving into the specifications.
 
+  [TO BE COMPLETED]
+
 These sections provide a narrative and accessible introduction to the profile.  
 More technical content—such as data organisation, frames, delivery bundles, and the detailed CFL specifications is located in dedicated directories outside the introduction.
