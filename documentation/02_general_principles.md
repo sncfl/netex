@@ -1,6 +1,6 @@
-## 2. General principles
+# 2. General principles
 
-### 2.1 What is NeTEx (in simple terms)
+## 2.1 What is NeTEx (in simple terms)
 
 NeTEx (Network Timetable Exchange) is a **CEN Technical Specification series** (CEN/TS 16614-x) for exchanging public-transport network and timetable data. It provides:
 
@@ -12,7 +12,7 @@ NeTEx is **model-driven** (Transmodel): you describe the world (stops, lines, jo
 
 ---
 
-### 2.2 Why NeTEx?
+## 2.2 Why NeTEx?
 
 Public-transport information in Europe has historically been published through multiple formats, each created for a specific operational or national context (e.g. GTFS, VDV, TransXChange). While these formats cover particular needs, they also lead to fragmentation and limited interoperability between systems.
 
@@ -34,7 +34,7 @@ NeTEx acts as the **structured backbone** from which lighter or specialised form
 
 ---
 
-### 2.3 What is a “profile” and why CFL needs one
+## 2.3 What is a “profile” and why CFL needs one
 
 A NeTEx profile defines how the standard is applied within a specific national, regional or organisational context.
 It selects the relevant concepts, constrains optionalities, and establishes clear modelling and coding rules.
@@ -51,7 +51,7 @@ The CFL profile provides a shared, authoritative reference for structuring and p
 
 ---
 
-### 2.4 Method and delivery approach
+## 2.4 Method and delivery approach
 
 The CFL NeTEx profile is developed through a **pragmatic, iterative and collaborative process**:
 
@@ -65,8 +65,7 @@ The CFL NeTEx profile is developed through a **pragmatic, iterative and collabor
 This approach ensures that the profile remains both **normative enough** to guarantee interoperability and **practical enough** to be produced, consumed and maintained efficiently.
 
 ---
-
-### 2.5 Principles adopted for the MVP
+## 2.5 Principles adopted for the MVP
 
 The work package 1 establishes a **Minimum Viable Profile** focused on CFL’s scheduled offer.
 Its design follows the principles below:
