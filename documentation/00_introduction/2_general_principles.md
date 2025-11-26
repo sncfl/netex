@@ -1,19 +1,22 @@
 ## 2.2 Why NeTEx?
 
-Public transport information in Europe has historically been published through a variety of formats, each designed for specific national or operational contexts (e.g. GTFS, VDV, TransXChange). While these formats meet particular needs, they also create fragmentation and limit interoperability.
+Public-transport information in Europe has historically been published through multiple formats, each created for a specific operational or national context (e.g. GTFS, VDV, TransXChange). While these formats cover particular needs, they also lead to fragmentation and limited interoperability between systems.
 
 NeTEx was developed by CEN to provide a **harmonised, multimodal and extensible standard** capable of supporting:
 
 - the complete description of the public-transport offer (stops, networks, timetables, accessibility, fares);
-- consistent data exchange between operators, authorities, and information systems;
-- cross-border and international interoperability.
+- consistent and reliable data exchange between operators, authorities, and information systems;
+- seamless cross-border and international interoperability.
 
-NeTEx complements existing standards:
+NeTEx does not replace existing formats but complements them:
 
 - **GTFS** remains widely used for consumer-facing journey planners and global map services;
-- **TAP TSI** remains mandatory for railway timetable and reservation exchanges at European level.
+- **TAP TSI** remains mandatory for railway timetable and reservation exchanges at European level;
+- **SIRI** provides the real-time counterpart to NeTEx for operational monitoring and passenger information.
 
-In this ecosystem, NeTEx provides the **structured backbone** for national and European mobility data, from which lighter or specialised formats may be derived when needed.
+**Compared to other formats**, NeTEx stands out by its model-driven foundation (Transmodel), its completeness across all public-transport domains, and its extensibility through national profiles.  
+GTFS focuses on lightweight consumer applications; TAP TSI targets rail-sector exchanges; SIRI covers real-time.  
+NeTEx acts as the **structured backbone** from which lighter or specialised formats can be derived or complemented.
 
 ## 2.3 What is a “profile” and why CFL needs one
 
