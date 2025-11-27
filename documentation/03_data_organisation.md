@@ -30,6 +30,10 @@ Although NeTEx permits combining multiple business frames within a CompositeFram
 
 This constrained structure remains fully compliant with NeTEx while providing clearer boundaries between responsibilities of each file.
 
+<p align="center">
+  <img src="media/publication_delivery.png" style="max-width:100%; height:auto;">
+</p>
+
 ## 3.2 CompositeFrames used in the MVP
 
 The MVP profile relies on a limited subset of NeTEx frames.  
