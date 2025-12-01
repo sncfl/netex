@@ -200,6 +200,8 @@ All codespaces used in identifiers (e.g. `LU:CFL`, `LU:RGTR`, `LU:TICE`) must:
 - be used consistently across all files,
 - remain stable across deliveries.
 
+---
+
 ## 3.4 Cross-File Reference Model
 
 The CFL dataset applies a strict separation of responsibilities between files.  
@@ -395,6 +397,8 @@ Bundles must remain internally consistent:
 - **New public holiday definition**  
   → bundle includes `resource.xml` + all affected line files
 
+---
+
 ## 3.6 Archiving and Delivery Naming
 
 This section defines how publication bundles (ZIP archives) are named, published and archived.  
@@ -466,6 +470,8 @@ Deliveries must not be deleted unless required by legal or regulatory constraint
 - Consumers interpret the current dataset using the last baseline combined with all relevant updates.
 
 Each published delivery must provide resolvable and consistent data.
+
+---
 
 ## 3.7 Entity Versioning
 
