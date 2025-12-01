@@ -34,6 +34,8 @@ This constrained structure remains fully compliant with NeTEx while providing cl
   <img src="media/publication_delivery.png" style="max-width:100%; height:auto;">
 </p>
 
+---
+
 ## 3.2 File Structure and Roles
 
 The CFL dataset is divided into several XML files.  
@@ -140,6 +142,7 @@ This section describes for each file:
 | `line_<LineId>.xml` | `ServiceFrame` + `TimetableFrame` | Line, routes, journey patterns, vehicle journeys, passing times | Service structure and timetable of one commercial line |
 | `network.xml` (optional) | `NetworkFrame` or `ServiceFrame` | Network, groups of lines (future) | Network-level or tariff structures (not WP1) |
 
+---
 
 ## 3.3 Naming Rules
 
@@ -286,6 +289,8 @@ Cross-file relationships follow a simple model:
 - **Codespaces → All files**: identifiers in all files use codespaces declared in `resource.xml`
 
 A diagram is provided separately to illustrate these reference flows.
+
+---
 
 ## 3.5 Publication Bundles
 
