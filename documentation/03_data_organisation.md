@@ -204,93 +204,99 @@ All codespaces used in identifiers (e.g. `LU:CFL`, `LU:RGTR`, `LU:TICE`) must:
 
 ## 3.4 Cross-File Reference Model
 
-The CFL dataset applies a strict separation of responsibilities between files.  
-Each entity type is defined in exactly one file and referenced from other files through `…Ref` fields.  
-This ensures consistency, prevents duplication, and guarantees resolvability.
+This section describes how entities defined in different XML files refer to each other.  
+Three principles govern the model:  
+1. stable identifiers,  
+2. a single authoritative source per entity type,  
+3. references using …Ref fields.
 
 ---
 
-### 3.4.1 Single authoritative source per entity type
+### 3.4.1 Identifier Model
 
-Each file defines its own set of entities and is the only authoritative source for them:
+Identifiers (`id`) are globally unique and stable across deliveries.  
+They follow these rules:
 
-**stop.xml**
+- an identifier never changes once assigned;  
+- new versions of an entity must reuse the same identifier;  
+- identifiers are never reused for unrelated entities;  
+- each identifier includes a declared codespace (e.g. LU:CFL).
+
+Examples:
+
+- `LU:CFL:StopPlace:SP00045`  
+- `LU:CFL:Quay:BASCHARAGE-SANEM-1`  
+- `LU:CFL:Line:8200001-8200027`  
+
+Codespaces used in identifiers are declared in `resource.xml`.
+
+---
+
+### 3.4.2 Authoritative Source Model
+
+Each entity type is defined in exactly one file.  
+This prevents duplication and ensures consistent maintenance.
+
+**stop.xml**  
 - StopPlace  
 - Quay  
-- (optional) SiteEquipment  
 
-**resource.xml**
+**resource.xml**  
 - Codespaces  
 - Organisations, Operators, Authorities  
-- Notices  
-- TypeOfValue and value sets  
-- ServiceFacilitySet  
-- PhysicalConnection, Transfer, TransferDuration  
-- DayType, OperatingPeriod, OperatingDay, DayTypeAssignment  
+- Notices, ValueSets  
+- Physical connections  
+- Calendar primitives (DayType, OperatingPeriod, OperatingDay)
 
-**line_<LineId>.xml**
+**line_<LineId>.xml**  
 - Line  
-- Route, RoutePoint, PointOnRoute  
+- Route and RoutePoints  
 - ServiceLink  
-- JourneyPattern  
-- StopPointInJourneyPattern  
-- ServiceJourney  
-- VehicleJourney  
-- PassingTime  
-
-**network.xml** *(optional)*
-- Network and network-level structures (future use only)
+- JourneyPattern and StopPointInJourneyPattern  
+- ServiceJourney and VehicleJourney  
+- PassingTime
 
 No entity type is defined in more than one file.
 
 ---
 
-### 3.4.2 Reference principles
+### 3.4.3 Reference Model
 
-Cross-file relationships use only identifier references (`…Ref`).  
-Typical examples:
+When an entity needs to refer to an entity defined in another file, it uses a NeTEx reference field (`…Ref`).
 
-- A `StopPointInJourneyPattern` references a `Quay` from `stop.xml`
-- A `ServiceJourney` references a `DayType` from `resource.xml`
-- A `Line` references an `Operator` from `resource.xml`
+Examples:
+
+- A `StopPointInJourneyPattern` references a `Quay` using `QuayRef`.  
+- A `ServiceJourney` references a `DayType` using `DayTypeRef`.  
+- A `Line` references an operator using `OperatorRef`.
 
 Rules:
-- Entities defined in one file must not be redefined in another.  
-- Only `…Ref` fields may reference external entities.  
-- All referenced identifiers must be resolvable using the files in the same delivery or a previous baseline/reference delivery.  
+
+- Entities defined in another file must never be redefined locally.  
+- A reference must always use the identifier of the authoritative source.  
+- Referenced identifiers must be resolvable within the current delivery or a previous valid baseline/reference delivery.  
 - Deprecated entities remain valid through versioning and temporal validity.
 
 ---
 
-### 3.4.3 Identifier characteristics
+### 3.4.4 Cross-File Reference Overview
 
-Identifiers used in references must be:
+Cross-file references follow a simple structure:
 
-- Globally unique  
-- Stable across deliveries  
-- Prefixed with a declared codespace  
-- Persistent (attribute changes do not change the ID)
+- **Lines → Stops**  
+  Line files reference StopPlace and Quay from `stop.xml`.
 
-**Examples**
-- `LU:CFL:StopPlace:SP00045`
-- `LU:CFL:Quay:BASCHARAGE-SANEM-1`
-- `LU:CFL:Line:8200001-8200027`
-- `LU:CFL:ServiceJourney:SJ12345`
+- **Timetables → Calendars**  
+  ServiceJourney and VehicleJourney reference DayType from `resource.xml`.
 
-Codespaces are declared in the `ResourceFrame` of `resource.xml`.
+- **Lines → Operators**  
+  Line elements reference operators from `resource.xml`.
 
----
+This compact diagram summarises these relationships :
 
-### 3.4.4 Cross-file reference overview
-
-Cross-file relationships follow a simple model:
-
-- **Lines → Stops**: line files reference StopPlace/Quay in `stop.xml`  
-- **Timetables → Calendars**: timetable elements reference DayTypes and calendar primitives in `resource.xml`  
-- **Lines → Operators**: lines reference operator data declared in `resource.xml`  
-- **Codespaces → All files**: identifiers in all files use codespaces declared in `resource.xml`
-
-A diagram is provided separately to illustrate these reference flows.
+<p align="center">
+  <img src="media/cross_file_reference_overview.png" alt="Cross-file reference overview" width="650">
+</p>
 
 ---
 
@@ -308,72 +314,14 @@ Bundles must remain internally consistent:
 
 ### 3.5.1 Bundle Types
 
-#### Baseline delivery
-**Content**
-- `resource.xml`
-- `stop.xml`
-- all `line_<LineId>.xml` files
-
-**Purpose**
-- initial deployment  
-- yearly resets  
-- major structural changes  
-- synchronisation before new timetable periods  
-
----
-
-#### Reference delivery
-**Content**
-- `resource.xml`
-- `stop.xml`
-
-**Purpose**
-- updates to shared reference data (operators, facilities, calendars, stop attributes)  
-- no timetable changes  
-
----
-
-#### Timetable update
-**Content**
-- one or more `line_<LineId>.xml` files
-
-**Purpose**
-- adjustments limited to timetables  
-- changes affecting specific lines only  
-
-*Constraint*: must not introduce references to new stops unless the corresponding updates to `stop.xml` are included.
-
----
-
-#### Calendar update
-**Content**
-- `resource.xml` (ServiceCalendarFrame)
-- affected `line_<LineId>.xml` files
-
-**Purpose**
-- changes to operating periods or public-holiday definitions  
-- updates to DayTypes requiring aligned timetable updates  
-
----
-
-#### New stop / new line delivery
-**Content**
-- updated `stop.xml` and/or `resource.xml`
-- affected `line_<LineId>.xml` files
-
-**Purpose**
-- introduction of a new StopPlace or Quay  
-- creation of a new commercial line  
-- changes introducing new identifiers that must be resolvable  
-
----
-
-#### Mode-specific delivery
-**Content**
-- all updated line files for a given mode (e.g. rail)
-
-**Purpose**
-- coordinated timetable change across multiple lines within the same mode  
+| Bundle type            | resource.xml                 | stop.xml                 | line_<LineId>.xml                                    | When used / Notes |
+|------------------------|------------------------------|---------------------------|-------------------------------------------------------|--------------------|
+| **BaselineDelivery**   | ✓                            | ✓                         | ✓ (all line files)                                    | Initial deployment, full refresh, yearly reset, major structural changes. |
+| **ReferenceDelivery**  | ✓                            | ✓                         | –                                                     | Only reference data changes (operators, calendars, stops). No timetable modifications. |
+| **TimetableUpdate**    | –                            | –                         | ✓ (only affected lines)                               | Adjustments limited to timetables. Must not introduce new StopPlace/Quay unless stop.xml also included. |
+| **CalendarUpdate**     | ✓ (ServiceCalendarFrame)     | –                         | ✓ (affected lines)                                    | Updates to DayTypes or operating periods requiring aligned line files. |
+| **NewStopOrLine**      | ✓ or – depending on change   | ✓ or – depending on change | ✓ (affected lines)                                    | Introduction of new stops, quays, or new commercial lines. Files included ensure resolvability of new IDs. |
+| **ModeSpecific**       | –                            | –                         | ✓ (all lines for the mode concerned)                 | Coordinated timetable update for a full mode (e.g. rail). |
 
 ---
 
