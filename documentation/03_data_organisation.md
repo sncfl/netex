@@ -34,262 +34,498 @@ This constrained structure remains fully compliant with NeTEx while providing cl
   <img src="media/publication_delivery.png" style="max-width:100%; height:auto;">
 </p>
 
-## 3.2 CompositeFrames used in the MVP
+## 3.2 File Structure and Roles
 
-The MVP profile relies on a limited subset of NeTEx frames.  
-Only the frames required for describing stops, service structures, calendars and timetables are included.
+The CFL dataset is divided into several XML files.  
+Each file has a **precise functional scope**, contains **one CompositeFrame**, and is the **only authoritative source** for the entities it defines.  
+Other files may reference these entities but must not redefine them.
 
-| Frame                       | Scope / Content                                   | Key Entities                                           |
-|-----------------------------|---------------------------------------------------|---------------------------------------------------------|
-| **ResourceFrame**           | Shared reference data reused across all files     | Codespace, Organisation, Operator, Authority, TypeOfValue, Notice |
-| **ServiceFrame (connections)** | Physical transfer connections between StopPlaces | Connection, Transfer, TransferDuration |
-| **ServiceCalendarFrame**    | Shared operating days and periods                 | DayType, OperatingPeriod, OperatingDay, DayTypeAssignment |
-| **SiteFrame**               | Stop referential                                  | StopPlace, Quay |
-| **ServiceFrame (per line)** | Line-specific service structure                   | Line, JourneyPattern, StopPointInJourneyPattern |
-| **TimetableFrame (per line)** | Line-specific timetable                         | VehicleJourney, PassingTime |
-
-Each frame is self-contained and references other frames through **stable identifiers**, ensuring consistency across the dataset.
-
-## 3.3 File publication strategy (CFL scheduled dataset)
-
-This section describes how XML files are structured and named within WP1.
-
-The CFL profile follows a multi-file strategy to ensure modularity, ease of validation, and predictable consumption by downstream systems:
-
-- All shared reference data are centralised in one file.
-- All stops and quays are centralised in a dedicated file.
-- Each commercial line has its own line-specific file grouping both the service structure and the timetable.
+This section describes for each file:
+1. the frames it contains,  
+2. the entities it defines locally,  
+3. its intended scope and usage.
 
 ---
 
-### 3.3.1 File structure
+### 3.2.1 `resource.xml` — Shared Reference Data
 
-| File name                | Frame(s) included                                                                                   | Key content (entities)                                                                      | Role                                                                                   |
-|--------------------------|-------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------|
-| **stop.xml**             | SiteFrame                                                                                            | StopPlace, Quay                                                                                | Authoritative repository of all stops and quays.                                       |
-| **line_<LineId>.xml**    | ServiceFrame<br>TimetableFrame                                                                       | Line definition, JourneyPatterns, StopPointInJourneyPattern<br>, VehicleJourney, PassingTime | Complete service and timetable for a single commercial line.                          |
-| **resource.xml**         | ResourceFrame<br>ServiceFrame (connections)<br>ServiceCalendarFrame                                   | Codespaces, Notices, shared ValueSets/Enumerations, Organisations, Operators, Calendars, Transfer connections | Central shared referential for the entire dataset.                                     |
-| **network.xml** *(optional)* | ServiceFrame (marketing- or network-level structures)                                             | Branding, GroupOfLines, possible network definitions                                           | Reserved for future use. Not delivered in WP1.                                         |
+**Frames**
+- `ResourceFrame`
+- `ServiceCalendarFrame`
+- *(optional)* `ServiceFrame` for shared transfer connections
+
+**Entities defined locally**
+- Codespaces and data source metadata  
+- Organisations, Operators, Authorities  
+- Notices and other shared textual elements  
+- TypeOfValue and other value sets or enumerations  
+- ServiceFacilitySet and shared facilities  
+- PhysicalConnection, Transfer, TransferDuration  
+- DayType, OperatingPeriod, OperatingDay, DayTypeAssignment  
+
+**Scope and role**
+- Serves as the **central shared referential** for the entire dataset  
+- Contains all elements reused across several files  
+- No stop- or line-specific entities are defined here  
 
 ---
 
-### 3.3.2 Naming rules
+### 3.2.2 `stop.xml` — Stop and Platform Referential
 
-**Shared files** use fixed names:
+**Frame**
+- `SiteFrame`
 
-- `resource.xml`  
+**Entities defined locally**
+- StopPlace  
+- Quay  
+- *(optional)* StopPlaceEquipment / SiteEquipment  
+- *(optional)* Zones if required later  
+
+**Scope and role**
+- Provides the **complete national stop register** used by all lines  
+- All stop-related identifiers referenced in other files originate here  
+
+---
+
+### 3.2.3 `line_<LineId>.xml` — Line Structure and Timetable
+
+**Frames**
+- `ServiceFrame`
+- `TimetableFrame`
+
+**Entities defined locally**
+
+**ServiceFrame**
+- Line  
+- Route, RoutePoint, PointOnRoute  
+- ServiceLink  
+- JourneyPattern  
+- StopPointInJourneyPattern  
+
+**TimetableFrame**
+- ServiceJourney  
+- VehicleJourney  
+- PassingTime  
+- *(if used)* JourneyPatternRunTimes, WaitTimes, DayTypeAssignment  
+
+**Scope and role**
+- Defines the **complete service structure and timetable** for a single commercial line  
+- Each line has its own file  
+- Several timetable periods may be grouped in one file when appropriate  
+
+---
+
+### 3.2.4 `network.xml` — Optional Network-Level Structures  
+*(Not included in WP1)*
+
+**Frames**
+- `NetworkFrame` or `ServiceFrame` (depending on future modelling choices)
+
+**Entities defined locally**
+- Network  
+- GroupsOfLines, marketing/tariff structures (future extensions)
+
+**Scope and role**
+- Reserved for future work packages  
+- Not delivered in WP1  
+
+---
+
+### 3.2.5 Summary Table
+
+| File | Frames Included | Entities Defined Locally (Authoritative) | Purpose |
+|------|-----------------|------------------------------------------|---------|
+| `resource.xml` | `ResourceFrame`, `ServiceCalendarFrame`, optional `ServiceFrame` | Operators, codespaces, notices, facilities, physical connections, calendar elements | Shared reference elements used across all files |
+| `stop.xml` | `SiteFrame` | StopPlace, Quay, equipment | National stop and platform register |
+| `line_<LineId>.xml` | `ServiceFrame` + `TimetableFrame` | Line, routes, journey patterns, vehicle journeys, passing times | Service structure and timetable of one commercial line |
+| `network.xml` (optional) | `NetworkFrame` or `ServiceFrame` | Network, groups of lines (future) | Network-level or tariff structures (not WP1) |
+
+
+## 3.3 Naming Rules
+
+This section defines the naming conventions applied to XML files in the CFL NeTEx dataset.  
+Filenames must remain predictable and stable across deliveries.
+
+---
+
+### 3.3.1 Shared files
+
+Two filenames are fixed and do not vary:
+
+- `resource.xml`
 - `stop.xml`
 
-**Line-specific files** follow the pattern:
+These filenames do not include timestamps, versions or operator names.
 
-```text
-line_<LineIdentifier>.xml
-```
+---
 
-Where `<LineIdentifier>` is derived from the Line id (e.g. the suffix of `LU:CFL:Line:8200001-8200027`).
+### 3.3.2 Line-specific files
 
-**Examples:**
+Line files follow the naming pattern:
 
+**`line_<LineIdentifier>.xml`**
+
+The `<LineIdentifier>` is derived from the identifier of the corresponding `Line` entity, typically using the suffix of the NeTEx ID (the portion appearing after `LU:CFL:Line:`).
+
+**Examples**
 - `line_8200001-8200027.xml`
 - `line_8200001-8200095-via-8200060.xml`
 
-Several TimetableFrames for the same Line may be grouped into one file.
-
-Auxiliary files for future work packages (e.g., accessibility, fares) may also be added later.
-
-#### Multi-operator notes
-
-- In a national aggregated publication, **XML filenames MUST remain operator-neutral**; operator attribution is expressed in the data (OperatorRef, AuthorityRef, etc.).
-- If multiple operators publish independently, ZIP archive names **may include the operator**, but XML filenames should remain neutral.
-- All operator codespaces (e.g. `LU:CFL`, `LU:RGTR`, `LU:TICE`) **must be declared in `resource.xml`** and used consistently.
+Multiple timetable periods for the same line may be grouped within a single file when appropriate.
 
 ---
 
-### 3.3.3 Cross-file references
+### 3.3.3 Multi-operator considerations
 
-The dataset follows a strict **“single authority per entity”** principle.
+In national aggregated publications:
 
-- `stop.xml` is the authoritative source for **StopPlace** and **Quay**.
-- `resource.xml` is authoritative for **Organisations**, **Operators**, **Codespaces**, **Notices**, **Calendars**, and **Transfer connections**.
-- `line_<LineId>.xml` files contain the authoritative definitions of **Line**, **JourneyPattern**, **VehicleJourney**, and **PassingTime**.
+- XML filenames remain **operator-neutral**.
+- Operator information must appear only inside the XML data (e.g. `OperatorRef`, `AuthorityRef`), never in filenames.
 
-Other files reference these entities using stable identifiers.
+If multiple operators publish their own ZIP archives:
 
-**Examples:**
+- The **ZIP filename** may include operator information.
+- The XML filenames **inside** the ZIP must remain stable and operator-neutral.
 
-- A `JourneyPattern` in a line file references a `Quay` defined in `stop.xml`.
-- A `VehicleJourney` references a `DayType` defined in `resource.xml`.
+---
 
-Identifiers are globally unique and always include a declared codespace:
+### 3.3.4 Codespaces
 
+All codespaces used in identifiers (e.g. `LU:CFL`, `LU:RGTR`, `LU:TICE`) must:
+
+- be declared in the `ResourceFrame` of `resource.xml`,
+- be used consistently across all files,
+- remain stable across deliveries.
+
+## 3.4 Cross-File Reference Model
+
+The CFL dataset applies a strict separation of responsibilities between files.  
+Each entity type is defined in exactly one file and referenced from other files through `…Ref` fields.  
+This ensures consistency, prevents duplication, and guarantees resolvability.
+
+---
+
+### 3.4.1 Single authoritative source per entity type
+
+Each file defines its own set of entities and is the only authoritative source for them:
+
+**stop.xml**
+- StopPlace  
+- Quay  
+- (optional) SiteEquipment  
+
+**resource.xml**
+- Codespaces  
+- Organisations, Operators, Authorities  
+- Notices  
+- TypeOfValue and value sets  
+- ServiceFacilitySet  
+- PhysicalConnection, Transfer, TransferDuration  
+- DayType, OperatingPeriod, OperatingDay, DayTypeAssignment  
+
+**line_<LineId>.xml**
+- Line  
+- Route, RoutePoint, PointOnRoute  
+- ServiceLink  
+- JourneyPattern  
+- StopPointInJourneyPattern  
+- ServiceJourney  
+- VehicleJourney  
+- PassingTime  
+
+**network.xml** *(optional)*
+- Network and network-level structures (future use only)
+
+No entity type is defined in more than one file.
+
+---
+
+### 3.4.2 Reference principles
+
+Cross-file relationships use only identifier references (`…Ref`).  
+Typical examples:
+
+- A `StopPointInJourneyPattern` references a `Quay` from `stop.xml`
+- A `ServiceJourney` references a `DayType` from `resource.xml`
+- A `Line` references an `Operator` from `resource.xml`
+
+Rules:
+- Entities defined in one file must not be redefined in another.  
+- Only `…Ref` fields may reference external entities.  
+- All referenced identifiers must be resolvable using the files in the same delivery or a previous baseline/reference delivery.  
+- Deprecated entities remain valid through versioning and temporal validity.
+
+---
+
+### 3.4.3 Identifier characteristics
+
+Identifiers used in references must be:
+
+- Globally unique  
+- Stable across deliveries  
+- Prefixed with a declared codespace  
+- Persistent (attribute changes do not change the ID)
+
+**Examples**
 - `LU:CFL:StopPlace:SP00045`
 - `LU:CFL:Quay:BASCHARAGE-SANEM-1`
 - `LU:CFL:Line:8200001-8200027`
-- `LU:CFL:VehicleJourney:V12345`
+- `LU:CFL:ServiceJourney:SJ12345`
 
-Codespaces are declared in the ResourceFrame of `resource.xml`.
-
----
-
-### 3.3.4 Separation of concerns
-
-Each file has a clearly defined role:
-
-#### **resource.xml**
-- Codespaces, organisations, operators  
-- Notices and value sets  
-- Calendars (DayTypes, OperatingPeriods, DayTypeAssignments)  
-- Transfer connections  
-
-#### **stop.xml**
-- All StopPlaces and Quays  
-- Coordinates and identifiers  
-
-#### **line_xyz.xml**
-- Line definition  
-- JourneyPatterns  
-- Logical-to-physical stop associations (ScheduledStopPoint → QuayRef)  
-- VehicleJourney definitions  
-- PassingTimes (timetable)
-- xyz corresponds to the Line identifier  
-
-This structure ensures that timetable data can always be resolved against consistent references, avoiding duplication, ambiguity, or conflicts.
-
-## 3.4 Delivery bundles
-
-This section defines how XML files are grouped into delivery bundles.  
-Not every delivery needs to include all XML files.  
-Depending on the use case, CFL will publish different delivery bundles, each packaged as a ZIP archive (see §3.5).
-
-| Bundle type            | Content                                                | When                                                         |
-|------------------------|---------------------------------------------------------|--------------------------------------------------------------|
-| **Baseline delivery**  | `resource.xml`, `stop.xml`, all `line_<LineId>.xml`     | Initial deployment, yearly resets, major structural changes. |
-| **Reference delivery** | `resource.xml`, `stop.xml`                              | Updates to reference data with no timetable changes.         |
-| **Timetable update**   | One or more `line_<LineId>.xml`                         | Time-related changes for one or several lines.               |
-| **Calendar update**    | `resource.xml` (ServiceCalendarFrame) + affected line files | Updates of operating periods or public holidays.         |
-| **New stop / new line**| Updated `stop.xml` and/or `resource.xml` + affected line files | Ensures resolvability of new identifiers.              |
-| **Mode-specific delivery** | All updated line files for one mode (e.g. Train)     | Coordinated timetable change for an entire mode.             |
+Codespaces are declared in the `ResourceFrame` of `resource.xml`.
 
 ---
 
-## 3.5 Archiving and versioning
+### 3.4.4 Cross-file reference overview
 
-Deliveries constitute official snapshots of the CFL dataset. Strict rules ensure reproducibility and trust.
+Cross-file relationships follow a simple model:
+
+- **Lines → Stops**: line files reference StopPlace/Quay in `stop.xml`  
+- **Timetables → Calendars**: timetable elements reference DayTypes and calendar primitives in `resource.xml`  
+- **Lines → Operators**: lines reference operator data declared in `resource.xml`  
+- **Codespaces → All files**: identifiers in all files use codespaces declared in `resource.xml`
+
+A diagram is provided separately to illustrate these reference flows.
+
+## 3.5 Publication Bundles
+
+Publication bundles define how XML files are grouped for delivery.  
+Each bundle is a ZIP archive containing one or more XML files.  
+The type of bundle depends on the scope of the changes being published.
+
+Bundles must remain internally consistent:  
+- all references must be resolvable;  
+- files must form a coherent snapshot.
 
 ---
 
-### 3.5.1 Archiving rules
+### 3.5.1 Bundle Types
 
-- Each delivery is a single ZIP archive.
-- XML filenames inside the ZIP follow stable naming conventions.
-- ZIP names include the bundle type and a UTC timestamp:
+#### Baseline delivery
+**Content**
+- `resource.xml`
+- `stop.xml`
+- all `line_<LineId>.xml` files
 
-```text
-LU_NeTEx_<BundleType>_<YYYYMMDDThhmmZ>.zip
-```
+**Purpose**
+- initial deployment  
+- yearly resets  
+- major structural changes  
+- synchronisation before new timetable periods  
 
-**Examples:**
+---
 
+#### Reference delivery
+**Content**
+- `resource.xml`
+- `stop.xml`
+
+**Purpose**
+- updates to shared reference data (operators, facilities, calendars, stop attributes)  
+- no timetable changes  
+
+---
+
+#### Timetable update
+**Content**
+- one or more `line_<LineId>.xml` files
+
+**Purpose**
+- adjustments limited to timetables  
+- changes affecting specific lines only  
+
+*Constraint*: must not introduce references to new stops unless the corresponding updates to `stop.xml` are included.
+
+---
+
+#### Calendar update
+**Content**
+- `resource.xml` (ServiceCalendarFrame)
+- affected `line_<LineId>.xml` files
+
+**Purpose**
+- changes to operating periods or public-holiday definitions  
+- updates to DayTypes requiring aligned timetable updates  
+
+---
+
+#### New stop / new line delivery
+**Content**
+- updated `stop.xml` and/or `resource.xml`
+- affected `line_<LineId>.xml` files
+
+**Purpose**
+- introduction of a new StopPlace or Quay  
+- creation of a new commercial line  
+- changes introducing new identifiers that must be resolvable  
+
+---
+
+#### Mode-specific delivery
+**Content**
+- all updated line files for a given mode (e.g. rail)
+
+**Purpose**
+- coordinated timetable change across multiple lines within the same mode  
+
+---
+
+### 3.5.2 Consistency Requirements
+
+- All references must be resolvable within the bundle or within a previously published baseline/reference delivery that remains valid.  
+- A timetable referencing a new StopPlace or Operator must be accompanied by the corresponding update to `stop.xml` or `resource.xml`.  
+- A bundle must not depend on unpublished or external files.  
+- Bundle composition must ensure unambiguous interpretation by consumers.
+
+---
+
+### 3.5.3 Examples of Bundle Usage
+
+- **Timetable change on Line L60 only**  
+  → bundle includes `line_<L60>.xml`
+
+- **Addition of a new platform at Luxembourg**  
+  → bundle includes updated `stop.xml` + any updated line files referencing the new quay
+
+- **New public holiday definition**  
+  → bundle includes `resource.xml` + all affected line files
+
+## 3.6 Archiving and Delivery Naming
+
+This section defines how publication bundles (ZIP archives) are named, published and archived.  
+All deliveries must remain traceable, immutable and reproducible.
+
+---
+
+### 3.6.1 ZIP Archive Format
+
+Each bundle is delivered as a single ZIP archive.
+
+Inside the ZIP:
+- XML filenames follow the conventions in section 3.3,  
+- no timestamps or versions appear in XML filenames,  
+- all XML files are placed at the root of the ZIP,  
+- filenames must not be modified across deliveries.
+
+---
+
+### 3.6.2 Naming Convention for ZIP Archives
+
+ZIP filenames follow this pattern:
+
+**`LU_NeTEx_<BundleType>_<YYYYMMDDThhmmZ>.zip`**
+
+Where:
+- `<BundleType>` is one of the defined publication types (BaselineDelivery, ReferenceDelivery, TimetableUpdate, etc.).  
+- `<YYYYMMDDThhmmZ>` is the UTC timestamp of the publication.
+
+**Examples**
 - `LU_NeTEx_BaselineDelivery_20250922T0600Z.zip`
-- `LU_NeTEx_ReferenceDelivery_20250922T0600Z.zip`
-- `LU_NeTEx_TimetableUpdate_20250922T0600Z.zip`
+- `LU_NeTEx_ReferenceDelivery_20251001T0400Z.zip`
+- `LU_NeTEx_TimetableUpdate_20251115T1800Z.zip`
 
-**Immutability:**  
-Once published, a delivery is final. Corrections are issued as a new delivery.
-
-**Retention:**  
-All deliveries are archived permanently.
+Each delivery must have a unique filename.
 
 ---
 
-### 3.5.2 Entity versioning (inside frames)
+### 3.6.3 Immutability
 
-- Each entity carries a `version` attribute.
-- A new version is created whenever an entity changes.
-- Temporal validity is tracked via `ValidFrom` / `ValidTo` or `ValidBetween`.
-- Identifiers are stable and never reused.
-- Additive change is preferred over deletion: retired entities remain in the dataset with an end of validity.
+Once published, a delivery must not be altered.
 
-**Example:**  
-StopPlace Luxembourg  
-- v1 (2018–2025)  
-- v2 (from 2025)
+Rules:
+- XML files inside a ZIP archive must not be modified.  
+- ZIP archives must not be replaced or republished under the same name.  
+- Any correction requires a new ZIP file with a new timestamp.
+
+Immutability ensures reproducibility and reliable audit tracking.
 
 ---
 
-### 3.5.3 Profile versioning (CFL NeTEx Profile)
+### 3.6.4 Retention Policy
 
-Beyond entity-level versioning, the CFL NeTEx profile itself evolves.  
-A semantic versioning scheme communicates the type of changes and their impact.
+All published deliveries must be archived permanently.
 
-**Version number format:**  
+Archived bundles serve as:
+- historical datasets,  
+- audit references,  
+- reproducible sources for past timetable reconstruction.
 
-```text
-<MAJOR>.<MINOR>.<PATCH>
-```
-
-
-- **MAJOR — Incompatible changes**  
-  Breaking changes requiring consumers to adapt.  
-  Example: `v1.4.2 → v2.0.0` if the identifier scheme changes.
-
-- **MINOR — Backward-compatible additions**  
-  New optional elements or attributes, with continued compatibility.  
-  Example: `v1.2.3 → v1.3.0` if an optional `AccessibilityFeature` is added.
-
-- **PATCH — Non-breaking corrections**  
-  Documentation fixes, corrected enumerations, etc.  
-  Example: `v1.2.3 → v1.2.4` for a ValueSet typo fix.
-
-**Governance rules:**
-
-- Every official profile release MUST have a documented version number.
-- MAJOR and MINOR increments MUST be communicated before deployment.
-- Detailed governance rules are described in Chapter 6.
+Deliveries must not be deleted unless required by legal or regulatory constraints.
 
 ---
 
-### 3.5.4 Compatibility principles
+### 3.6.5 Relationship Between Deliveries
 
-Compatibility ensures that each new delivery integrates smoothly with consumer systems and that datasets remain interpretable across time.
+- A `BaselineDelivery` replaces the previous baseline but all baselines remain archived.  
+- Updates (ReferenceDelivery, TimetableUpdate, CalendarUpdate, etc.) apply relative to the most recent baseline.  
+- Consumers interpret the current dataset using the last baseline combined with all relevant updates.
 
-#### Backward compatibility
-Backward compatibility is prioritised.
+Each published delivery must provide resolvable and consistent data.
 
-#### Resolvable references
+## 3.7 Entity Versioning
 
-A delivery MUST NOT contain references to entities absent from the current or previous baseline/reference deliveries.
+Entity versioning ensures traceability of changes across deliveries and supports reconstruction of past states of the dataset.  
+All entities defined in WP1 must include a `version` attribute and, when relevant, temporal validity information.
 
-Examples:
-- If a new StopPlace appears in `stop.xml` and a timetable references it, **both must be delivered together**.
-- A timetable MUST NOT reference a StopPlace that consumers cannot resolve.
+---
 
-#### Single authority per entity type
+### 3.7.1 Version attribute
 
-Each type of entity has exactly one authoritative source file:
+Each entity includes a `version` attribute.  
+A new version must be created whenever any aspect of the entity changes, including:
 
-- StopPlace, Quay → `stop.xml`
-- Line, JourneyPattern → `line_<LineId>.xml`
-- DayType → `resource.xml`
-- VehicleJourney → `line_<LineId>.xml`
+- descriptive fields (e.g. name),  
+- geometry or coordinates,  
+- operational attributes,  
+- structural relationships,  
+- facilities or equipment.
 
-Examples:
-- Stops must not be redefined in timetables.
-- Calendars must not be duplicated in line-specific files.
+Version values follow the NeTEx conventions (typically integers).
 
-#### Consistency of references
+---
 
-Identifiers MUST remain stable across deliveries.
+### 3.7.2 Temporal validity
 
-Examples:
-- `LU:CFL:StopPlace:Luxembourg` must appear identically in all future deliveries.
-- If the stop is renamed (“Luxembourg Gare Centrale” → “Luxembourg Central”), the identifier stays the same; only the Name changes.
+Temporal validity is expressed using:
 
-#### Integrity of bundles
+- `ValidFrom`,  
+- `ValidTo`,  
+- or `ValidBetween`.
 
-Each bundle type ensures internal consistency.
+These attributes define the period during which an entity version is applicable and allow consumers to interpret data for a given date.
 
-Examples:
-- A Calendar update includes both the updated `resource.xml` calendar elements and the affected line files.
-- A New stop / new line delivery pairs the updated reference file(s) with the corresponding timetable(s).
+---
 
+### 3.7.3 Identifier stability
+
+Identifiers remain stable across all versions of an entity.
+
+Rules:
+- A new version does **not** receive a new identifier.  
+- Identifiers are never reused for unrelated entities.  
+- Attribute changes do not alter the identifier.  
+- All versions of an entity must be identifiable through the same ID.
+
+Example:
+- `StopPlace Luxembourg`: version 1 (ValidFrom 2018–01–01, ValidTo 2025–06–30) → version 2 (ValidFrom 2025–07–01).  
+  Same ID, different versions.
+
+---
+
+### 3.7.4 Additive approach
+
+The dataset uses an additive approach:
+
+- Entities are not deleted when withdrawn.  
+- Validity periods are closed using `ValidTo`.  
+- Older versions remain present to maintain interpretability of historical timetables.
+
+---
+
+### 3.7.5 Relationship with publication bundles
+
+- A BaselineDelivery may contain only the latest version of each entity.  
+- Update bundles (TimetableUpdate, CalendarUpdate, etc.) may introduce new versions of existing entities.  
+- Previous versions remain available in archived deliveries (section 3.6).
+
+Entity versioning therefore remains consistent with the publication process.
