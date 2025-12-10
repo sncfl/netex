@@ -1,242 +1,566 @@
-## 4. Description of Frames used in WP1
+# 4. Frames and Entities Used in the MVP
 
-### 4.1. Purpose and Overview
+## 4.1 Overview of Frames Used in the MVP
 
-This chapter provides a detailed description of each NeTEx frame used in the CFL profile for the MVP.  
-While the previous chapter explained how data are organized and exchanged across files, this section focuses on the internal structure and purpose of each frame within the dataset.
+The MVP relies on a focused subset of NeTEx frames.
+Each frame groups entities that share a common conceptual scope (referentials, stops, service structure, timetables, calendars).
+The table below summarises the frames used and their purposes.
 
-Each frame is described with its **scope**, **key entities**, **dependencies**, and **level of implementation** in the MVP.  
-Common modelling principles applicable to all frames are summarized at the end of this chapter, before moving on to the interactions between them.
+| Frame | Conceptual scope | Key entities (MVP) | Purpose |
+|-------|------------------|---------------------|---------|
+| **ResourceFrame** | Shared reference data | Codespace, Operator, Notice, ValueSet, Calendar primitives | Provides global identifiers, shared definitions and calendar elements. |
+| **ServiceCalendarFrame** | Calendar definitions | DayType, OperatingPeriod, OperatingDay, DayTypeAssignment | Defines the operational calendar used by all scheduled circulations. |
+| **SiteFrame** | Stop referential | StopPlace, Quay | Provides the authoritative registry of stops and quays. |
+| **ServiceFrame (per line)** | Service structure | Line, JourneyPattern, StopPointInJourneyPattern | Defines the public line identity and stop sequences for each pattern. |
+| **TimetableFrame** | Scheduled times | VehicleJourney, PassingTime | Describes planned train circulations and their scheduled times. |
 
----
-
-### 4.2. ResourceFrame
-
-#### Purpose and scope
-
-The **ResourceFrame** gathers the reference data and common reusable definitions used by all other frames.  
-It defines organizations, operators, roles, and various classification types that provide context and identifiers for other datasets.
-
-In the CFL NeTEx profile, the ResourceFrame acts as the **core reference layer**, ensuring consistent identifiers and terminology across Site, Service, and Timetable frames.
-
-#### Key entities included in WP1
-
-| Entity                           | Definition                                                | Typical usage                                                         | Mandatory (MVP) |
-|----------------------------------|----------------------------------------------------------|------------------------------------------------------------------------|-----------------|
-| Organisation                     | Legal or administrative structure involved in transport operations. | Defines CFL and other operators participating in the multimodal dataset. | ✅ |
-| Operator                         | Organisation responsible for operating services.         | Used as reference in Line and ServiceJourney elements.                | ✅ |
-| Authority                        | Public transport authority managing the network or lines.| Defines the regulatory context (e.g. Ministry of Mobility).           | ✅ |
-| ResponsibilityRoleAssignment     | Allocation of a role (e.g., Operator, DataProvider).     | Links organisations to their functions.                               | ✅ |
-| TypeOfFrame / TypeOfValue / TypeOfEntity | Classification or metadata definitions.           | Defines controlled vocabularies for modes, service types, etc.        | Optional |
-| UnitsOfMeasure, Currency, CountryRef | Common reference data.                            | Shared across frames for standardisation.                             | Optional |
-
-#### Dependencies
-
-- All other frames (*SiteFrame*, *ServiceFrame*, *TimetableFrame*) reference entities defined here.  
-- Identifiers must use the **CFL codespace** (`LU:CFL:` prefix) and remain stable over time to ensure traceability and versioning consistency.
-
-#### MVP scope
-
-In the MVP, the ResourceFrame includes only the **core entities** necessary for timetable publication (Operator, Organisation, Authority, ResponsibilityRoleAssignment).  
-Extended reference data (e.g., detailed responsibilities, value sets, or external organisations) will be included in later extensions.
-
-#### Future extensions
-
-- **WP3 (Accessibility):** add accessibility classification types and mobility aids.  
-- **WP4 (Tariff):** add fare structures, value sets for tariffs and currencies.  
-- **WP5 (New modes):** add additional operators or authority references for emerging modes.
-
----
-### 4.3. SiteFrame
-
-#### 4.3.1. Purpose and Scope
-
-The SiteFrame describes the physical topology of the network: all places where passengers can access or leave the transport system.  
-It models stops, quays, entrances, accesses, and their relationships, and defines how these places are organised into larger complexes such as stations or multimodal hubs.
-
-In CFL’s NeTEx profile, the SiteFrame serves as the **geographical and spatial reference layer** for all journeys.  
-Each StopPlace and Quay defined here provides the physical anchor points referenced later in the ServiceFrame and TimetableFrame.
-
-
-#### 4.3.2. Key Entities Included in WP1
-
-| Entity               | Definition                                                               | Typical usage                                           | Mandatory (MVP) |
-|----------------------|---------------------------------------------------------------------------|----------------------------------------------------------|-----------------|
-| StopPlace            | A named place where passengers can board or alight. May include multiple quays. | Represents CFL stations and multimodal interchanges. | ✅ |
-| Quay                 | A physical boarding area or platform associated with a StopPlace.        | Used in StopPointInJourneyPattern references.          | ✅ |
-| AccessSpace / Entrance | Access zones and entrances to the StopPlace.                          | Optional in WP1; foreseen for accessibility extensions.| ❌ |
-| TopographicPlace     | Geographic reference (city, area) associated with the StopPlace.         | Optional in WP1; Enables geographical grouping of stops.                | ❌ |
-| PlaceEquipment / Parking / BikeParking | Facilities associated with stops.                     | Out of WP1 scope; to be included in WP3.               | ❌ |
-| GroupOfStopPlaces    | Logical grouping (e.g. multimodal interchange).                          | Will be used for complex sites with multiple modes.    | ❌ |
-
-
-#### 4.3.3. Transfer and Connection Modelling (Transfer Times / “Temps de battement”)
-
-The SiteFrame also hosts the description of **intra-site transfer possibilities** — the time needed for passengers to walk between two boarding areas or to connect between services within the same station.
-
-These durations, sometimes called *minimum transfer times* or *temps de battement*, are modelled in NeTEx using **Connection** or **Transfer** elements, located inside the SiteFrame.
-
-| Element                           | Definition                                                                 | Typical usage                                                                 | Mandatory (MVP) |
-|-----------------------------------|---------------------------------------------------------------------------|-------------------------------------------------------------------------------|------------------|
-| Connection / Transfer             | Logical link between two StopPlaces or two Quays, with an associated transfer duration. | Used to express the minimum interchange time between platforms or services within the same station. | ✅ (at StopPlace level) |
-| TransferDuration                  | Duration of the connection, expressed as ISO 8601 duration.              | Represents the battement known in SIV for each station.                       | ✅ |
-| MobilityRestrictedTravellerDuration | Alternative duration for passengers with reduced mobility.             | To be added in WP3 (Accessibility).                                           | ❌ |
-
-Additional modelling rules:
-
-- In WP1, transfer durations are defined **at StopPlace level** (not per Quay), as CFL systems (e.g., SIV) provide one battement per commercial stop.  
-- Each Connection or Transfer shall link a **StopPlace to itself** (`FromStopPlaceRef = ToStopPlaceRef`), with the applicable duration.  
-- The attribute `TransferDuration` is expressed in **ISO 8601 format** (e.g., `PT5M` = 5 minutes).  
-- More detailed modelling between individual Quays may be introduced in WP3 when accessibility data are included.
-
-
-#### 4.3.4. XML Example
-
-```xml
-<SiteFrame id="LU:SITE:FRAME:1" version="1">
-  <connections>
-    <Connection id="LU:CONNECTION:NOERTZANGE_INTRA" version="1">
-      <From>
-        <StopPlaceRef ref="LU:STOPPLACE:NOERTZANGE"/>
-      </From>
-      <To>
-        <StopPlaceRef ref="LU:STOPPLACE:NOERTZANGE"/>
-      </To>
-      <TransferDuration>PT5M</TransferDuration>
-    </Connection>
-  </connections>
-</SiteFrame>
-```
-
-This Connection expresses that within the station Noertzange, passengers need at least 5 minutes to transfer between trains.  
-This value corresponds to the *temps de battement* maintained in SIV.
-
-#### Dependencies
-
-- Referenced by **ServiceFrame** (through *StopPointInJourneyPattern → QuayRef*).  
-- May reference entities in **ResourceFrame** (Operator, Authority).  
-- Coordinates, identifiers, and names must remain stable across updates to ensure interoperability with SIRI and downstream systems.
-
-#### MVP scope
-
-WP1 focuses on:
-
-- StopPlace and Quay objects for the national rail network.  
-- Core attributes (identifier, name, coordinates, StopPlaceType, PublicCode).  
-- Optional multilingual names (FR, DE, EN, LU) when available.  
-
-Other detailed structures (Accessibility, Facilities, Equipment) are deferred to future work packages.
-
-#### Future extensions
-
-- **WP3:** accessibility attributes (lifts, tactile guidance, mobility aid access).  
-- **WP4:** integration with fare zones and tariff references.  
-- **WP5:** expansion to new modes (bus, tram, bike-box, park&ride sites).
-
-
-### 4.4. ServiceFrame
-
-#### Purpose and scope
-
-The **ServiceFrame** contains the operational definition of the public-transport offer, including Lines, JourneyPatterns, StopPointsInJourneyPattern, and related entities.
-
-In the Luxembourg WP1 profile, the ServiceFrame is the central frame describing:
-
-- the logical structure of the timetable offer,  
-- the sequence of stops served,  
-- the public identity of services (*Line*),  
-- the terminus and via information,  
-- the references used later in the ServiceCalendarFrame and TimetableFrame.
-
-Since **no NetworkFrame is used in WP1**, the ServiceFrame is also the place where **Lines are defined**, following the specific modelling principles of the CFL profile.
-
-#### Key entities included in WP1
-
-| Entity                     | Definition                                         | Typical usage                                             | Mandatory (MVP) |
-|----------------------------|-----------------------------------------------------|------------------------------------------------------------|-----------------|
-| Line                       | Public axis defined by an origin–destination pair. | Provides public identity and service classification for all JourneyPatterns and ServiceJourneys. | ✅ |
-| JourneyPattern             | Ordered sequence of stop points describing the service pattern. | Used as reference in ServiceJourney. | ✅ |
-| StopPointInJourneyPattern  | Specific stop in the pattern, pointing to a Quay. | Defines stop sequence for each pattern. | ✅ |
-| DestinationDisplayRef      | Reference to destination display (if used).        | Optional. | ❌ |
-
-
-#### Modelling of Lines in the CFL profile
-
-The CFL profile defines **Line** as:
-
-> A public axis represented by an ordered pair of major stops, identified using UIC origin and destination codes (optionally with “via”).
-
-The Line is **not** a container for route geometry and does **not** define multiple routes.
-
-Therefore:
-
-- A Line does **not** reference `Route` / `RoutePoint` / `PointOnRoute`, as no NetworkFrame is used.  
-- A Line acts as a **classification** and **public identity**.  
-- All service topology is expressed only through **JourneyPatterns**.
-
-**Example:**
-
-- **Line Name:** Luxembourg – Arlon  
-- **Line ID:** `LU:CFL:Line:0800_0840` (example using UIC codes)  
-- The RB/RE/IC information is **not** included in `Line`; it is a *ServiceClassification* of the *ServiceJourney*.
+This overview introduces the frames that are described in detail in sections 4.2 to 4.6.
 
 ---
 
-#### Dependencies
+## 4.2 ResourceFrame
 
-- **SiteFrame**, for Quay references used in StopPointInJourneyPattern  
-- **ResourceFrame**, for Operator, Organisation, ResponsibilityRole  
-- **ServiceCalendarFrame**, indirectly, via the TimetableFrame  
-
----
-
-#### MVP scope
-
-WP1 defines a limited set of **JourneyPatterns per Line**, with StopPointsInJourneyPattern referencing Quays in SiteFrame.  
-Only elements required to describe a **regular scheduled service** are included.
+The ResourceFrame contains the cross-cutting reference data required to interpret all other frames.  
+It defines the common concepts that are reused throughout the dataset: identifiers, organisations, shared textual elements and calendar primitives.
 
 ---
 
-#### Future extensions
+### 4.2.1 Scope
 
-- **WP3:** accessibility data associated with JourneyPatterns.  
-- **WP4:** fare-relevant references (e.g. TariffZones).  
-- **WP5:** multi-modal patterns and flexible services.
+The ResourceFrame groups the elements that:
 
-#### 4.X. XML Example (ServiceFrame)
+- are referenced by multiple frames (SiteFrame, ServiceFrame, TimetableFrame);
+- ensure consistent interpretation of identifiers and categories;
+- provide shared domain definitions (e.g. calendars, notices, controlled vocabularies).
 
-```xml
-<ServiceFrame id="LU:SERVICE:FRAME:1" version="1">
+Only concepts strictly required for the MVP timetable modelling are included.
 
-  <!-- Line: public axis Luxembourg – Arlon -->
-  <lines>
-    <Line id="LU:CFL:Line:0800_0840" version="1">
-      <Name>Luxembourg – Arlon</Name>
-      <PublicCode>0800_0840</PublicCode>
-      <OperatorRef ref="LU:OPERATOR:CFL"/>
-    </Line>
-  </lines>
+---
 
-  <!-- JourneyPattern: sequence of stops for the service -->
-  <journeyPatterns>
-    <JourneyPattern id="LU:JP:0800_0840:1" version="1">
-      <Name>Luxembourg – Arlon Pattern</Name>
-      <pointsInSequence>
-        <StopPointInJourneyPattern id="LU:SPJP:LUX:1" order="1" version="1">
-          <ScheduledStopPointRef ref="LU:SSP:LUXEMBOURG:Q1"/>
-        </StopPointInJourneyPattern>
+### 4.2.2 Entities used in the MVP profile
 
-        <StopPointInJourneyPattern id="LU:SPJP:NOERTZANGE:2" order="2" version="1">
-          <ScheduledStopPointRef ref="LU:SSP:NOERTZANGE:Q1"/>
-        </StopPointInJourneyPattern>
+**Identification structures**  
+- Codespace  
+- (Optional) ResponsibilitySet
 
-        <StopPointInJourneyPattern id="LU:SPJP:ARLON:3" order="3" version="1">
-          <ScheduledStopPointRef ref="LU:SSP:ARLON:Q1"/>
-        </StopPointInJourneyPattern>
-      </pointsInSequence>
-    </JourneyPattern>
-  </journeyPatterns>
+**Organisational data**  
+- Operator (CFL)  
+- Organisation / Authority (minimal use, only if structurally required)
 
-</ServiceFrame>
+**Shared textual and categorical elements**  
+- Notice  
+- ValueSet / TypeOfValue
+
+**Calendar model**  
+- DayType  
+- OperatingPeriod  
+- OperatingDay  
+- DayTypeAssignment  
+
+These elements form the base calendar model used by all ServiceJourneys.
+
+**Transfer connections** *(included only if modelled in MVP)*  
+- Connection  
+- Transfer  
+- TransferDuration
+
+---
+
+### 4.2.3 Modelling rules (CFL MVP)
+
+- All identifiers use codespaces declared in the ResourceFrame.
+- Only elements with cross-cutting meaning are placed in the ResourceFrame.
+- CFL is the sole Operator in MVP.
+- DayTypes encode operational categories (e.g. weekdays, weekends, holidays).
+- OperatingPeriods, OperatingDays and DayTypeAssignments define the validity calendar.
+- Notices and value sets may be referenced from multiple frames.
+
+---
+
+### 4.2.4 Scope limitations
+
+The ResourceFrame includes only the elements required for modelling CFL’s scheduled offer in MVP.  
+Additional functional domains (accessibility, fares, real-time…) are out of scope at this stage.
+
+---
+
+## 4.3 ServiceCalendarFrame
+
+The ServiceCalendarFrame provides the calendar structures used to describe the operational validity of services.  
+It defines the temporal components required to express which days a service operates, on which periods the timetable applies, and how exceptional dates are handled.
+
+This frame acts as the temporal backbone of the timetable model in MVP.
+
+---
+
+### 4.3.1 Scope
+
+The ServiceCalendarFrame groups the elements that define:
+
+- categories of operational days (day types),
+- periods of validity (continuous date ranges),
+- individual dates (operating days),
+- how day types are assigned to dates.
+
+Its purpose is to supply a unified, reusable calendar model shared by all ServiceJourneys.
+
+This separation ensures that the service structure (ServiceFrame) and the timetable (TimetableFrame) can reference a stable, centralised calendar.
+
+---
+
+### 4.3.2 Entities used in MVP
+
+The MVP profile uses the core NeTEx calendar primitives:
+
+#### **DayType**
+Represents a category of days (e.g. weekday, weekend, specific holiday group).  
+Used by ServiceJourney and VehicleJourney to indicate the type of days on which they run.
+
+#### **OperatingPeriod**
+Defines continuous date ranges during which services operate (e.g. "01/12/2025–14/12/2025" for a seasonal timetable).
+
+#### **OperatingDay**
+Represents a specific calendar date (ISO day).  
+Used for exceptions or precise modelling of validity ranges.
+
+#### **DayTypeAssignment**
+Links DayTypes to specific dates or date ranges.  
+Enables modelling of:
+
+- regular patterns (weekday, weekend),
+- special days (public holidays),
+- exceptional additions or removals of service.
+
+---
+
+### 4.3.3 Modelling rules (CFL MVP)
+
+The calendar model in the MVP follows these principles:
+
+- **DayTypes express categories of days**, not specific dates.  
+  Examples: weekday, weekend, public holiday.
+
+- **OperatingPeriods express continuous ranges** on which a timetable is valid.  
+  Periods are used to limit the validity of a timetable dataset (e.g. summer season).
+
+- **OperatingDays express individual dates** when fine-grained control is needed.
+
+- **DayTypeAssignments combine all components**, ensuring that each date can be interpreted unambiguously.
+
+- **DayTypes referenced by ServiceJourneys** must be defined in the ServiceCalendarFrame.
+
+- **Calendar definitions must be consistent across all lines**: a DayType represents the same concept for all services.
+
+This approach ensures predictable, reusable calendar structures across the entire CFL dataset.
+
+---
+
+### 4.3.4 Scope limitations
+
+The ServiceCalendarFrame in the MVP includes only the elements necessary to support scheduled services.  
+It does not model:
+
+- real-time operating days,
+- school calendars or agency-specific calendars,
+- fare calendars,
+- resource availability calendars.
+
+These elements may be modelled later if required, but are outside the scope of MVP.
+
+---
+
+## 4.4 SiteFrame
+
+The SiteFrame contains the geographical and operational definition of stops used in the CFL dataset.  
+It provides the spatial structure needed to describe where services operate: stations, platforms, quays, and their associated identifiers.
+
+This frame forms the authoritative stop referential for the MVP.
+
+---
+
+### 4.4.1 Scope
+
+The SiteFrame models the components that describe:
+
+- the physical and logical structure of stops and stations,
+- the access points used by services (quays/platform edges),
+- the associated identifiers, names and coordinates.
+
+It defines the stop topology independently from any specific line or timetable.  
+ServiceFrames and TimetableFrames refer to the stop elements defined here.
+
+---
+
+### 4.4.2 Entities used in MVP
+
+The MVP focuses on the core stop entities required for scheduled services:
+
+#### **StopPlace**
+Represents a station or stop area.  
+Key roles in MVP:
+- defines the geographical location of a stop,
+- groups one or several quays,
+- provides the stable, public-facing stop identity.
+
+Typical attributes:
+- Name  
+- ShortName / PublicCode  
+- Centroid (coordinates)  
+- StopPlaceType (e.g. “railStation”)  
+- Multilingual names (if available)
+
+#### **Quay**
+Represents a platform edge or boarding position within a StopPlace.  
+It is the physical point at which a ServiceJourney stops.
+
+Key roles:
+- the primary reference used in JourneyPatterns and PassingTimes,
+- uniquely identifies the physical platform used for boarding/alighting.
+
+Typical attributes:
+- Name  
+- PublicCode (e.g. platform number)  
+- QuayType  
+- Coordinates (if relevant)
+
+#### **(Optional) Topographic or grouping structures**
+The MVP profile can include:
+- **GroupOfStopPlaces** (if grouping several StopPlaces is required),  
+but only when necessary for multimodal coherence within CFL.
+
+The MVP does **not** model complex hierarchies beyond what is strictly required for CFL stops.
+
+---
+
+### 4.4.3 Modelling rules (CFL MVP)
+
+- **StopPlace is the authoritative public identity** of a stop.  
+  Quays belong to exactly one StopPlace.
+
+- **Identifiers for StopPlace and Quay are stable** and use CFL codespaces declared in the ResourceFrame.
+
+- **Geographical coordinates are attached to StopPlace**  
+  (Quays may also carry coordinates if required for precision).
+
+- **Quays represent boarding positions, not sector boards.**  
+  Sector-level information (e.g., A/B/C) is not modelled in MVP unless explicitly needed.
+
+- **Multilingual naming is optional**  
+  and included only when available in source systems.
+
+- **Stop topology is line-independent.**  
+  A StopPlace must be defined once, regardless of the number of lines serving it.
+
+---
+
+### 4.4.4 Scope limitations
+
+The SiteFrame in the MVP does **not** include:
+
+- detailed accessibility features (WP3 scope),  
+- detailed station equipment or facilities,  
+- internal station topology (paths, entrances, lifts),
+- fare zones or commercial areas,
+- 3D geometry or indoor navigation structures.
+
+The MVP restricts itself to the elements required for describing stop identity and platform references.
+
+---
+
+## 4.5 ServiceFrame (per line)
+
+The ServiceFrame describes the logical service structure of a line.  
+It defines the public service axis, the patterns followed by services, and the ordered sequence of stops used by scheduled journeys.  
+This frame acts as the structural layer between the stop referential (SiteFrame) and the timetable (TimetableFrame).
+
+---
+
+### 4.5.1 Scope
+
+The ServiceFrame models the **service structure independently from time and calendar**.  
+It provides:
+
+- the **public-facing identity** of the line,  
+- one or more **JourneyPatterns** representing service variants,  
+- the ordered **StopPointInJourneyPattern** elements forming each pattern.
+
+This structure is reused by all `VehicleJourney` instances belonging to the same line.
+
+---
+
+### 4.5.2 Entities used in the MVP
+
+#### **Line**
+Represents the public-facing axis of the service (e.g. Luxembourg–Arlon).  
+It provides the stable identity under which all JourneyPatterns and VehicleJourneys of the line are grouped.
+
+Typical attributes:
+- Name  
+- Description (optional)  
+- Public-facing codes or service classification (e.g. RB/RE/IC), where relevant  
+- OperatorRef (CFL)
+
+---
+
+#### **JourneyPattern**
+Represents an ordered sequence of stops served by a particular pattern of the line.  
+A line may have several JourneyPatterns to represent:
+- full-length services,  
+- partial or short-turn services,  
+- variants skipping certain stops.
+
+JourneyPatterns structure the relationship between the line and the timetable.
+
+---
+
+#### **StopPointInJourneyPattern**
+Represents a single stop within a JourneyPattern.  
+It:
+
+- references a Quay (from the SiteFrame),  
+- provides the order of stops,  
+- forms the anchor point for PassingTimes in the TimetableFrame.
+
+It is the lowest-level structural element used to attach timing information.
+
+---
+
+### 4.5.3 Modelling rules (MVP)
+
+- The ServiceFrame contains **exactly one Line**.  
+- All JourneyPatterns defined in the frame must belong to this Line.  
+- JourneyPatterns represent **service variants**, not route geometry.  
+- StopPointInJourneyPattern must always reference a **Quay** (no alternative stop representation is used).  
+- Public codes such as RB/RE/IC express **service classification** and are not part of the Line identifier.  
+- The ServiceFrame remains independent from calendar definitions and from timing information.  
+  ServiceJourneys refer to a JourneyPattern and apply time data through the TimetableFrame.
+
+---
+
+### 4.5.4 Scope limitations
+
+The MVP ServiceFrame does **not** model:
+
+- route geometry or network topology,  
+- operational train paths,  
+- consist or composition information,  
+- platform sectors or sub-quay subdivisions,  
+- intermodal structures,  
+- operational rules or signalling constraints.
+
+Its purpose is limited to the **logical service structure** required for associating stops and scheduled times within a Line.
+
+---
+
+## 4.6 TimetableFrame
+
+The **TimetableFrame** describes the scheduled operation of services.  
+It provides the **temporal dimension** of the offer by modelling the planned circulations of vehicles and the times at which they reach each stop defined in the ServiceFrame.
+
+It depends on three other frames:
+
+- the **SiteFrame**, which defines the stop topology;  
+- the **ServiceFrame**, which defines the logical service structure (Line, JourneyPattern, StopPointInJourneyPattern);  
+- the **ServiceCalendarFrame**, which defines the operating days (DayTypes, OperatingPeriods, OperatingDays).
+
+The TimetableFrame does not define structural or calendar elements.  
+Its role is to express **when** each circulation operates and **what times** it observes at each stop.
+
+---
+
+### 4.6.1 Scope
+
+The TimetableFrame contains all elements required to represent:
+
+- individual scheduled circulations (**VehicleJourney**),  
+- the sequence of planned times at each stop (**PassingTime**),  
+- the association of each circulation with operational days (**DayTypeRef**),  
+- the alignment between temporal data and the service structure.
+
+In the MVP, this frame is limited to the **publicly published timetable information**.  
+No operational-level structures are included.
+
+---
+
+### 4.6.2 Entities used in the MVP
+
+#### **VehicleJourney**
+
+A `VehicleJourney` represents **one planned circulation** of a CFL vehicle (typically a train).  
+It corresponds to the public-facing notion of a departure following a specific pattern at scheduled times.
+
+A `VehicleJourney`:
+
+- references **exactly one `JourneyPattern`**,  
+- references **one or more `DayTypes`** via `DayTypeRef`,  
+- contains one `PassingTime` element per `StopPointInJourneyPattern`.
+
+**Typical attributes:**
+
+- `JourneyPatternRef` (mandatory)  
+- `DayTypeRef` (one or more)  
+- optional public identifiers (e.g. train number)  
+
+In the MVP, **VehicleJourney is the primary timetable entity**.  
+`ServiceJourney` is not used.
+
+---
+
+#### **PassingTime**
+
+A `PassingTime` represents the scheduled time a VehicleJourney:
+
+- arrives at a stop,  
+- departs from a stop,  
+- or passes through it.
+
+Each `PassingTime`:
+
+- is attached to one `StopPointInJourneyPattern`,  
+- provides `ArrivalTime` and/or `DepartureTime`,  
+- must follow the exact order defined by the `JourneyPattern`.
+
+`PassingTime` elements provide the essential temporal information of the timetable.
+
+---
+
+#### **(Optional) Additional operational identifiers**
+
+The MVP may include operational identifiers **only if strictly required**, such as:
+
+- train number,  
+- mission identifier,  
+- block number.
+
+No further operational modelling is included.
+
+---
+
+### 4.6.3 Modelling rules (MVP)
+
+#### **Link between structure and timetable**
+
+- Each `VehicleJourney` must reference **one `JourneyPattern`**.  
+- All `PassingTime` elements must match the stop sequence of that JourneyPattern.  
+- No `PassingTime` may exist without a corresponding `StopPointInJourneyPattern`.
+
+The structural and temporal models must remain fully aligned.
+
+---
+
+#### **Calendar association**
+
+- Each `VehicleJourney` must reference **at least one `DayType`**.  
+- `DayTypeRef` defines operational validity.  
+- DayTypeAssignments from the ServiceCalendarFrame provide the actual list of operating dates.
+
+No validity information is carried directly in the TimetableFrame.
+
+---
+
+#### **Temporal consistency**
+
+- `ArrivalTime` and `DepartureTime` must be consistent and non-contradictory.  
+- `PassingTime` elements must form a coherent sequence (no negative travel times).  
+- Times must be present for all stops actually served.
+
+---
+
+#### **VehicleJourney as the primary unit**
+
+In the MVP:
+
+- **VehicleJourney is the sole representation of scheduled services**,  
+- no `ServiceJourney` is defined,  
+- no operational decomposition or rolling-stock assignment is modelled.
+
+---
+
+### 4.6.4 Scope limitations
+
+The TimetableFrame does **not** include:
+
+- real-time information or predictions,  
+- service deviations or temporary alterations,  
+- dynamic platforming or sector-level platform assignments,  
+- consist/rolling-stock details,  
+- crew or duty planning,  
+- operational timing constraints (minimum dwell, margins).
+
+Its scope is intentionally limited to **planned, published timetable data**.
+
+## 4.7 Summary table :  Entities used in the MVP
+
+| Entity | Frame | Definition | Role in the MVP | Mandatory |
+|--------|--------|-------------|------------------|-----------|
+| **Codespace** | ResourceFrame | Namespace defining the scope of identifiers. | Ensures global uniqueness of all IDs. | ✅ |
+| **Operator** | ResourceFrame | Organisation running the service. | Identifies CFL as service provider. | ✅ |
+| **Notice** | ResourceFrame | Shared textual note. | Optional informational messages. | ⚪ Optional |
+| **DayType** | ServiceCalendarFrame | Category of operating days. | Associates VehicleJourneys with the calendar. | ✅ |
+| **OperatingPeriod** | ServiceCalendarFrame | Continuous date range. | Defines long-term validity spans. | ⚪ Optional |
+| **OperatingDay** | ServiceCalendarFrame | Single calendar date. | Used when dates must be enumerated. | ⚪ Optional |
+| **DayTypeAssignment** | ServiceCalendarFrame | Assignment of DayType to specific dates. | Produces the final operational calendar. | ✅ |
+| **StopPlace** | SiteFrame | Station or stop area. | Public identity of a stop. | ✅ |
+| **Quay** | SiteFrame | Boarding point / platform edge. | Referenced by StopPointInJourneyPattern. | ✅ |
+| **Line** | ServiceFrame | Public axis of service (e.g. “Luxembourg–Arlon”). | Groups all patterns and journeys of the line. | ✅ |
+| **JourneyPattern** | ServiceFrame | Ordered sequence of stops for a service variant. | Structural reference for VehicleJourneys. | ✅ |
+| **StopPointInJourneyPattern** | ServiceFrame | One stop in the pattern referencing a Quay. | Defines stop order used by PassingTimes. | ✅ |
+| **VehicleJourney** | TimetableFrame | One scheduled circulation of a vehicle. | Core unit of the timetable (planned run). | ✅ |
+| **PassingTime** | TimetableFrame | Arrival/departure time at a stop. | Provides the temporal dimension of the timetable. | ✅ |
+
+---
+
+### 4.8 Summary of frame interactions
+
+The frames described in this chapter are not isolated components:  
+they work together to form a coherent, structured timetable dataset.  
+This section provides a visual summary of how the main frames relate to one another and how information flows between them.
+
+- **SiteFrame** defines the physical locations used by services (StopPlace, Quay).  
+- **ServiceFrame** reuses these locations to define the logical service structure (Line, JourneyPattern).  
+- **TimetableFrame** instantiates concrete journeys and their times (VehicleJourney, PassingTime).  
+- **ServiceCalendarFrame** defines when these journeys operate (DayType, OperatingPeriod).  
+- **ResourceFrame** provides shared metadata required by all other frames (Codespace, Operator, Notices).
+
+The diagram below summarises these interactions:
+
+```mermaid
+flowchart LR
+    subgraph SITE ["SiteFrame"]
+        S1["StopPlace"]
+        S2["Quay"]
+    end
+
+    subgraph SERVICE ["ServiceFrame"]
+        J1["JourneyPattern"]
+        J2["StopPointInJourneyPattern"]
+        L1["Line"]
+    end
+
+    subgraph TIMETABLE ["TimetableFrame"]
+        V1["VehicleJourney"]
+        P1["PassingTime"]
+    end
+
+    subgraph CAL ["ServiceCalendarFrame"]
+        C1["DayType"]
+        C2["OperatingPeriod"]
+    end
+
+    subgraph RES ["ResourceFrame"]
+        R1["Codespace"]
+        R2["Operator"]
+        R3["Notice"]
+    end
+
+    S2 --> J2
+    J2 --> P1
+    J1 --> V1
+    C1 --> V1
+
+    RES -. reused by .- SITE
+    RES -. reused by .- SERVICE
+    RES -. reused by .- TIMETABLE
+    RES -. reused by .- CAL
 ```
 
