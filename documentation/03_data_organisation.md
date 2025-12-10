@@ -30,9 +30,26 @@ Although NeTEx permits combining multiple business frames within a CompositeFram
 
 This constrained structure remains fully compliant with NeTEx while providing clearer boundaries between responsibilities of each file.
 
-<p align="center">
-  <img src="media/publication_delivery.png" style="max-width:100%; height:auto;">
-</p>
+```mermaid
+flowchart TD
+    FILE["XML file"]
+
+    FILE --> PD[PublicationDelivery]
+
+    PD --> META["Metadata<br/>• PublicationTimestamp<br/>• ParticipantRef<br/>• Description"]
+
+    PD --> CF[CompositeFrame]
+
+    subgraph FRAMES ["Business Frames"]
+        RF[ResourceFrame]
+        SF[ServiceFrame]
+        SCF[ServiceCalendarFrame]
+        SITEF[SiteFrame]
+        TT[TimetableFrame]
+    end
+
+    CF --> FRAMES
+```
 
 ---
 
