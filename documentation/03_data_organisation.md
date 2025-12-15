@@ -1,4 +1,4 @@
-# 3. Organisation of Data
+# 3. Data organisation
 
 ## 3.1 PublicationDelivery (the exchange envelope)
 
@@ -32,31 +32,45 @@ This constrained structure remains fully compliant with NeTEx while providing cl
 
 ```mermaid
 flowchart TD
-    FILE["XML file"]
 
-    FILE --> PD[PublicationDelivery]
+%% Grand cadre = fichier XML
+subgraph XML["XML file"]
 
-    PD --> META["Metadata<br/>• PublicationTimestamp<br/>• ParticipantRef<br/>• Description"]
+    %% PublicationDelivery
+    subgraph PD["PublicationDelivery"]
 
-    PD --> CF[CompositeFrame]
+        %% Metadata
+        subgraph META["Metadata"]
+            note1["• PublicationTimestamp"]
+            note2["• ParticipantRef"]
+            note3["• Description"]
+        end
 
-    subgraph FRAMES ["Business Frames"]
-        RF[ResourceFrame]
-        SF[ServiceFrame]
-        SCF[ServiceCalendarFrame]
-        SITEF[SiteFrame]
-        TT[TimetableFrame]
+        %% CompositeFrame
+        subgraph CF["CompositeFrame"]
+
+            %% Business Frames directement imbriquées
+            RF["ResourceFrame"]
+            SF["ServiceFrame"]
+            SCF["ServiceCalendarFrame"]
+            SITEF["SiteFrame"]
+            TT["TimetableFrame"]
+
+        end
+
     end
 
-    CF --> FRAMES
+end
+
+
 ```
 
 ---
 
 ## 3.2 File Structure and Roles
 
-The CFL dataset is divided into several XML files.  
-Each file has a **precise functional scope**, contains **one CompositeFrame**, and is the **only authoritative source** for the entities it defines.  
+The CFL MVP dataset is divided into three XML files.  
+Each file has a **defined functional scope**, contains **one CompositeFrame**, and is the **authoritative source** for the entities it defines.  
 Other files may reference these entities but must not redefine them.
 
 This section describes for each file:
@@ -66,104 +80,81 @@ This section describes for each file:
 
 ---
 
-### 3.2.1 `resource.xml` — Shared Reference Data
+### 3.2.1 `resource.xml` — Shared reference data
 
 **Frames**
 - `ResourceFrame`
 - `ServiceCalendarFrame`
 - *(optional)* `ServiceFrame` for shared transfer connections
 
-**Entities defined locally**
-- Codespaces and data source metadata  
-- Organisations, Operators, Authorities  
-- Notices and other shared textual elements  
-- TypeOfValue and other value sets or enumerations  
-- ServiceFacilitySet and shared facilities  
-- PhysicalConnection, Transfer, TransferDuration  
-- DayType, OperatingPeriod, OperatingDay, DayTypeAssignment  
+**Entities defined locally (authoritative)**
+- Codespaces and other dataset-wide reference objects (e.g. Operator)
+- Calendar primitives shared across all lines:
+  - DayType
+  - OperatingPeriod
+  - DayTypeAssignment
+- *(optional)* shared transfer connection entities (if published)
 
 **Scope and role**
-- Serves as the **central shared referential** for the entire dataset  
-- Contains all elements reused across several files  
-- No stop- or line-specific entities are defined here  
+- Central shared referential reused across the entire dataset  
+- Contains no stop- or line-specific operational timetable entities  
 
 ---
 
-### 3.2.2 `stop.xml` — Stop and Platform Referential
+### 3.2.2 `stop.xml` — Stop infrastructure referential
 
 **Frame**
 - `SiteFrame`
 
-**Entities defined locally**
-- StopPlace  
-- Quay  
-- *(optional)* StopPlaceEquipment / SiteEquipment  
-- *(optional)* Zones if required later  
+**Entities defined locally (authoritative)**
+- StopPlace
+- Quay
 
 **Scope and role**
-- Provides the **complete national stop register** used by all lines  
-- All stop-related identifiers referenced in other files originate here  
+- Authoritative stop and platform register used by all line files  
+- Stop-related identifiers referenced in other files originate here  
 
 ---
 
-### 3.2.3 `line_<LineId>.xml` — Line Structure and Timetable
+### 3.2.3 `line_<LineId>.xml` — Line structure and timetable
 
 **Frames**
 - `ServiceFrame`
 - `TimetableFrame`
 
-**Entities defined locally**
+**Entities defined locally (authoritative)**
 
 **ServiceFrame**
-- Line  
-- Route, RoutePoint, PointOnRoute  
-- ServiceLink  
-- JourneyPattern  
-- StopPointInJourneyPattern  
+- Line
+- ScheduledStopPoint
+- ServiceJourneyPattern
+- StopPointInJourneyPattern
 
 **TimetableFrame**
-- ServiceJourney  
-- VehicleJourney  
-- PassingTime  
-- *(if used)* JourneyPatternRunTimes, WaitTimes, DayTypeAssignment  
+- VehicleJourney
+- TimetabledPassingTime
+- VehicleJourneyStopAssignment *(if platform assignments are published)*
 
 **Scope and role**
-- Defines the **complete service structure and timetable** for a single commercial line  
-- Each line has its own file  
-- Several timetable periods may be grouped in one file when appropriate  
+- Defines the complete service structure and timetable for one commercial Line  
+- One file per published Line  
 
 ---
 
-### 3.2.4 `network.xml` — Optional Network-Level Structures  
-*(Not included in WP1)*
+### 3.2.4 Summary table
 
-**Frames**
-- `NetworkFrame` or `ServiceFrame` (depending on future modelling choices)
-
-**Entities defined locally**
-- Network  
-- GroupsOfLines, marketing/tariff structures (future extensions)
-
-**Scope and role**
-- Reserved for future work packages  
-- Not delivered in WP1  
-
----
-
-### 3.2.5 Summary Table
-
-| File | Frames Included | Entities Defined Locally (Authoritative) | Purpose |
+| File | Frames included | Entities defined locally (authoritative) | Purpose |
 |------|-----------------|------------------------------------------|---------|
-| `resource.xml` | `ResourceFrame`, `ServiceCalendarFrame`, optional `ServiceFrame` | Operators, codespaces, notices, facilities, physical connections, calendar elements | Shared reference elements used across all files |
-| `stop.xml` | `SiteFrame` | StopPlace, Quay, equipment | National stop and platform register |
-| `line_<LineId>.xml` | `ServiceFrame` + `TimetableFrame` | Line, routes, journey patterns, vehicle journeys, passing times | Service structure and timetable of one commercial line |
-| `network.xml` (optional) | `NetworkFrame` or `ServiceFrame` | Network, groups of lines (future) | Network-level or tariff structures (not WP1) |
+| `resource.xml` | `ResourceFrame`, `ServiceCalendarFrame`, *(optional)* `ServiceFrame` | shared reference objects; calendar primitives; *(optional)* shared transfers | Shared reference data reused across all files |
+| `stop.xml` | `SiteFrame` | StopPlace, Quay | Stop and platform register |
+| `line_<LineId>.xml` | `ServiceFrame`, `TimetableFrame` | line structure and timetable entities for one Line | Service structure and timetable of one commercial Line |
+
 
 ---
 
 ## 3.3 Naming Rules
 
-This section defines the naming conventions applied to XML files in the CFL NeTEx dataset.  
+This section defines the naming conventions applied to XML files produced in the CFL NeTEx dataset.  
 Filenames must remain predictable and stable across deliveries.
 
 ---
@@ -185,7 +176,7 @@ Line files follow the naming pattern:
 
 **`line_<LineIdentifier>.xml`**
 
-The `<LineIdentifier>` is derived from the identifier of the corresponding `Line` entity, typically using the suffix of the NeTEx ID (the portion appearing after `LU:CFL:Line:`).
+The `<LineIdentifier>` is derived from the identifier of the corresponding `Line` entity, by using the suffix of the NeTEx ID (the portion appearing after `LU:CFL:Line:`).
 
 **Examples**
 - `line_8200001-8200027.xml`
@@ -202,7 +193,7 @@ In national aggregated publications:
 - XML filenames remain **operator-neutral**.
 - Operator information must appear only inside the XML data (e.g. `OperatorRef`, `AuthorityRef`), never in filenames.
 
-If multiple operators publish their own ZIP archives:
+If multiple operators publish their own publication bundles (ZIP archives):
 
 - The **ZIP filename** may include operator information.
 - The XML filenames **inside** the ZIP must remain stable and operator-neutral.
@@ -267,11 +258,9 @@ This prevents duplication and ensures consistent maintenance.
 
 **line_<LineId>.xml**  
 - Line  
-- Route and RoutePoints  
-- ServiceLink  
 - JourneyPattern and StopPointInJourneyPattern  
-- ServiceJourney and VehicleJourney  
-- PassingTime
+- VehicleJourney  
+- TimetabledPassingTime
 
 No entity type is defined in more than one file.
 
