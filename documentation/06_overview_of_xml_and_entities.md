@@ -1,76 +1,43 @@
 # 6. Overview of XML Publications and Contained Entities
 
 This chapter provides a **synthetic overview** of the XML files produced in the CFL NeTEx MVP
-and indicates **where each Frame and entity is physically published**.
+and identifies **where each Frame and entity is physically published**.
 
-It is intended as a **navigation aid** for readers, before consulting:
-- the conceptual description of Frames
-  ([4. Frames description](04_frames_description.md)),
-- and the detailed NeTEx entity specifications
-  ([7. How to read entity specifications](07_01_how_to-read_entity_specs.md)).
+It complements the conceptual description of Frames
+([4. Frames description](04_frames_description.md))
+by mapping them to the concrete XML publications,
+and supports the reading of the detailed NeTEx entity specifications
+([7. How to read entity specifications](07_01_how_to-read_entity_specs.md)).
 
 This chapter does **not** define new modelling rules.
 The authoritative rules for file organisation, publication structure,
-and cross-file references are defined in **Chapter 3**.
-
+and cross-file references are defined in
+([3. Data Organisation](03_data_organisation.md)).
 
 ---
 
-## 6.1 Publication files and content overview
+## 6.1 XML files, Frames and entities
 
 The CFL NeTEx MVP dataset is published as a set of XML files.
 Each file contains one or more NeTEx Frames encapsulated in a `PublicationDelivery`.
 
-The table below summarises, for each XML file:
-- the Frames it contains,
-- the NeTEx entities defined in that file.
+The table below summarises, for each XML file,
+the Frames it contains and the NeTEx entities **contained** in that file.
 
+| **XML file** | **Frames included** | **Entities contained** | **Notes** |
+|--------------|---------------------|------------------------|----------|
+| **resource.xml** | `ResourceFrame` | Operator, Branding, Codespaces | Dataset-wide reference objects shared by all publications. |
+| | `ServiceCalendarFrame` | DayType, OperatingPeriod, DayTypeAssignment | Calendar and validity definitions applied across all Lines. |
+| | *(optional / future)* `ServiceFrame` | Interchange / transfer-related entities | Not published in the MVP baseline. If added later, shared interchange data is published here (as recommended by experts). |
+| **stop.xml** | `SiteFrame` | StopPlace, Quay | Complete stop infrastructure model. Contains no timetable data. |
+| **line_<LineId>.xml** | `ServiceFrame` | Line, ScheduledStopPoint, StopPointInJourneyPattern, ServiceJourneyPattern, VehicleJourney | Operational structures specific to a single Line. |
+| | `TimetableFrame` | TimetabledPassingTime, VehicleJourneyStopAssignment | Timing information and (if used) platform/stop assignment structures for VehicleJourneys. |
 
----
-
-### Table — XML files, frames and entities
-
-| XML file | Frames included | Entities defined in the file |
-|----------|-----------------|------------------------------|
-| `resource.xml` | `ResourceFrame` | Codespace, Operator, Notice, ValueSet |
-| | `ServiceCalendarFrame` | DayType, OperatingPeriod, OperatingDay, DayTypeAssignment |
-| `stop.xml` | `SiteFrame` | StopPlace, Quay |
-| `line_<LineId>.xml` | `ServiceFrame` | Line, JourneyPattern, StopPointInJourneyPattern |
-| | `TimetableFrame` | VehicleJourney, PassingTime |
-
+Note: Entities listed in this table are specified in Chapter 7 when they are effectively used in the MVP.
+Optional or future entities may be documented later when they are introduced.
 
 ---
 
-## 6.2 Reading this overview
-
-This overview table is the entry point for navigating the rest of the documentation:
-
-- it shows **where each entity is published** in the XML dataset,
-- it allows producers and consumers to quickly locate entities across files,
-- it provides the concrete link between:
-  - the conceptual Frames described in
-    [Frames description](04_frames_description.md), and
-  - the detailed NeTEx entity specifications described in
-    [How to read entity specifications](07_01_how_to-read_entity_specs.md).
-
-The detailed modelling rules, constraints and examples for each entity
+This overview table serves as a **synthetic map** of the published dataset.
+Detailed modelling rules, constraints and XML examples for each entity
 are provided exclusively in **Chapter 7**.
-
----
-
-## 6.3 Relationship with data organisation rules
-
-The file structure and publication logic summarised in this chapter
-follow the data organisation principles defined in **Chapter 3**.
-
-In particular:
-- each entity type is defined in exactly one XML file,
-- other files may reference these entities but must not redefine them,
-- cross-file references rely exclusively on NeTEx reference mechanisms (`…Ref`).
-
-This chapter does not repeat those rules and should be read
-as a **synthetic map** of the published dataset.
-
-
-
-
