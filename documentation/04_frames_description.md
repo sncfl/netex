@@ -8,13 +8,16 @@ The table below summarises the frames used and their purposes.
 
 | Frame | Conceptual scope | Key entities (MVP) | Purpose |
 |-------|------------------|---------------------|---------|
-| **ResourceFrame** | Shared reference data | Codespace, Operator, Notice, ValueSet, Calendar primitives | Provides global identifiers, shared definitions and calendar elements. |
-| **ServiceCalendarFrame** | Calendar definitions | DayType, OperatingPeriod, OperatingDay, DayTypeAssignment | Defines the operational calendar used by all scheduled circulations. |
-| **SiteFrame** | Stop referential | StopPlace, Quay | Provides the authoritative registry of stops and quays. |
-| **ServiceFrame (per line)** | Service structure | Line, JourneyPattern, StopPointInJourneyPattern | Defines the public line identity and stop sequences for each pattern. |
-| **TimetableFrame** | Scheduled times | VehicleJourney, PassingTime | Describes planned train circulations and their scheduled times. |
+| **[ResourceFrame](#42-resourceframe)** | Shared reference data | Codespace, Operator, Notice, ValueSet, Calendar primitives | Provides global identifiers, shared definitions and calendar elements. |
+| **[ServiceCalendarFrame](#43-servicecalendarframe)** | Calendar definitions | DayType, OperatingPeriod, OperatingDay, DayTypeAssignment | Defines the operational calendar used by all scheduled circulations. |
+| **[SiteFrame](#44-siteframe)** | Stop referential | StopPlace, Quay | Provides the authoritative registry of stops and quays. |
+| **[ServiceFrame (per line)](#45-serviceframe-per-line)** | Service structure | Line, JourneyPattern, StopPointInJourneyPattern | Defines the public line identity and stop sequences for each pattern. |
+| **[TimetableFrame](#46-timetableframe)** | Scheduled times | VehicleJourney, PassingTime | Describes planned train circulations and their scheduled times. |
 
-This overview introduces the frames that are described in detail in sections 4.2 to 4.6.
+
+This overview introduces the frames that are described in detail in sections
+[4.2](#42-resourceframe) to [4.6](#46-timetableframe).
+
 
 ---
 
