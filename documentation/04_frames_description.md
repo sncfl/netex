@@ -18,6 +18,8 @@ The table below summarises the frames used and their purposes.
 This overview introduces the frames that are described in detail in sections
 [4.2](#42-resourceframe) to [4.6](#46-timetableframe).
 
+For a consolidated view of all entities used in the MVP, see **[Section 4.7 – Summary table : Entities used in the MVP](#47-summary-table--entities-used-in-the-mvp)**.
+For an overview of how frames interact, see **[Section 4.8 – Summary of frame interactions](#48-summary-of-frame-interactions)**.
 
 ---
 
@@ -492,7 +494,7 @@ The TimetableFrame does **not** include:
 
 Its scope is intentionally limited to **planned, published timetable data**.
 
-## 4.7 Summary table :  Entities used in the MVP
+## 4.7 Summary table : Entities used in the MVP
 
 | Entity | Frame | Definition | Role in the MVP | Mandatory |
 |--------|--------|-------------|------------------|-----------|
@@ -513,7 +515,7 @@ Its scope is intentionally limited to **planned, published timetable data**.
 
 ---
 
-### 4.8 Summary of frame interactions
+## 4.8 Summary of frame interactions
 
 The frames described in this chapter are not isolated components:  
 they work together to form a coherent, structured timetable dataset.  
