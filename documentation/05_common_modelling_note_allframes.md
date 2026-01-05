@@ -6,6 +6,13 @@ While Chapter 4 describes *what* is modelled (frames and entities), this chapter
 The rules below apply to all files and all entities of the MVP.  
 They cover identifiers, naming principles, versioning, references between entities, and minimal requirements on temporal consistency and data quality.
 
+**Quick navigation within this chapter:**
+- **[5.1 Identifier scheme](#51-identifier-scheme)**  
+- **[5.2 Naming conventions](#52-naming-conventions)**  
+- **[5.3 Coding conventions](#53-coding-conventions)**  
+- **[5.4 Referencing rules](#54-referencing-rules)**  
+- **[5.5 Temporal rules](#55-temporal-rules)**
+
 ## 5.1 Identifier scheme
 
 Identifiers are fundamental in NeTEx: they ensure that entities can be referenced consistently across files, frames and systems.  
@@ -583,3 +590,4 @@ The temporal rules ensure that all CFL timetable data in the MVP:
 - and is correctly associated with operating days.
 
 These rules guarantee that the published timetable is reliable, interpretable and suitable for downstream systems.
+

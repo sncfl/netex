@@ -1,61 +1,46 @@
 # 6. Overview of XML Publications and Contained Entities
 
-This section provides a consolidated overview of the XML files produced in the CFL NeTEx MVP and identifies which Frames and entities each file contains.  
-It serves as a navigation aid for readers before entering the detailed entity specifications in sections 6.1 onwards.
+This chapter provides a **synthetic overview** of the XML files produced in the CFL NeTEx MVP
+and identifies **where each Frame and entity is physically published**.
 
-The goal is to give a **clear and immediate understanding** of how the dataset is structured and how the various parts of the profile relate to each other at publication time.
+It complements the conceptual description of Frames
+([4. Frames description](04_frames_description.md))
+by mapping them to the concrete XML publications,
+and supports the reading of the detailed NeTEx entity specifications
+([7. How to read entity specifications](07_01_how_to-read_entity_specs.md)).
 
----
-
-## 6.1 Publication files and content overview
-
-The MVP dataset consists of **three XML files**:
-
-- `resource.xml`  
-- `stop.xml`  
-- `line_<LineId>.xml` (one file per published Line)
-
-Each file contains one or more NeTEx Frames within a `PublicationDelivery`.  
-The table below summarises the Frames and the entities they include.
+This chapter does **not** define new modelling rules.
+The authoritative rules for file organisation, publication structure,
+and cross-file references are defined in
+([3. Data Organisation](03_data_organisation.md)).
 
 ---
 
-### Table — XML files, frames and entities
+## 6.1 XML files, Frames and entities
+
+The CFL NeTEx MVP dataset is published as a set of XML files.
+Each file contains one or more NeTEx Frames encapsulated in a `PublicationDelivery`.
+
+The table below summarises, for each XML file,
+the Frames it contains and the NeTEx entities **contained** in that file.
 
 | **XML file** | **Frames included** | **Entities contained** | **Notes** |
-|--------------|---------------------|--------------------------|----------|
-| **resource.xml** | `ResourceFrame` | Operator, Network, Branding, Codespaces | Dataset-wide reference objects shared by all publications. |
-| | `ServiceCalendarFrame` | DayType, OperatingPeriod, DayTypeAssignment | Calendar and validity definitions applied across all Lines. |
-| | *(optional)* `ServiceFrame` | Interchange / transfer-related entities | Included only if shared interchange information is published. |
-| **stop.xml** | `SiteFrame` | StopPlace, Quay | Complete stop infrastructure model. Contains no timetable data. |
-| **line_<LineId>.xml** | `ServiceFrame` | Line, ScheduledStopPoint, StopPointInJourneyPattern, ServiceJourneyPattern, VehicleJourney | Operational structures specific to a single Line. |
-| | `TimetableFrame` | TimetabledPassingTime, VehicleJourneyStopAssignment | Timing information and platform assignments for the VehicleJourneys. |
+|--------------|---------------------|------------------------|----------|
+| **stop.xml** | `SiteFrame` | [StopPlace](07_02_stopplace.md), [Quay](07_03_quay.md) | Complete stop infrastructure model. Contains no timetable data. |
+| **line_<LineId>.xml** | `ServiceFrame` | [Line](07_04_line.md), [GroupOfLines](07_05_groupoflines.md), [ScheduledStopPoint](07_07_scheduledstoppoint.md), [StopPointInJourneyPattern](07_08_stoppointinjourneypattern.md), [ServiceJourneyPattern](07_09_servicejourneypattern.md), [VehicleJourney](07_10_vehiclejourney.md) | Operational structures specific to a single Line. |
+| | `TimetableFrame` | [TimetabledPassingTime](07_14_timetabledpassingtime.md), [VehicleJourneyStopAssignment](07_15_vehiclejourneystopassignment.md) | Timing information and (if used) platform/stop assignment structures for VehicleJourneys. |
+| **resource.xml** | `ResourceFrame` | [Operator](07_16_resourceframe.md#7163-operator), [Branding](07_16_resourceframe.md#7164-branding), [Codespace](07_16_resourceframe.md#7162-codespace) | Dataset-wide reference objects shared by all publications. |
+| | `ServiceCalendarFrame` | [DayType](07_11_daytype.md), [OperatingPeriod](07_12_operatingperiod.md), [DayTypeAssignment](07_13_daytypeassignment.md) | Calendar and validity definitions applied across all Lines. |
+| | *(optional / future)* `ServiceFrame` | Interchange / transfer-related entities | Not published in the MVP baseline. If added later, shared interchange data is published here (as recommended by experts). |
+
+
+Note: Entities listed in this table are specified in Chapter 7 when they are effectively used in the MVP.
+Optional or future entities may be documented later when they are introduced.
 
 ---
 
-## 6.2 Rationale for the file organisation
+This overview table serves as a **synthetic map** of the published dataset.
+Detailed modelling rules, constraints and XML examples for each entity
+are provided exclusively in **Chapter 7**.
 
-The separation into three files follows NeTEx best practices and supports modularity and maintainability:
 
-- **resource.xml** centralises identifiers, operators, and calendars that remain stable over time.  
-- **stop.xml** isolates the stop infrastructure model, which evolves independently of timetables.  
-- **line_<LineId>.xml** groups all operational and timetable data for a single Line, allowing incremental updates and simplifying debugging.
-
-This organisation ensures that:
-
-- producers can regenerate only the Line files when schedules change,  
-- updates to the stop model do not affect vehicle schedules,  
-- consumers can load only the relevant components,  
-- version management remains controlled and predictable.
-
----
-
-## 6.3 Using this overview
-
-This table provides a reference point for interpreting the rest of Chapter 6:
-
-- It indicates **where each entity appears** within the published dataset.  
-- It helps developers and integrators locate objects quickly during ingestion or debugging.  
-- It reinforces the link between **Frames** (chapter 4) and **entity specifications** (chapter 6).
-
----

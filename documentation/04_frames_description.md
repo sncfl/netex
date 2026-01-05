@@ -8,13 +8,19 @@ The table below summarises the frames used and their purposes.
 
 | Frame | Conceptual scope | Key entities (MVP) | Purpose |
 |-------|------------------|---------------------|---------|
-| **ResourceFrame** | Shared reference data | Codespace, Operator, Notice, ValueSet, Calendar primitives | Provides global identifiers, shared definitions and calendar elements. |
-| **ServiceCalendarFrame** | Calendar definitions | DayType, OperatingPeriod, OperatingDay, DayTypeAssignment | Defines the operational calendar used by all scheduled circulations. |
-| **SiteFrame** | Stop referential | StopPlace, Quay | Provides the authoritative registry of stops and quays. |
-| **ServiceFrame (per line)** | Service structure | Line, JourneyPattern, StopPointInJourneyPattern | Defines the public line identity and stop sequences for each pattern. |
-| **TimetableFrame** | Scheduled times | VehicleJourney, PassingTime | Describes planned train circulations and their scheduled times. |
+| **[ResourceFrame](#42-resourceframe)** | Shared reference data | Codespace, Operator, Notice, ValueSet, Calendar primitives | Provides global identifiers, shared definitions and calendar elements. |
+| **[ServiceCalendarFrame](#43-servicecalendarframe)** | Calendar definitions | DayType, OperatingPeriod, OperatingDay, DayTypeAssignment | Defines the operational calendar used by all scheduled circulations. |
+| **[SiteFrame](#44-siteframe)** | Stop referential | StopPlace, Quay | Provides the authoritative registry of stops and quays. |
+| **[ServiceFrame (per line)](#45-serviceframe-per-line)** | Service structure | Line, JourneyPattern, StopPointInJourneyPattern | Defines the public line identity and stop sequences for each pattern. |
+| **[TimetableFrame](#46-timetableframe)** | Scheduled times | VehicleJourney, PassingTime | Describes planned train circulations and their scheduled times. |
 
-This overview introduces the frames that are described in detail in sections 4.2 to 4.6.
+
+This overview introduces the frames that are described in detail in sections
+[4.2](#42-resourceframe) to [4.6](#46-timetableframe).
+
+For a consolidated view of all entities used in the MVP, see **[Section 4.7 – Summary table : Entities used in the MVP](#47-summary-table--entities-used-in-the-mvp)**.
+
+For an overview of how frames interact, see **[Section 4.8 – Summary of frame interactions](#48-summary-of-frame-interactions)**.
 
 ---
 
@@ -489,7 +495,7 @@ The TimetableFrame does **not** include:
 
 Its scope is intentionally limited to **planned, published timetable data**.
 
-## 4.7 Summary table :  Entities used in the MVP
+## 4.7 Summary table : Entities used in the MVP
 
 | Entity | Frame | Definition | Role in the MVP | Mandatory |
 |--------|--------|-------------|------------------|-----------|
@@ -510,7 +516,7 @@ Its scope is intentionally limited to **planned, published timetable data**.
 
 ---
 
-### 4.8 Summary of frame interactions
+## 4.8 Summary of frame interactions
 
 The frames described in this chapter are not isolated components:  
 they work together to form a coherent, structured timetable dataset.  
