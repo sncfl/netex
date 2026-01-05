@@ -1,74 +1,76 @@
 # 6. Overview of XML Publications and Contained Entities
 
-This chapter provides a consolidated overview of the XML files produced in the CFL NeTEx MVP
-and identifies which **Frames** and **entities** each file contains.
+This chapter provides a **synthetic overview** of the XML files produced in the CFL NeTEx MVP
+and indicates **where each Frame and entity is physically published**.
 
-It serves as a navigation aid for readers before entering the detailed entity specifications
-in sections 6.1 onwards.
+It is intended as a **navigation aid** for readers, before consulting:
+- the conceptual description of Frames
+  ([4. Frames description](04_frames_description.md)),
+- and the detailed NeTEx entity specifications
+  ([7. How to read entity specifications](07_01_how_to-read_entity_specs.md)).
 
-The goal is to give a **clear and immediate understanding** of:
-- how the dataset is split into XML publications,
-- how Frames are distributed across files,
-- where each entity defined in **[Chapter 4 – Frames description](04_frames_description.md)** is physically published.
+This chapter does **not** define new modelling rules.
+The authoritative rules for file organisation, publication structure,
+and cross-file references are defined in **Chapter 3**.
+
 
 ---
 
 ## 6.1 Publication files and content overview
 
-The CFL NeTEx MVP dataset consists of **three types of XML files**:
-
-- `resource.xml`
-- `stop.xml`
-- `line_<LineId>.xml` (one file per published Line)
-
+The CFL NeTEx MVP dataset is published as a set of XML files.
 Each file contains one or more NeTEx Frames encapsulated in a `PublicationDelivery`.
-The table below summarises, for each XML file, the Frames included and the entities they contain.
+
+The table below summarises, for each XML file:
+- the Frames it contains,
+- the NeTEx entities defined in that file.
+
 
 ---
 
 ### Table — XML files, frames and entities
 
-| **XML file** | **Frames included** | **Entities contained (MVP)** | **Notes** |
-|--------------|---------------------|------------------------------|----------|
-| **resource.xml** | `ResourceFrame` | Codespace, Operator, Notice, ValueSet | Dataset-wide reference data shared by all publications. |
-| | `ServiceCalendarFrame` | DayType, OperatingPeriod, OperatingDay, DayTypeAssignment | Centralised calendar model used by all VehicleJourneys. |
-| **stop.xml** | `SiteFrame` | StopPlace, Quay | Authoritative stop and platform referential. No service or timetable data. |
-| **line_<LineId>.xml** | `ServiceFrame` | Line, JourneyPattern, StopPointInJourneyPattern | Logical service structure for a single Line. |
-| | `TimetableFrame` | VehicleJourney, PassingTime | Scheduled circulations and their planned times at each stop. |
+| XML file | Frames included | Entities defined in the file |
+|----------|-----------------|------------------------------|
+| `resource.xml` | `ResourceFrame` | Codespace, Operator, Notice, ValueSet |
+| | `ServiceCalendarFrame` | DayType, OperatingPeriod, OperatingDay, DayTypeAssignment |
+| `stop.xml` | `SiteFrame` | StopPlace, Quay |
+| `line_<LineId>.xml` | `ServiceFrame` | Line, JourneyPattern, StopPointInJourneyPattern |
+| | `TimetableFrame` | VehicleJourney, PassingTime |
 
 
 ---
 
-## 6.2 Rationale for the file organisation
+## 6.2 Reading this overview
 
-The separation into these XML files follows NeTEx best practices and supports modularity,
-maintainability and controlled updates:
+This overview table is the entry point for navigating the rest of the documentation:
 
-- **resource.xml** centralises reference data and calendars that are stable and reused across all Lines.
-- **stop.xml** isolates the stop infrastructure model, which evolves independently from services and timetables.
-- **line_<LineId>.xml** groups all service structure and timetable data for a single Line.
-
-This organisation ensures that:
-- Line timetables can be updated independently without republishing stop or calendar data,
-- stop infrastructure updates do not impact timetable files,
-- consumers can load only the files relevant to their use case,
-- versioning and debugging remain predictable and scoped.
-
-
----
-
-## 6.3 Using this overview
-
-This overview table is the entry point for interpreting the rest of this documentation :
-
-- it indicates **in which XML file each entity is published**,
-- it helps developers and integrators locate entities during ingestion, validation or debugging,
+- it shows **where each entity is published** in the XML dataset,
+- it allows producers and consumers to quickly locate entities across files,
 - it provides the concrete link between:
-- the **conceptual Frames described in
-    [Chapter 4 – Frames description](04_frames_description.md)**, and
-  - the **entity-level specifications described in
-    [Chapter 7 - How to read entity specifications](07_01_how_to-read_entity_specs.md)**.
+  - the conceptual Frames described in
+    [Frames description](04_frames_description.md), and
+  - the detailed NeTEx entity specifications described in
+    [How to read entity specifications](07_01_how_to-read_entity_specs.md).
+
+The detailed modelling rules, constraints and examples for each entity
+are provided exclusively in **Chapter 7**.
 
 ---
+
+## 6.3 Relationship with data organisation rules
+
+The file structure and publication logic summarised in this chapter
+follow the data organisation principles defined in **Chapter 3**.
+
+In particular:
+- each entity type is defined in exactly one XML file,
+- other files may reference these entities but must not redefine them,
+- cross-file references rely exclusively on NeTEx reference mechanisms (`…Ref`).
+
+This chapter does not repeat those rules and should be read
+as a **synthetic map** of the published dataset.
+
+
 
 
