@@ -1,61 +1,73 @@
 # 6. Overview of XML Publications and Contained Entities
 
-This section provides a consolidated overview of the XML files produced in the CFL NeTEx MVP and identifies which Frames and entities each file contains.  
-It serves as a navigation aid for readers before entering the detailed entity specifications in sections 6.1 onwards.
+This chapter provides a consolidated overview of the XML files produced in the CFL NeTEx MVP
+and identifies which **Frames** and **entities** each file contains.
 
-The goal is to give a **clear and immediate understanding** of how the dataset is structured and how the various parts of the profile relate to each other at publication time.
+It serves as a navigation aid for readers before entering the detailed entity specifications
+in sections 6.1 onwards.
+
+The goal is to give a **clear and immediate understanding** of:
+- how the dataset is split into XML publications,
+- how Frames are distributed across files,
+- where each entity defined in **[Chapter 4 – Frames description](04_frames_description.md)** is physically published.
 
 ---
 
 ## 6.1 Publication files and content overview
 
-The MVP dataset consists of **three XML files**:
+The CFL NeTEx MVP dataset consists of **three types of XML files**:
 
-- `resource.xml`  
-- `stop.xml`  
+- `resource.xml`
+- `stop.xml`
 - `line_<LineId>.xml` (one file per published Line)
 
-Each file contains one or more NeTEx Frames within a `PublicationDelivery`.  
-The table below summarises the Frames and the entities they include.
+Each file contains one or more NeTEx Frames encapsulated in a `PublicationDelivery`.
+The table below summarises, for each XML file, the Frames included and the entities they contain.
 
 ---
 
 ### Table — XML files, frames and entities
 
-| **XML file** | **Frames included** | **Entities contained** | **Notes** |
-|--------------|---------------------|--------------------------|----------|
-| **resource.xml** | `ResourceFrame` | Operator, Network, Branding, Codespaces | Dataset-wide reference objects shared by all publications. |
-| | `ServiceCalendarFrame` | DayType, OperatingPeriod, DayTypeAssignment | Calendar and validity definitions applied across all Lines. |
-| | *(optional)* `ServiceFrame` | Interchange / transfer-related entities | Included only if shared interchange information is published. |
-| **stop.xml** | `SiteFrame` | StopPlace, Quay | Complete stop infrastructure model. Contains no timetable data. |
-| **line_<LineId>.xml** | `ServiceFrame` | Line, ScheduledStopPoint, StopPointInJourneyPattern, ServiceJourneyPattern, VehicleJourney | Operational structures specific to a single Line. |
-| | `TimetableFrame` | TimetabledPassingTime, VehicleJourneyStopAssignment | Timing information and platform assignments for the VehicleJourneys. |
+| **XML file** | **Frames included** | **Entities contained (MVP)** | **Notes** |
+|--------------|---------------------|------------------------------|----------|
+| **resource.xml** | `ResourceFrame` | Codespace, Operator, Notice, ValueSet | Dataset-wide reference data shared by all publications. |
+| | `ServiceCalendarFrame` | DayType, OperatingPeriod, OperatingDay, DayTypeAssignment | Centralised calendar model used by all VehicleJourneys. |
+| **stop.xml** | `SiteFrame` | StopPlace, Quay | Authoritative stop and platform referential. No service or timetable data. |
+| **line_<LineId>.xml** | `ServiceFrame` | Line, JourneyPattern, StopPointInJourneyPattern | Logical service structure for a single Line. |
+| | `TimetableFrame` | VehicleJourney, PassingTime | Scheduled circulations and their planned times at each stop. |
+
 
 ---
 
 ## 6.2 Rationale for the file organisation
 
-The separation into three files follows NeTEx best practices and supports modularity and maintainability:
+The separation into these XML files follows NeTEx best practices and supports modularity,
+maintainability and controlled updates:
 
-- **resource.xml** centralises identifiers, operators, and calendars that remain stable over time.  
-- **stop.xml** isolates the stop infrastructure model, which evolves independently of timetables.  
-- **line_<LineId>.xml** groups all operational and timetable data for a single Line, allowing incremental updates and simplifying debugging.
+- **resource.xml** centralises reference data and calendars that are stable and reused across all Lines.
+- **stop.xml** isolates the stop infrastructure model, which evolves independently from services and timetables.
+- **line_<LineId>.xml** groups all service structure and timetable data for a single Line.
 
 This organisation ensures that:
+- Line timetables can be updated independently without republishing stop or calendar data,
+- stop infrastructure updates do not impact timetable files,
+- consumers can load only the files relevant to their use case,
+- versioning and debugging remain predictable and scoped.
 
-- producers can regenerate only the Line files when schedules change,  
-- updates to the stop model do not affect vehicle schedules,  
-- consumers can load only the relevant components,  
-- version management remains controlled and predictable.
 
 ---
 
 ## 6.3 Using this overview
 
-This table provides a reference point for interpreting the rest of Chapter 6:
+This overview table is the entry point for interpreting the rest of Chapter 6:
 
-- It indicates **where each entity appears** within the published dataset.  
-- It helps developers and integrators locate objects quickly during ingestion or debugging.  
-- It reinforces the link between **Frames** (chapter 4) and **entity specifications** (chapter 6).
+- it indicates **in which XML file each entity is published**,
+- it helps developers and integrators locate entities during ingestion, validation or debugging,
+- it provides the concrete link between:
+- the **conceptual Frames described in
+    [Chapter 4 – Frames description](04_frames_description.md)**, and
+  - the **entity-level specifications described in
+    [Chapter 7 - How to read entity specifications](07_01_how_to-read_entity_specs.md)**.
 
 ---
+
