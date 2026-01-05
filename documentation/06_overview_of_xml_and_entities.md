@@ -59,7 +59,7 @@ This organisation ensures that:
 
 ## 6.3 Using this overview
 
-This overview table is the entry point for interpreting the rest of Chapter 6:
+This overview table is the entry point for interpreting the rest of this documentation :
 
 - it indicates **in which XML file each entity is published**,
 - it helps developers and integrators locate entities during ingestion, validation or debugging,
@@ -70,4 +70,5 @@ This overview table is the entry point for interpreting the rest of Chapter 6:
     [Chapter 7 - How to read entity specifications](07_01_how_to-read_entity_specs.md)**.
 
 ---
+
 
