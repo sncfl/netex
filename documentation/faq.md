@@ -25,6 +25,7 @@ The current structure reflects the state of discussions and arbitrages at the ti
   - [Why does the CFL NeTEx profile use Codespaces, and how should they be applied?](#why-does-the-cfl-netex-profile-use-codespaces-and-how-should-they-be-applied)
   - [Why are routes not modelled at this stage in the CFL NeTEx profile?](#why-are-routes-not-modelled-at-this-stage-in-the-cfl-netex-profile)
   - [Why is no bitcode used for timetable publication in the CFL NeTEx profile?](#why-is-no-bitcode-used-for-timetable-publication-in-the-cfl-netex-profile)
+  - [Which information is published in NeTEx and which is published in SIRI-ET for the display of train formation at the platform (sectors, 3V markers, car-to-sector mapping), and when?](#which-information-is-published-in-netex-and-which-is-published-in-siri-et-for-the-display-of-train-formation-at-the-platform-sectors-3v-markers-car-to-sector-mapping-and-when)
 
 
 ## Why does the CFL NeTEx profile use CompositeFrame?
@@ -179,3 +180,59 @@ The NeTEx standard does not define a generic mechanism for publishing timetable 
 The CFL NeTEx profile therefore does not use bitcodes for timetable publication, as this approach is **not part of the NeTEx standard** and would introduce non-standard decoding logic for data consumers.
 
 Instead, the profile follows the standard NeTEx modelling approach, favouring clarity, interoperability and long-term maintainability. Data volume and exchange constraints are addressed through structural mechanisms (such as frame organisation, file splitting and ZIP packaging), rather than through encoded representations.
+
+## Which information is published in NeTEx and which is published in SIRI-ET for the display of train formation at the platform (sectors, 3V markers, car-to-sector mapping), and when?
+
+In the CFL profile, “platform train formation” information is split between **NeTEx** (reference data and rules) and **SIRI-ET** (operational *day-of-operation* data), following a clear timeline.
+
+### 1) What is published in NeTEx (reference, stable, versioned)
+
+NeTEx is used to publish what is **structural** and **reusable**, i.e. independent from a specific operating day:
+
+- **Planned timetable (scheduled offer)**
+  - In the **TimetableFrame**: `VehicleJourney` (and its calls/times).
+  - This is the planned baseline that real-time information is linked to.
+
+- **Stop topology and boarding landmarks**
+  - In the **SiteFrame**: `StopPlace`, `Quay`, `BoardingPosition`.
+  - Platform sectors (A/B/C/D) and 2V/3V/4V markers can be modelled as `BoardingPosition` (or equivalent quay subdivisions), with stable identifiers.
+
+- **Formation catalogue**
+  - In the **ResourceFrame**: `Train`, `TrainComponent`, `TrainElement`.
+  - Goal: describe reusable train formation types (cars, zones, pictograms, bike, 1st class, PRM, decks, etc.) as a shared vocabulary.
+
+- **Alignment and assignment rules depending on the formation**
+  - In the **ServiceFrame**:
+    - `PassengerStopAssignment`: links a `ScheduledStopPoint` (timetable stop) to a `Quay`/`BoardingPosition` (structural assignment).
+    - `TrainStopAssignment`: alignment rules such as “if TrainSize/formation = X, then stop at marker 3V (BoardingPosition) and apply the car-to-sector mapping”, potentially per station/platform.
+  - These rules explain *how alignment is determined*, but **do not state** which formation will be used on a given day.
+
+> **In short:** NeTEx publishes the *vocabulary and rules*, and everything remains joinable via the same stop references (`ScheduledStopPointRef`) used by `VehicleJourney`.
+
+### 2) What is published in SIRI-ET (operational, day-of-operation, near real-time)
+
+SIRI-ET is used to publish the **effective result** for a dated journey, when the information becomes operationally available.
+
+In our context, RailOpt provides the formation **~5 minutes before departure from the origin station**. The SIV then publishes a **snapshot** in SIRI-ET, linked to the day-of-operation journey through `DatedVehicleJourneyRef`.
+
+The SIV publishes in SIRI-ET:
+
+- **For the dated journey**
+  - The identifier `DatedVehicleJourneyRef` (the join key to the planned offer).
+
+- **For each relevant stop (`EstimatedCall`)**
+  - The **platform/quay** (`ExpectedQuayRef`).
+  - The **selected marker/sector** (e.g. “3V”), provided as a reference (often profiled via an extension if needed).
+  - If required by screens/apps, the **car-to-sector mapping** (always as a ready-to-display result, not as a rule to be recalculated by consumers).
+
+> **In short:** SIRI-ET publishes “what applies today” (formation received at T-5 ⇒ marker 3V ⇒ sector distribution) and links back to the planned timetable via the dated journey identifier.
+
+### 3) Simplified timeline
+
+- **Before day-of-operation (periodic):** NeTEx publishes the planned offer plus reference data and rules (TimetableFrame, SiteFrame, ResourceFrame, ServiceFrame).
+- **Day-of-operation, T-5 minutes:** SIRI-ET publishes the operational snapshot (platform + 3V marker + optionally the schema/mapping) for the `DatedVehicleJourneyRef`.
+- **Later (optional):** if RailOpt starts sending updates during the journey, SIRI-ET publishes updated versions.
+
+### 4) What about SIRI-SM?
+
+SIRI-SM is a **stop-centric** service (next arrivals/departures at a stop). It can be added later if a “departure board” view per stop/platform is required. For now, if the primary need is a **near real-time, inter-system exchange** linked to journeys, **SIRI-ET is the priority service**.
