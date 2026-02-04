@@ -5,13 +5,12 @@
 A **DayTypeAssignment** links a DayType to actual dates or date patterns.  
 It defines *when* a DayType is available within an OperatingPeriod, through:
 
-- a weekly pattern (e.g. Monday to Friday),
-- a continuous date range,
-- individual dates,
-- exceptions (inclusion or exclusion).
+- A weekly pattern (e.g. Monday to Friday),
+- A continuous date range,
+- Individual dates,
+- Exceptions (inclusion or exclusion).
 
-In the CFL MVP, DayTypeAssignment provides the **operational calendar** used by
-VehicleJourneys to determine on which days they run.
+In the CFL MVP, DayTypeAssignment provides the **operational calendar** used by VehicleJourneys to determine on which days they run.
 
 ---
 
@@ -22,8 +21,8 @@ A DayType is an *abstract category* (“WEEKDAYS”).
 DayTypeAssignment defines *how that category is realised*:
 
 - Monday to Friday during the operating period,
-- excluding public holidays,
-- including special running days.
+- Excluding public holidays,
+- Including special running days.
 
 ### Weekly patterns
 The most common case is a weekly repetition (Monday–Friday, Saturday only, etc.).
@@ -36,8 +35,7 @@ This is represented using:
 ```
 
 ### Operating period association
-A DayTypeAssignment MAY reference an OperatingPeriod to indicate that the rule is  
-valid only during a specific timetable period.
+A DayTypeAssignment MAY reference an OperatingPeriod to indicate that the rule is valid only during a specific timetable period.
 
 ### Inclusion / exclusion
 - `isAvailable="true"` → the DayType applies on the specified days.  

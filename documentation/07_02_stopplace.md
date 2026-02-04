@@ -6,10 +6,10 @@ A **StopPlace** represents a physical location where passengers may access the p
 It serves as the **spatial anchor** for all stop-related elements referenced across the dataset.
 
 A StopPlace is the authoritative source for:
-- the official name of the station or stop,
-- its coordinates,
-- its internal components (Quays, Entrances, etc.),
-- its public-facing identifiers.
+- The official name of the station or stop,
+- Its coordinates,
+- Its internal components (Quays, Entrances, etc.),
+- Its public-facing identifiers.
 
 StopPlaces are defined **exclusively** in the *SiteFrame* and referenced by other frames (ServiceFrame, TimetableFrame).
 
@@ -46,7 +46,7 @@ StopPlaces are defined **exclusively** in the *SiteFrame* and referenced by othe
 ### Identifiers
 - Must follow the format:  
   **`LU:CFL:StopPlace:<LocalId>`**  
-  e.g. `LU:CFL:StopPlace:SP00032`.
+  e.g., `LU:CFL:StopPlace:SP00032`.
 
 - Identifiers never change, even when the name is updated.
 
@@ -90,10 +90,10 @@ StopPlaces are defined **exclusively** in the *SiteFrame* and referenced by othe
 The StopPlace is the foundational spatial object of the CFL timetable dataset.
 It provides the authoritative definition of each station or stop, including:
 
-- stable identifier,
-- public name(s),
-- coordinates,
-- associated quays.
+- Stable identifier,
+- Public name(s),
+- Coordinates,
+- Associated quays.
 
 All other frames reference these elements through identifiers, ensuring consistency across the entire dataset.
 

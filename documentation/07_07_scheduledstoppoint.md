@@ -6,27 +6,22 @@ A **ScheduledStopPoint** represents a *logical stop* within a journey pattern, i
 
 It is:
 
-- the **operational stop reference** used by JourneyPatterns and VehicleJourneys,
-- linked to the physical stop via **QuayRef** (platform) or **StopPlaceRef** (station),
-- the *abstract stop* that appears in timetables, prior to assignment to a real platform.
+- The **operational stop reference** used by JourneyPatterns and VehicleJourneys;
+- Linked to the physical stop via **QuayRef** (platform) or **StopPlaceRef** (station);
+- The *abstract stop* that appears in timetables, prior to assignment to a real platform.
 
 A ScheduledStopPoint is **not** a physical object.  
 
 It exists to model:
 
-- the ordered sequence of stops in a ServiceJourneyPattern,
-- the target commercial stop (station/board point) independently of the platform,
-- the binding between timetable data and infrastructure data.
+- The ordered sequence of stops in a ServiceJourneyPattern,
+- The target commercial stop (station/board point) independently of the platform,
+- The binding between timetable data and infrastructure data.
 
 In the CFL MVP:
 
 - Each ScheduledStopPoint SHALL reference exactly one StopPlace or Quay. 
-- Referencing a StopPlace is the typical case for CFL rail services today, but
-referencing a Quay MAY be used in future extensions or for modes requiring
-platform-level granularity. The CFL profile therefore keeps both options open,
-even though StopPlaceRef will be by far the dominant case in current timetable
-data.
-
+- Referencing a StopPlace is the typical case for CFL rail services today, but referencing a Quay MAY be used in future extensions or for modes requiring platform-level granularity. The CFL profile therefore keeps both options open, even though StopPlaceRef will be by far the dominant case in current timetable data.
 - The ScheduledStopPoint is the **bridge** between operational schedules (VehicleJourneys) and the infrastructure model (SiteFrame).
 
 ---
@@ -37,46 +32,37 @@ data.
 
 A ScheduledStopPoint is *logical*:
 
-- it identifies **where** a train stops in a commercial sequence (e.g. “Luxembourg”),
-- not **how** or **where exactly** on a platform it stops.
+- It identifies **where** a train stops in a commercial sequence (e.g., “Luxembourg”),
+- Not **how** or **where exactly** on a platform it stops.
 
 Physical details (platform assignment) are handled via:
 
-- `QuayRef` inside `VehicleJourneyStopAssignment`,
-- or `QuayRef` inside `StopPointInJourneyPattern` if the assignment is stable.
+- `QuayRef` inside `VehicleJourneyStopAssignment`; or
+- `QuayRef` inside `StopPointInJourneyPattern` if the assignment is stable.
 
 ### Identifier strategy and rationale
 
-In the CFL profile, ScheduledStopPoint identifiers are intentionally designed to be
-**human-readable** and derived from public station name (e.g. “LuxGare”), rather than using opaque technical
-codes such as `SSP0001`.
+In the CFL profile, ScheduledStopPoint identifiers are intentionally designed to be **human-readable** and derived from public station name (e.g. “LuxGare”), rather than using opaque technical codes such as `SSP0001`.
 
 This approach is chosen for several reasons:
 
 - **Debuggability and maintainability**  
-  ScheduledStopPoints appear extensively in timetables (TimetableFrame,
-  VehicleJourney, StopPointInJourneyPattern).  
-  Readable identifiers make it significantly easier for analysts, developers and
-  operational staff to interpret timetable structures directly from XML files,
-  logs, diffs or diagnostic tools, without requiring a lookup table.
+  ScheduledStopPoints appear extensively in timetables (TimetableFrame,VehicleJourney, StopPointInJourneyPattern).  
+  Readable identifiers make it significantly easier for analysts, developers and operational staff to interpret timetable structures directly from XML files, logs, diffs or diagnostic tools, without requiring a lookup table.
 
 - **Operational transparency**  
   Many CFL teams (planning, SIV, operational support) consult or manipulate
   timetable data.  
-  Using meaningful identifiers allows non-technical users to immediately recognise
-  stations when inspecting exports or troubleshooting integrations.
+  Using meaningful identifiers allows non-technical users to immediately recognise stations when inspecting exports or troubleshooting integrations.
 
 - **Stability and long-term maintainability**  
-  Unlike StopPlace identifiers, which will eventually be aligned with the future
-  national stop register, ScheduledStopPoints are internal timetable objects.
-  Giving them human-readable identifiers ensures long-term clarity and avoids
-  spreading opaque or temporary codes into downstream systems.
+  Unlike StopPlace identifiers, which will eventually be aligned with the future national stop register, ScheduledStopPoints are internal timetable objects.
+  Giving them human-readable identifiers ensures long-term clarity and avoids spreading opaque or temporary codes into downstream systems.
 
 - **Alignment with other CFL identifiers**  
   The CFL MVP already uses recognisable patterns for StopPlace (`LuxGare`) and
   Quay (`LuxGare-1`).  
-  Using the same strategy for ScheduledStopPoint keeps the profile consistent and
-  predictable across frames.
+  Using the same strategy for ScheduledStopPoint keeps the profile consistent and predictable across frames.
 
 Therefore, the identifier pattern adopted in the CFL profile is:
 
@@ -84,9 +70,7 @@ Pattern:
 
 `LU:CFL:ScheduledStopPoint:<ReadableStationId>`
 
-where `<ReadableStationId>` is a short, human-friendly identifier derived from the
-public station name (e.g. “LuxGare”, “EschAlzette”, “Bettembourg”), and **not**
-the technical identifier of the StopPlace object.
+where `<ReadableStationId>` is a short, human-friendly identifier derived from the public station name (e.g. “LuxGare”, “EschAlzette”, “Bettembourg”), and **not** the technical identifier of the StopPlace object.
 
 Examples:
 
@@ -95,6 +79,8 @@ Examples:
 - `LU:CFL:ScheduledStopPoint:Bettembourg`
 
 There is no requirement nor expectation for the ScheduledStopPoint identifier to match or derive from the StopPlace identifier. The two identifiers serve different purposes.
+
+**Important note:** Although the identifiers of the ScheduleStopPoint is designed to be human-readable for data production purposes, it should not be used for semantic search or analytics on the data consumer side. Data consumers should always consider identifiers as a "black-box" chain of characters used to build references and share information across files in the dataset.
 
 ---
 

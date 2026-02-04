@@ -2,11 +2,11 @@
 
 ## 2.1 What is NeTEx (in simple terms)
 
-NeTEx (Network Timetable Exchange) is a **CEN Technical Specification series** (CEN/TS 16614-x) for exchanging public-transport network and timetable data. It provides:
+NeTEx (Network Timetable Exchange) is a **CEN Technical Specification series** (CEN/TS 16614) for exchanging public-transport network, timetable data, and all relevant static information. It provides:
 
-- a **shared vocabulary** (entities and relationships) for stops, networks, timetables, fares, etc.;
-- a **machine-readable format** (XML) to publish and exchange those data consistently;
-- a **modular structure** (frames) so producers publish only what is needed.
+- A **shared vocabulary** (entities and relationships) for stops, networks, timetables, fares, etc.;
+- A **machine-readable format** (XML) to publish and exchange those data consistently;
+- A **modular structure** (frames) so producers publish only what is needed.
 
 NeTEx is **model-driven** (Transmodel): you describe the world (stops, lines, journeys) and then export consistent data sets from that model.
 
@@ -14,13 +14,13 @@ NeTEx is **model-driven** (Transmodel): you describe the world (stops, lines, jo
 
 ## 2.2 Why NeTEx?
 
-Public-transport information in Europe has historically been published through multiple formats, each created for a specific operational or national context (e.g. GTFS, VDV, TransXChange). While these formats cover particular needs, they also lead to fragmentation and limited interoperability between systems.
+Public-transport information in Europe has historically been published through multiple formats, each created for a specific operational or national context (e.g., GTFS, VDV, TransXChange). While these formats cover particular needs, they also lead to fragmentation and limited interoperability between systems.
 
 NeTEx was developed by CEN to provide a **harmonised, multimodal and extensible standard** capable of supporting:
 
-- the complete description of the public-transport offer (stops, networks, timetables, accessibility, fares);
-- consistent and reliable data exchange between operators, authorities, and information systems;
-- seamless cross-border and international interoperability.
+- The comprehensive description of the public-transport offer (stops, networks, timetables, accessibility, fares);
+- Consistent and reliable data exchange between operators, authorities, and information systems;
+- Seamless cross-border and international interoperability.
 
 NeTEx does not replace existing formats but **complements** them:
 
@@ -28,7 +28,8 @@ NeTEx does not replace existing formats but **complements** them:
 - **TAP TSI** remains mandatory for railway timetable and reservation exchanges at European level;
 - **SIRI** provides the real-time counterpart to NeTEx for operational monitoring and passenger information.
 
-Compared to other formats, NeTEx stands out by its **model-driven foundation** (Transmodel), its **completeness** across all public-transport domains, and its **extensibility** through national profiles.
+Compared to other formats, NeTEx stands out by its **model-driven foundation** (Transmodel), its **completeness** across all public-transport domains, and its **flexibility** through national profiles (i.e., national profiles allow to agree on selecting specific NeTEx concecpts to cater to local needs).
+
 GTFS focuses on lightweight consumer applications; TAP TSI targets rail-sector exchanges; SIRI covers real-time.
 NeTEx acts as the **structured backbone** from which lighter or specialised formats can be derived or complemented.
 
@@ -41,9 +42,9 @@ It selects the relevant concepts, constrains optionalities, and establishes clea
 
 A profile ensures:
 
-- coherence across datasets produced by different systems or teams;
-- predictability for data consumers, who can rely on stable structures and identifiers;
-- interoperability with other national or European datasets by aligning with common modelling principles.
+- Coherence across datasets produced by different systems or teams;
+- Predictability for data consumers, who can rely on stable structures and identifiers;
+- Interoperability with other national or European datasets by aligning with common modelling principles.
 
 Without a profile, each producer or consumer could interpret NeTEx differently, leading to inconsistencies or incompatible implementations.
 
@@ -55,8 +56,8 @@ The CFL profile provides a shared, authoritative reference for structuring and p
 
 The CFL NeTEx profile is developed through a **pragmatic, iterative and collaborative process**:
 
-- **Alignment with European standards**: strict adherence to NeTEx (CEN/TS 16614-x) and Transmodel (EN 12896) to ensure compatibility at European level.
-- **Reuse of established practices**: integration of relevant modelling choices from existing profiles (e.g. France, Nordic, ITxPT) to ensure continuity with recognised implementations.
+- **Alignment with European standards**: strict adherence to NeTEx (CEN/TS 16614) and Transmodel (EN 12896) to ensure compatibility at European level.
+- **Reuse of established practices**: integration of relevant modelling choices from existing profiles (e.g., France, Nordic, VDV) to ensure continuity with recognised implementations.
 - **Regular expert consultations**: workshops with CFL business, data and technical teams to validate modelling decisions.
 - **Transparency and documentation**: systematic recording of decisions, modelling choices and rationale.
 - **Incremental refinement**: the MVP delivers a functional baseline which is progressively enriched based on actual use cases.

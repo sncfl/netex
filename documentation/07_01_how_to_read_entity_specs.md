@@ -4,11 +4,11 @@ This chapter describes, for each NeTEx entity used in the MVP, which attributes 
 
 For each entity, the profile provides:
 
-- a short functional description;
-- a list of attributes and child elements used in the MVP;
-- the expected cardinality in the CFL profile;
-- specific constraints or modelling notes;
-- a minimal XML example.
+- A short functional description;
+- A list of attributes and child elements used in the MVP;
+- The expected cardinality in the CFL profile;
+- Specific constraints or modelling notes;
+- A minimal XML example.
 
 The goal is to give producers and consumers a precise, operational view of what is *actually* used in the CFL NeTEx dataset.
 
@@ -18,19 +18,17 @@ The goal is to give producers and consumers a precise, operational view of what 
 
 Each entity in this chapter is presented using a standard structure that defines which NeTEx elements are used in the CFL MVP, how they are constrained, and how they must be populated.
 
-The goal is to provide producers and consumers with a precise, operational view of the *actual* structure of the CFL dataset.
-
 ---
 
 #### 7.1.1 Structure of each entity specification
 
 For each NeTEx entity, the specification includes:
 
-- a **short functional description** of the entity;
-- a **table of attributes and sub-elements** retained in the CFL MVP;
-- the **allowed cardinality** in the CFL profile;
-- **constraints or modelling rules** specific to CFL;
-- a **minimal XML example** to illustrate the expected structure.
+- A **short functional description** of the entity;
+- A **table of attributes and sub-elements** retained in the CFL MVP;
+- The **allowed cardinality** in the CFL profile;
+- **Constraints or modelling rules** specific to CFL;
+- A **minimal XML example** to illustrate the expected structure.
 
 ---
 
@@ -65,9 +63,9 @@ Each table typically contains:
 
 The examples provided in this chapter (sample values and minimal XML fragments):
 
-- are **illustrative only**,  
-- are **not real CFL production data**,  
-- serve exclusively to clarify the meaning of concepts and structures,  
-- may not reflect final identifiers, codes, naming conventions, or operational data.
+- Are **illustrative only**,  
+- Are **not real CFL production data**,  
+- Serve exclusively to clarify the meaning of concepts and structures,  
+- May not reflect final identifiers, codes, naming conventions, or operational data.
 
 They are included to support understanding, not to prescribe actual content.

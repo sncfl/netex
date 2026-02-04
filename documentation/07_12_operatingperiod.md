@@ -2,14 +2,11 @@
 
 ## 7.12.1 Purpose and scope
 
-An **OperatingPeriod** defines a *continuous date range* during which a timetable
-or a set of VehicleJourneys is valid.
+An **OperatingPeriod** defines a *continuous date range* during which a timetable or a set of VehicleJourneys is valid.
 
-It provides the temporal boundaries of the timetable dataset, typically aligned
-with seasonal timetable changes (e.g. winter period, summer period).
+It provides the temporal boundaries of the timetable dataset, typically aligned with seasonal timetable changes (e.g. winter period, summer period).
 
-An OperatingPeriod does **not** specify which days within the period are
-operational.  
+An OperatingPeriod does **not** specify which days within the period are operational.  
 It only defines the *outer validity range*.  
 Actual running days are determined by **DayType** and **DayTypeAssignment**.
 
@@ -23,12 +20,10 @@ In the CFL MVP:
 ## 7.12.2 Modelling principles
 
 ### Continuous range  
-An OperatingPeriod represents an uninterrupted period starting on `FromDate`
-and ending on `ToDate` (inclusive).
+An OperatingPeriod represents an uninterrupted period starting on `FromDate` and ending on `ToDate` (inclusive).
 
 ### Stability  
-OperatingPeriods remain stable across timetable updates as long as the date
-range does not change.
+OperatingPeriods remain stable across timetable updates as long as the date range does not change.
 
 ### Independence from DayType  
 OperatingPeriods do not imply any pattern (e.g. weekdays, weekends).  
@@ -38,7 +33,7 @@ They only define *when the timetable is active* at a high level.
 
 ## 7.12.3 Elements and attributes retained in the CFL MVP
 
-| Element / Attribute | Description | Card. (MVP) | Notes / Constraints | Example value |
+| Element / Attribute | Description | Cardinality (MVP) | Notes / Constraints | Example value |
 |---------------------|-------------|-------------|----------------------|----------------|
 | `@id` | Unique identifier | 1..1 | Stable identifier for the period | `LU:CFL:OP_2025_WINTER` |
 | `version` | Object version | 1..1 | Incremented if dates change | `1` |

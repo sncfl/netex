@@ -19,10 +19,11 @@ Identifiers are fundamental in NeTEx: they ensure that entities can be reference
 The **CFL MVP Profile** defines a clear and uniform identifier structure for all CFL-managed entities, ensuring stability, readability and long-term maintainability.
 
 In the future, when a **LU NeTEx Profile** is established at national level, identifier governance **shall** be extended to all operators and applied consistently across all public-transport data in Luxembourg.  
+
 The rules below therefore distinguish between:
 
-- identifiers defined by **CFL for the MVP**, and  
-- identifiers that **will later be governed nationally**.
+- Identifiers defined by **CFL for the MVP**, and  
+- Identifiers that **will later be governed nationally**.
 
 ---
 
@@ -40,6 +41,8 @@ Examples:
 
 This format guarantees global uniqueness and enables consistent cross-referencing throughout the dataset.
 
+**Important note:** Once these identifiers are constructed using the above-mentioned structure, they should not be used for any semantic research. They must be treated as a "black-box" chain of charaacters that will allow to search for their references / usages within the dataset.
+
 ---
 
 ### 5.1.2 Codespace
@@ -50,8 +53,8 @@ The codespace specifies the namespace in which the identifier exists.
 - When the LU NeTEx Profile will be developed, additional codespaces **shall** be assigned to other operators (e.g. RGTR networks, AVL, TICE, Luxtram) following a coordinated national governance model.
 
 Rules:  
-- the codespace always appears first in the identifier;  
-- codespaces must be stable and centrally allocated (at national level).
+- The codespace always appears first in the identifier;  
+- Codespaces must be stable and centrally allocated (at national level).
 
 
 ---
@@ -64,8 +67,8 @@ Examples:
 `Line`, `JourneyPattern`, `VehicleJourney`, `PassingTime`, `DayType`, `StopPlace`, `Quay`.
 
 Rules:  
-- use the **official NeTEx class name**;  
-- no abbreviations or operator-specific naming variants.
+- Use the **official NeTEx class name**;  
+- No abbreviations or operator-specific naming variants.
 
 ---
 
@@ -97,15 +100,15 @@ Reason:
 Identifiers for physical stops must ultimately come from a **National Stop Registry**, which will be created as part of the future LU NeTEx Profile.  
 Until that registry exists, CFL may use temporary internal identifiers, but:
 
-- these are not normative,  
-- they will be replaced by national identifiers,  
-- the CFL MVP Profile does **not** prescribe any StopPlace or Quay LocalId pattern.
+- These are not normative;
+- They will be replaced by national identifiers;
+- The CFL MVP Profile does **not** prescribe any StopPlace or Quay LocalId pattern.
 
 #### What LocalId is *not*
 
-- not a `PrivateCode` (internal operator code),  
-- not a `PublicCode` (display code),  
-- not a name or label.
+- Not a `PrivateCode` (internal operator code),  
+- Not a `PublicCode` (display code),  
+- Not a name or label.
 
 Only the complete `id` (Codespace + Class + LocalId) is authoritative for referencing.
 
@@ -115,17 +118,17 @@ Only the complete `id` (Codespace + Class + LocalId) is authoritative for refere
 
 Identifiers defined in the CFL MVP Profile are **permanent**. They do not change when:
 
-- a name changes (e.g. station rename),  
-- a pattern is adjusted,  
-- operational attributes evolve.
+- A name changes (e.g. station rename);
+- A pattern is adjusted;
+- Operational attributes evolve.
 
 If attributes require modification, a new **version** may be created, but the `id` itself remains unchanged.  
-Identifiers must never be reused.
+Identifiers must never be reused, except for an update of the same file / bundle.
 
 Forbidden constructions:  
-- including dates or version numbers;  
-- embedding descriptive text;  
-- regenerating identifiers between exports.
+- Including dates or version numbers;  
+- Embedding descriptive text;  
+- Regenerating identifiers between exports.
 
 ---
 
@@ -134,13 +137,13 @@ Forbidden constructions:
 When the **LU NeTEx Profile** is established, identifier governance **shall** be centralised at national level.  
 This governance will include:
 
-- allocation of codespaces for all operators;  
-- validation of identifier structure and LocalId formats;  
-- enforcement of global uniqueness across the national dataset;  
-- a shared model for StopPlace/Quay identifiers;  
-- rules for migrating from temporary CFL identifiers to national ones.
+- Allocation of codespaces for all operators;  
+- Validation of identifier structure and LocalId formats;  
+- Enforcement of global uniqueness across the national dataset;  
+- A shared model for StopPlace/Quay identifiers;  
+- Rules for migrating from temporary CFL identifiers to national ones.
 
-Operators **shall** follow this national governance model once in place.
+Operators **shall** follow this national governance model once defined.
 
 ---
 
@@ -154,7 +157,7 @@ Its role will be to provide a **single authoritative source** for the identifica
 The NSR shall define and maintain:
 
 - **StopPlace** entities, as unique representations of physical stations, stops or interchanges;  
-- associated topographic, naming and geographic metadata.
+- Associated topographic, naming and geographic metadata.
 
 StopPlace identifiers used in the CFL MVP Profile are therefore **temporary** and will be replaced by the identifiers allocated by the NSR once it exists.
 
@@ -176,10 +179,10 @@ Given the high degree of interchange between modes in Luxembourg, a centralised 
 
 #### Principles once the NSR exists
 
-- each StopPlace shall have **exactly one** national identifier;  
+- Each StopPlace shall have **exactly one** national identifier;  
 - Quay governance shall follow the national decision (centralised or operator-based);  
-- all operators shall reference the same StopPlace identifiers;  
-- any update to stop infrastructure (rename, closure, creation of new quays) shall first be applied to the NSR.
+- All operators shall reference the same StopPlace identifiers;  
+- Any update to stop infrastructure (rename, closure, creation of new quays) shall first be applied to the NSR.
 
 Identifiers used during the CFL MVP phase will therefore be **transitional** and replaced once the LU Profile and NSR are formalised.
 
@@ -277,10 +280,10 @@ Rules:
 
 Names must **not** include:
 
-- technical codes or internal references,  
-- version numbers or dates,  
-- annotations such as “(new)” or “(temporary)”,  
-- formatting artefacts (e.g., “_Platform_01_”).
+- Technical codes or internal references;
+- Version numbers or dates;
+- Annotations such as “(new)” or “(temporary)”;
+- Formatting artefacts (e.g., “_Platform_01_”).
 
 Names must remain clean, readable and aligned with official information for passengers.
 
@@ -290,9 +293,9 @@ Names must remain clean, readable and aligned with official information for pass
 
 Names may evolve (e.g., following an official rename), but:
 
-- changes must follow CFL or national naming policies,  
-- changes should be rare and justified,  
-- any update must be applied consistently across all frames referencing the entity.
+- Changes must follow CFL or national naming policies;  
+- Changes should be rare and justified;
+- Any update must be applied consistently across all frames referencing the entity.
 
 Changing the public name does **not** change the identifier (see section 5.1).
 
@@ -314,9 +317,9 @@ In the future LU NeTEx Profile, the use and governance of such codes **shall** b
 
 Examples include:
 
-- commercial line numbers (e.g., “10”, “80”, “RE”, “RB”, “IC”),  
-- platform identifiers used on signage (when structured codes exist),  
-- route designators used on maps or in journey planners.
+- Commercial line numbers (e.g., “10”, “80”, “RE”, “RB”, “IC”);  
+- Platform identifiers used on signage (when structured codes exist);
+- Route designators used on maps or in journey planners.
 
 In the CFL MVP Profile:
 
@@ -328,23 +331,23 @@ In the future LU Profile, the allocation of `PublicCode` values **shall** be coo
 
 ---
 
-### 5.3.2 PrivateCode
+### 5.3.2 privateCodes
 
-`PrivateCode` is an optional attribute intended for **internal business codes** used by CFL.
+`privateCodes` is an optional collection ofattribute intended for **internal business codes** used by CFL and any other IT systems (e..g, scheduling, ticketing).
 
 Examples include:
 
-- internal stop or quay codes used in legacy CFL systems,  
-- internal journey or vehicle pattern codes known by operations,  
-- codes required for mapping between CFL systems.
+- Internal stop or quay codes used in legacy CFL systems;
+- Internal journey or vehicle pattern codes known by operations;
+- Codes required for mapping between CFL systems.
 
 In the CFL MVP Profile:
 
-- `PrivateCode` may be used when needed for internal consistency or traceability.  
+- `privateCodec` may be used when needed for internal consistency or traceability.  
 - It should not be exposed to passengers.  
 - It must remain **operator-specific** and may differ from the conventions used by other operators.
 
-In the future LU Profile, the use of `PrivateCode` shall remain operator-specific unless a national need for harmonisation arises.
+In the future LU Profile, the use of `privateCodes` shall remain operator-specific unless a national need for harmonisation arises.
 
 ---
 
@@ -353,10 +356,10 @@ In the future LU Profile, the use of `PrivateCode` shall remain operator-specifi
 To avoid ambiguity, the following principles apply:
 
 - `id` (Codespace + Class + LocalId) is the **only authoritative identifier** used for referencing.  
-- `PublicCode` and `PrivateCode` **do not** participate in referencing.  
+- `PublicCode` and `privateCodes` **do not** participate in referencing.  
 - Names (section 5.2) are intended for human readability, whereas codes support concise labelling.  
 - Multiple entities may share the same `PublicCode` if this reflects operational reality (e.g., several VehicleJourneys of the same Line).  
-- `PrivateCode` may be duplicated across operators but must remain unique within the scope of the operator using it.
+- `privateCodes` may be duplicated across operators but must remain unique within the scope of the operator using it.
 
 ---
 
@@ -364,11 +367,11 @@ To avoid ambiguity, the following principles apply:
 
 Codes should generally remain stable but may evolve:
 
-- if CFL changes its public communication;  
-- if internal business processes evolve;  
-- if the future LU Profile introduces new national coding practices.
+- If CFL changes its public communication;  
+- If internal business processes evolve;  
+- If the future LU Profile introduces new national coding practices.
 
-Changing a `PublicCode` or `PrivateCode` **does not** change the identifier and does not require creating a new version of the entity.
+Changing a `PublicCode` or `privateCodes` **does not** change the identifier and does not require creating a new version of the entity.
 
 ---
 
@@ -376,11 +379,11 @@ Changing a `PublicCode` or `PrivateCode` **does not** change the identifier and 
 
 Codes must **not** include:
 
-- full identifiers (“LU:CFL:…”),  
-- dates,  
-- temporary annotations (“new”, “temp”),  
-- long descriptive text,  
-- special characters that may conflict with downstream systems.
+- Full identifiers (“LU:CFL:…”);
+- Dates;
+- Temporary annotations (“new”, “temp”);
+- Long descriptive text;
+- Special characters that may conflict with downstream systems.
 
 Codes are meant to remain **short and functional**.
 
@@ -388,7 +391,7 @@ Codes are meant to remain **short and functional**.
 
 ## 5.4 Referencing rules
 
-References (`…Ref`) are the mechanism that links the various components of a NeTEx dataset.  
+References (`xxxRef`) are the mechanism that links the various components of a NeTEx dataset.  
 They ensure that entities defined in one frame (e.g., stops, patterns, calendars) can be reused consistently in another (e.g., timetables).  
 Correct referencing is essential for producing a coherent and interoperable dataset.
 
@@ -399,7 +402,7 @@ In the future LU NeTEx Profile, referencing principles **shall** be extended acr
 
 ### 5.4.1 General principles
 
-- Every reference (`…Ref`) **must point to an existing, valid `id`**.  
+- Every reference (`xxxRef`) **must point to an existing, valid `id`**.  
 - References must always target the **authoritative frame** for the entity type.  
 - A reference is valid only if the referenced entity is present **within the same dataset**.  
 - References must be stable and must not depend on names, PublicCodes or PrivateCodes.
@@ -471,11 +474,11 @@ In the future LU Profile, these consistency rules **shall** be enforced across a
 
 The following constructions must be avoided:
 
-- referencing entities not included in the dataset being published;  
-- referencing identifiers from past or future deliveries;  
-- redefining an entity in multiple frames;  
-- referencing a StopPlace/Quay outside the scope allowed by the future National Stop Registry;  
-- using names or codes (PublicCode, PrivateCode) instead of identifiers.
+- Referencing entities not included in the dataset being published;  
+- Referencing identifiers from past or future deliveries;  
+- Redefining an entity in multiple frames;  
+- Referencing a StopPlace/Quay outside the scope allowed by the future National Stop Registry;  
+- Using names or codes (PublicCode, privateCodes) instead of identifiers.
 
 Such constructions lead to incoherent datasets and must be avoided.
 
@@ -485,10 +488,10 @@ Such constructions lead to incoherent datasets and must be avoided.
 
 Referencing rules ensure that:
 
-- stops defined in the SiteFrame are consistently reused in patterns;  
+- Stops defined in the SiteFrame are consistently reused in patterns;  
 - JourneyPatterns defined in the ServiceFrame structure the timetable;  
-- timetable data aligns with the calendar in the ServiceCalendarFrame;  
-- all references remain resolvable and stable across the dataset.
+- Timetable data aligns with the calendar in the ServiceCalendarFrame;  
+- All references remain resolvable and stable across the dataset.
 
 These rules guarantee that the CFL MVP Profile produces a coherent, interoperable dataset.  
 In the future LU NeTEx Profile, these referencing principles **shall** support multimodal integration across all operators and rely on the National Stop Registry for authoritative stop structures.
@@ -526,13 +529,13 @@ Arrival and departure times must form a coherent chronological sequence.
 Rules:
 
 - At a given stop:  
-  - `ArrivalTime` must be **≤** `DepartureTime`.  
+  - `ArrivalTime` must be **inferior or equal to (≤)** `DepartureTime`.  
   - One of the two may be omitted when operationally irrelevant (e.g., first or last stops).
 
 - Along the JourneyPattern:  
-  - time values must be strictly increasing;  
-  - negative running times are not allowed;  
-  - scheduled dwell or layover must be reflected in the times.
+  - Time values must be strictly increasing;  
+  - Negative running times are not allowed;  
+  - Scheduled dwell or layover must be reflected in the times.
 
 For overnight journeys, chronology must remain correct using NeTEx constructs such as `DayOffset` where necessary.
 
@@ -545,7 +548,7 @@ Each stop in a JourneyPattern must contain sufficient temporal data.
 Rules:
 
 - A stop that is served for boarding or alighting must include at least one time (`ArrivalTime` or `DepartureTime`).  
-- Intermediate operational stops may provide only one of the two.  
+- Intermediate operational stops may provide only one of the two attributes.  
 - A stop must not be left completely without time information unless explicitly marked as non-serviceable.
 
 Timetable data must therefore be complete and represent operational reality.
@@ -570,11 +573,11 @@ A `VehicleJourney` without a `DayTypeRef` is not permitted.
 
 To maintain consistency and data quality, the following must not occur:
 
-- a served stop with no `ArrivalTime` and no `DepartureTime`;  
+- A served stop with no `ArrivalTime` and no `DepartureTime`;  
 - `PassingTime` elements out of sequence with the JourneyPattern;  
-- artificial placeholder times (e.g., “00:00” for unknown times);  
+- Artificial placeholder times (e.g., “00:00” for unknown times);  
 - `VehicleJourney` elements without any `DayTypeRef`;  
-- encoding operational variants within identifiers.
+- Encoding operational variants within identifiers.
 
 Such cases result in ambiguous or invalid timetable data.
 
@@ -584,10 +587,10 @@ Such cases result in ambiguous or invalid timetable data.
 
 The temporal rules ensure that all CFL timetable data in the MVP:
 
-- follows the structure of the JourneyPattern,  
-- contains coherent and complete timing information,  
-- is chronologically valid,  
-- and is correctly associated with operating days.
+- Follows the structure of the JourneyPattern;
+- Contains coherent and complete timing information;
+- Is chronologically valid;
+- And is correctly associated with operating days.
 
 These rules guarantee that the published timetable is reliable, interpretable and suitable for downstream systems.
 

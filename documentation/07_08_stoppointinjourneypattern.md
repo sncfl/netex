@@ -2,14 +2,13 @@
 
 ## 7.8.1 Purpose and scope
 
-A **StopPointInJourneyPattern** represents the *ordered occurrence* of a ScheduledStopPoint
-within a ServiceJourneyPattern. It defines the structural path of a commercial service variant.
+A **StopPointInJourneyPattern** represents the *ordered occurrence* of a ScheduledStopPoint within a ServiceJourneyPattern. It defines the structural path of a commercial service variant.
 
 It is used to express:
 
-- the **sequence** of logical stops,
-- the **reference** to the underlying ScheduledStopPoint,
-- an optional **stable platform assignment** (QuayRef), if and only if all VehicleJourneys
+- The **sequence** of logical stops,
+- The **reference** to the underlying ScheduledStopPoint,
+- An optional **stable platform assignment** (QuayRef), if and only if all VehicleJourneys
   using the ServiceJourneyPattern share the same platform at that stop.
 
 A StopPointInJourneyPattern does **not** contain any timing information.  
@@ -21,17 +20,9 @@ It purely describes the **structure** of the journey.
 
 ### Structural component of a ServiceJourneyPattern
 A ServiceJourneyPattern is composed of an ordered list of StopPointInJourneyPattern elements.
-Each element:
+Each element identifies a logical stop (`ScheduledStopPointRef`). 
 
-- identifies a logical stop (`ScheduledStopPointRef`),
-- specifies its position in the sequence via `order`.
-
-### Ordering
-The attribute `order`:
-
-- SHALL start at `1`,
-- SHALL be strictly increasing,
-- determines the stop sequence for the ServiceJourneyPattern.
+NeTEx v2.0 favours the natural ordering of XML, which means that the order in which each `StopPointInJourneyPattern` is listed gives the order in which they are served by the `ServiceJourneyPattern` (i.e., its sequence of stops)
 
 ### Platform assignment
 In the CFL MVP:
@@ -60,7 +51,6 @@ In the CFL MVP:
 | JourneyPattern → StopPointInJourneyPattern  | 1..*        | A ServiceJourneyPattern SHALL contain one or more StopPointInJourneyPattern elements in ordered sequence. |
 | StopPointInJourneyPattern → ScheduledStopPoint | 1..1      | Each element SHALL reference exactly one ScheduledStopPoint. |
 | StopPointInJourneyPattern → QuayRef         | 0..1        | MAY be present only if the quay assignment is structurally constant. |
-| `order` attribute                           | 1..1        | SHALL be strictly increasing to define the stop sequence. |
 
 ---
 
@@ -72,15 +62,15 @@ In the CFL MVP:
 <ServiceJourneyPattern id="LU:CFL:JP:LUX-ESCH" version="1">
     <pointsInSequence>
 
-        <StopPointInJourneyPattern id="LU:CFL:SPJP:LuxGare_1" version="1" order="1">
+        <StopPointInJourneyPattern id="LU:CFL:SPJP:LuxGare_1" version="1">
             <ScheduledStopPointRef ref="LU:CFL:ScheduledStopPoint:LuxGare"/>
         </StopPointInJourneyPattern>
 
-        <StopPointInJourneyPattern id="LU:CFL:SPJP:Bettembourg_2" version="1" order="2">
+        <StopPointInJourneyPattern id="LU:CFL:SPJP:Bettembourg_2" version="1">
             <ScheduledStopPointRef ref="LU:CFL:ScheduledStopPoint:Bettembourg"/>
         </StopPointInJourneyPattern>
 
-        <StopPointInJourneyPattern id="LU:CFL:SPJP:EschAlzette_3" version="1" order="3">
+        <StopPointInJourneyPattern id="LU:CFL:SPJP:EschAlzette_3" version="1">
             <ScheduledStopPointRef ref="LU:CFL:ScheduledStopPoint:EschAlzette"/>
         </StopPointInJourneyPattern>
 
@@ -94,12 +84,12 @@ In the CFL MVP:
 <ServiceJourneyPattern id="LU:CFL:JP:LUX-HWD" version="1">
     <pointsInSequence>
 
-        <StopPointInJourneyPattern id="LU:CFL:SPJP:LuxGare_1" version="1" order="1">
+        <StopPointInJourneyPattern id="LU:CFL:SPJP:LuxGare_1" version="1">
             <ScheduledStopPointRef ref="LU:CFL:ScheduledStopPoint:LuxGare"/>
             <QuayRef ref="LU:CFL:Quay:LuxGare-3A"/>
         </StopPointInJourneyPattern>
 
-        <StopPointInJourneyPattern id="LU:CFL:SPJP:Howald_2" version="1" order="2">
+        <StopPointInJourneyPattern id="LU:CFL:SPJP:Howald_2" version="1">
             <ScheduledStopPointRef ref="LU:CFL:ScheduledStopPoint:Howald"/>
             <QuayRef ref="LU:CFL:Quay:Howald-2"/>
         </StopPointInJourneyPattern>

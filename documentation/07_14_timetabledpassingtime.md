@@ -2,15 +2,13 @@
 
 ## 7.14.1 Purpose and scope
 
-A **TimetabledPassingTime** provides the *scheduled theoretical time* at which a
-VehicleJourney is planned to arrive at and/or depart from a specific stop  
-(as defined in the referenced StopPointInJourneyPattern).
+A **TimetabledPassingTime** provides the *scheduled theoretical time* at which a VehicleJourney is planned to arrive at and/or depart from a specific stop (as defined in the referenced StopPointInJourneyPattern).
 
 It contains:
 
-- the scheduled **ArrivalTime**,
-- the scheduled **DepartureTime**,
-- and the reference to the stop in the journey pattern.
+- The scheduled **ArrivalTime**;
+- The scheduled **DepartureTime**;
+- And the reference to the stop in the journey pattern.
 
 In the CFL MVP:
 
@@ -22,8 +20,7 @@ In the CFL MVP:
 ## 7.14.2 Modelling principles
 
 ### One passing time per stop
-For each StopPointInJourneyPattern in the ServiceJourneyPattern, the corresponding
-VehicleJourney SHALL include exactly one TimetabledPassingTime.
+For each StopPointInJourneyPattern in the ServiceJourneyPattern, the corresponding VehicleJourney SHALL include exactly one TimetabledPassingTime.
 
 ### Arrival vs departure times
 - At the **origin stop**: only `DepartureTime` is normally present.  
