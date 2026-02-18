@@ -387,16 +387,16 @@ Inside the ZIP:
 
 ZIP filenames follow this pattern:
 
-**`LU_NeTEx_<BundleType>_<YYYYMMDDThhmmZ>.zip`**
+**`CFL_NeTEx_<BundleType>_<YYYYMMDDThhmmZ>.zip`**
 
 Where:
 - `<BundleType>` is one of the defined publication types (BaselineDelivery, ReferenceDelivery, TimetableUpdate, etc.).  
 - `<YYYYMMDDThhmmZ>` is the UTC timestamp of the publication.
 
 **Examples**
-- `LU_NeTEx_BaselineDelivery_20250922T0600Z.zip`
-- `LU_NeTEx_ReferenceDelivery_20251001T0400Z.zip`
-- `LU_NeTEx_TimetableUpdate_20251115T1800Z.zip`
+- `CFL_NeTEx_BaselineDelivery_20250922T0600Z.zip`
+- `CFL_NeTEx_ReferenceDelivery_20251001T0400Z.zip`
+- `CFL_NeTEx_TimetableUpdate_20251115T1800Z.zip`
 
 Each delivery must have a unique filename.
 
