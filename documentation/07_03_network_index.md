@@ -1,4 +1,4 @@
-# 7.3 Network
+# 7.3 Network entities
 
 # Line (ServiceFrame)
 
@@ -309,4 +309,5 @@ Identifiers:
   </members>
 </GroupOfLines>
 ```
+
 
