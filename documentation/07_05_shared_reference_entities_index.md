@@ -1,6 +1,6 @@
-# 7.16 ResourceFrame — shared reference entities
+# 7.5 Shared reference entities (ResourceFrame)
 
-## 7.16.1 Overview
+## Overview
 
 The **ResourceFrame** contains shared reference entities that are reused across the entire CFL NeTEx MVP dataset.
 
@@ -16,7 +16,7 @@ The ResourceFrame is published exclusively in `resource.xml`.
 
 ---
 
-## 7.16.2 Codespace
+## Codespace
 
 ### Functional description
 
@@ -47,7 +47,7 @@ All identifiers used in the CFL NeTEx MVP dataset rely on Codespaces declared in
 
 ---
 
-## 7.16.3 Operator
+## Operator
 
 ### Functional description
 
@@ -76,7 +76,7 @@ In the CFL NeTEx MVP, a single Operator is defined and reused across all Lines a
 
 ---
 
-## 7.16.4 Branding
+## Branding
 
 ### Functional description
 
@@ -104,7 +104,7 @@ It enables downstream systems to apply a consistent visual identity (e.g., colou
 
 ---
 
-## 7.16.5 Optional / future ResourceFrame entities
+## Optional / future ResourceFrame entities
 
 The following ResourceFrame entities are **not part of the CFL MVP baseline**, but may be introduced in future extensions of the profile.
 
@@ -134,7 +134,7 @@ These entities are not included in the CFL MVP baseline.
 
 ---
 
-## 7.16.6 Scope limitations and summary
+## Scope limitations and summary
 
 The ResourceFrame in the CFL NeTEx MVP:
 
@@ -151,3 +151,4 @@ The ResourceFrame provides the **shared foundation** of the CFL NeTEx MVP datase
 - And a clear extension point for future shared reference data.
 
 All other Frames rely on the ResourceFrame for stable, dataset-wide references.
+
