@@ -5,16 +5,16 @@
 A **Branding** element defines the **visual identity** associated with a GroupOfLines.  
 In the CFL profile, Branding is used to store:
 
-- the **colour** of a CFL line family (e.g. L50 = ##A14D00),
-- optionally, other visual attributes in future extensions (logo, icon, etc.).
+- The **colour** of a CFL line family (e.g., L50 = ##A14D00),
+- Optionally, other visual attributes in future extensions (logo, icon, etc.).
 
 Branding does **not** carry operational meaning.  
 It provides a reusable visual identity that may be applied across several NeTEx objects.
 
 In the CFL MVP:
 
-- **Branding is referenced by GroupOfLines** through `BrandingRef`,
-- Individual **Lines inherit the colour** indirectly through their GroupOfLines,
+- **Branding is referenced by GroupOfLines** through `BrandingRef`;
+- Individual **Lines inherit the colour** indirectly through their GroupOfLines;
 - Only the **colour** is modelled at this stage.
 
 ---
@@ -25,9 +25,9 @@ In the CFL MVP:
 
 - Colour definitions belong to **Branding**, not to Lines or GroupOfLines directly.
 - This ensures:
-  - clean separation between data (Line) and presentation (Branding),
-  - easier reuse of the same branding across multiple objects,
-  - future extensibility (logos, pictograms, accessibility variants, etc.).
+  - Clean separation between data (Line) and presentation (Branding),
+  - Easier reuse of the same branding across multiple objects,
+  - Future extensibility (logos, pictograms, accessibility variants, etc.).
 
 ### Identifier convention
 

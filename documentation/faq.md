@@ -4,9 +4,9 @@
 This FAQ aims to document the **design choices, modelling principles and scope decisions** underlying the CFL NeTEx profile.
 
 It is intended to:
-- clarify recurring questions raised during design and review phases,
-- explain modelling decisions in a transparent and pedagogical way,
-- support understanding and adoption of the profile by a broad audience (operators, implementers, experts, institutions).
+- Clarify recurring questions raised during design and review phases,
+- Explain modelling decisions in a transparent and pedagogical way,
+- Support understanding and adoption of the profile by a broad audience (operators, implementers, experts, institutions).
 
 This FAQ is a **living document**.  
 It will be **progressively enriched** as the profile evolves, new use cases emerge, or additional questions are identified.  
@@ -39,10 +39,10 @@ A `CompositeFrame`, by contrast, is used as a **container of frames**. It assemb
 In the CFL NeTEx profile, `CompositeFrame` is used as the primary structuring mechanism. This choice allows the different business frames (such as `ResourceFrame`, `SiteFrame`, `ServiceFrame`, `ServiceCalendarFrame` and `TimetableFrame`) to be clearly separated and explicitly assembled within a single publication.
 
 This approach provides several benefits:
-- immediate readability of the publication structure,
-- clear attribution of responsibilities to each frame,
-- reduced reliance on implicit thematic conventions,
-- progressive enrichment of the profile without restructuring existing data.
+- Immediate readability of the publication structure;
+- clear attribution of responsibilities to each frame;
+- Reduced reliance on implicit thematic conventions;
+- Progressive enrichment of the profile without restructuring existing data.
 
 The CFL profile does not ignore the domain-oriented approach adopted in the French profile. Rather, it deliberately adopts a different structuring strategy at this stage, in order to favour **clarity, pedagogy and ease of adoption**, particularly in a context where multiple operators are expected to progressively align their practices and gain familiarity with NeTEx concepts.
 
@@ -55,33 +55,33 @@ This choice does not preclude future evolutions. Domain-oriented structuring usi
 In NeTEx, `NetworkFrame` is intended to describe **network-oriented concepts** that provide a transversal view of a transport network, independently of individual service offers. Such concepts become particularly relevant when multiple operators publish services on a shared territory and a common network representation is required.
 
 At the current stage, the CFL MVP profile focuses on:
-- publication of the timetable offer,
-- passenger information needs (SIV),
-- clear and stable passenger-facing service structures,
-- interoperability with real-time systems such as SIRI.
+- Publication of the timetable offer,
+- Passenger information needs (SIV),
+- Clear and stable passenger-facing service structures,
+- Interoperability with real-time systems such as SIRI.
 
 These objectives are fully addressed through service- and timetable-oriented frames (notably `ServiceFrame`, `TimetableFrame` and `SiteFrame`), without introducing an explicit network layer.
 
 Introducing `NetworkFrame` at this stage would require additional assumptions regarding network governance, responsibilities and level of detail, which are not yet necessary to support the identified use cases. Excluding `NetworkFrame` therefore allows the profile to:
-- remain focused on passenger-facing use cases,
-- avoid premature infrastructure or network abstractions,
-- keep a clear separation between service modelling and network modelling,
-- limit complexity for data producers and consumers.
+- Remain focused on passenger-facing use cases,
+- Avoid premature infrastructure or network abstractions,
+- Keep a clear separation between service modelling and network modelling,
+- Limit complexity for data producers and consumers.
 
 Network-oriented concepts, including `NetworkFrame`, are expected to become more relevant in a future **multi-operator context**, where a shared and harmonised network representation may be required across multiple service providers. This perspective is acknowledged, but considered **out of scope for the CFL MVP NeTEx profile**.
 
 ## What does Line represent in the CFL NeTEx profile, and how are designations such as “Line 50” or “Line 70” handled?
 
-In the CFL NeTEx profile, a `Line` represents a **commercial service axis**, defined by an origin, a destination and, where relevant, intermediate “via” stations (e.g. *Luxembourg – Wasserbillig*).  
+In the CFL NeTEx profile, a `Line` represents a **commercial service axis**, defined by an origin, a destination and, where relevant, intermediate “via” stations (e.g., *Luxembourg – Wasserbillig*).  
 It is a passenger-facing concept used to structure timetable information and service presentation.
 
 In the CFL context, and in particular within the SIV, the term *commercial service* refers to a **passenger-facing structuring of the timetable offer**. It reflects how services are presented and understood by passengers, typically through a clear origin–destination axis, and provides a stable entry point for timetable consultation, journey planning and passenger information.
 
 A commercial service is independent of:
-- service category (RE, RB, IC, etc.),
-- rolling stock,
-- detailed routing or infrastructure usage,
-- internal operational or railway-specific classifications.
+- Service category (RE, RB, IC, etc.),
+- Rolling stock,
+- Detailed routing or infrastructure usage,
+- Internal operational or railway-specific classifications.
 
 The notion of commercial service is therefore not related to commercial or financial aspects, but to the **functional presentation of the service offer to passengers**.  
 In the CFL NeTEx profile, this concept is modelled through the `Line`, which provides the passenger-facing structure of the offer.
@@ -93,9 +93,9 @@ In the CFL NeTEx profile, these designations are therefore modelled as `GroupOfL
 A `GroupOfLines` allows several `Line` objects to be grouped under a shared identity, without conflating this grouping with the definition of a single commercial service axis.
 
 This distinction makes it possible to:
-- keep the `Line` focused on a clear and explicit commercial service axis,
-- preserve well-known historical and visual groupings (e.g. colours),
-- avoid ambiguity between service structure, service category and railway heritage concepts.
+- Keep the `Line` focused on a clear and explicit commercial service axis,
+- Preserve well-known historical and visual groupings (e.g. colours),
+- Avoid ambiguity between service structure, service category and railway heritage concepts.
 
 Service categories such as RE, RB, IC or TGV are not used as `Line` identifiers (`PublicCode`) because they describe the **service category or product** of a journey, not the commercial axis itself.  
 On a given `Line`, several service categories may coexist depending on the operated journey or the period. In the CFL profile, these codes are therefore handled as **service classifications associated with journeys**, while the `Line` remains the stable, passenger-facing grouping.
@@ -106,18 +106,18 @@ On a given `Line`, several service categories may coexist depending on the opera
 In the CFL MVP NeTEx profile, `VehicleJourney` is used as the primary journey entity because it best matches the **functional objectives** of the profile at this stage.
 
 A `VehicleJourney` represents a **concrete, operated journey**, with a defined timetable, stop sequence and operating day. This level of abstraction directly supports the main use cases targeted by the CFL MVP profile, in particular:
-- publication of the timetable offer,
-- passenger information systems (SIV),
-- consistency with real-time information based on SIRI,
-- alignment with existing CFL operational data sources.
+- Publication of the timetable offer,
+- Passenger information systems (SIV),
+- Consistency with real-time information based on SIRI,
+- Alignment with existing CFL operational data sources.
 
 `ServiceJourney`, by contrast, introduces an additional abstraction layer intended to represent a service independently of its operational realisation. While this concept is fully valid in NeTEx and Transmodel, it is not required to fulfil the current objectives of the CFL MVP profile.
 
 Modelling only `VehicleJourney` at this stage allows the profile to:
-- remain simple and readable,
-- avoid unnecessary duplication between abstract and operated journeys,
-- reduce modelling and implementation complexity,
-- focus on passenger-facing and operationally stable data.
+- Remain simple and readable,
+- Avoid unnecessary duplication between abstract and operated journeys,
+- Reduce modelling and implementation complexity,
+- Focus on passenger-facing and operationally stable data.
 
 This choice does not imply that `ServiceJourney` is incompatible with the CFL model. It reflects a **deliberate MVP scope decision**. The introduction of `ServiceJourney`, potentially alongside `VehicleJourney`, may be considered in future profile extensions if additional use cases require a clearer separation between abstract services and their operated instances.
 
@@ -144,10 +144,10 @@ Using codespaces addresses several key needs:
 - **Interoperability**: enabling consistent referencing across files, frames and systems, including downstream consumers such as the NAP.
 
 In the CFL NeTEx profile, codespaces are therefore introduced for identifiers that are expected to play a **structuring role** in the data model. This typically applies to identifiers that:
-- are referenced across multiple frames or XML files,
-- are intended to be stable over time,
-- are exposed to external consumers,
-- or represent shared reference objects (such as stops and sites, lines, journeys, calendars or other core entities).
+- Are referenced across multiple frames or XML files,
+- Are intended to be stable over time,
+- Are exposed to external consumers,
+- Or represent shared reference objects (such as stops and sites, lines, journeys, calendars or other core entities).
 
 Conversely, the profile deliberately avoids introducing a codespace for every identifier. For identifiers that are purely local in scope, short-lived, or used only for technical convenience within a single file or frame, adding a codespace would not improve interoperability and would unnecessarily increase complexity.
 
@@ -162,10 +162,10 @@ In NeTEx, routes and route-related elements can be used to describe the detailed
 This choice reflects the **current objectives and scope** of the profile. The CFL NeTEx profile primarily focuses on publishing the timetable offer and supporting passenger information use cases, where the sequence of stops and scheduled times are the key elements. These needs are fully addressed through `Line`, `JourneyPattern`, `VehicleJourney` and associated timetable elements, without requiring an explicit route model.
 
 Introducing routes would add an additional modelling layer that:
-- is not required for the identified passenger-facing use cases,
-- would increase the complexity of the data model,
-- would require additional assumptions about the level of geometric or topological detail to be provided,
-- could introduce dependencies on infrastructure-related data that are out of scope at this stage.
+- Is not required for the identified passenger-facing use cases,
+- Would increase the complexity of the data model,
+- Would require additional assumptions about the level of geometric or topological detail to be provided,
+- Could introduce dependencies on infrastructure-related data that are out of scope at this stage.
 
 The decision not to model routes does not imply that they are irrelevant or excluded by principle. It reflects a **deliberate sequencing choice**: prioritising concepts that are essential for timetable publication and passenger information before introducing more detailed network or path representations.
 

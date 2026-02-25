@@ -12,9 +12,9 @@ It defines **patterns of service availability**, such as:
 
 In the CFL MVP, DayTypes:
 
-- provide the **basic calendar structure** used by VehicleJourneys,
-- are referenced through `DayTypeRef`,
-- remain simple and limited to the operational needs of the rail timetable.
+- Provide the **basic calendar structure** used by VehicleJourneys,
+- Are referenced through `DayTypeRef`,
+- Remain simple and limited to the operational needs of the rail timetable.
 
 A DayType does **not** represent individual dates.  
 Concrete date assignment is handled via **DayTypeAssignment**.
@@ -41,7 +41,7 @@ DayTypes shall be **stable** and reused across timetable updates when their defi
 
 ## 7.11.3 Elements and attributes retained in the CFL MVP
 
-| Element / Attribute | Description | Card. (MVP) | Notes / Constraints | Example value |
+| Element / Attribute | Description | Cardinality (MVP) | Notes / Constraints | Example value |
 |---------------------|-------------|-------------|----------------------|----------------|
 | `@id` | Unique identifier of the DayType | 1..1 | Stable CFL identifier | `LU:CFL:DayType:WEEKDAYS` |
 | `version` | Object version | 1..1 | Incremented if meaning or name changes | `1` |

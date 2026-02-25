@@ -2,20 +2,18 @@
 
 ## 7.15.1 Purpose and scope
 
-A **VehicleJourneyStopAssignment** links a *logical stop* of a VehicleJourney
-(ScheduledStopPoint) to a *physical boarding location* (Quay or StopPlace),
-for that specific VehicleJourney.
+A **VehicleJourneyStopAssignment** links a *logical stop* of a VehicleJourney (ScheduledStopPoint) to a *physical boarding location* (Quay or StopPlace), for that specific VehicleJourney.
 
 It is used to express:
 
-- the **platform** (Quay) planned for a given stop of a VehicleJourney,
-- the **station context** when needed (StopPlaceRef).
+- The **platform** (Quay) planned for a given stop of a VehicleJourney;
+- The **station context** when needed (StopPlaceRef).
 
 In the CFL MVP:
 
 - VehicleJourneyStopAssignment is **optional**.
 - It is used when platform information is part of the published timetable or
-  needed by downstream systems (e.g. SIV).
+  needed by downstream systems (e.g., SIV).
 - Real-time platform changes are out of scope and handled by SIRI-VM / SIRI-ET.
 
 Assignments are modelled **inside the VehicleJourney**, under `stopAssignments`.
@@ -28,8 +26,8 @@ Assignments are modelled **inside the VehicleJourney**, under `stopAssignments`.
 
 VehicleJourneyStopAssignment acts as a bridge between:
 
-- the **timetable layer** (VehicleJourney, ScheduledStopPoint),
-- the **infrastructure layer** (Quay, StopPlace in the SiteFrame).
+- The **timetable layer** (VehicleJourney, ScheduledStopPoint);
+- The **infrastructure layer** (Quay, StopPlace in the SiteFrame).
 
 ### Scope of use in the CFL MVP
 
@@ -46,8 +44,7 @@ In the CFL MVP:
 - `StopPlaceRef` MAY be added when needed, but is not mandatory
   (it can be inferred from the Quay).
 
-Assignments are associated to a VehicleJourney through containment
-(`stopAssignments`), not via an explicit VehicleJourneyRef.
+Assignments are associated to a VehicleJourney through containment (`stopAssignments`), not via an explicit VehicleJourneyRef.
 
 ---
 

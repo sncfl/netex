@@ -2,20 +2,16 @@
 
 ## 7.10.1 Purpose and scope
 
-A **VehicleJourney** represents a *scheduled theoretical train run* applying to one
-or several days of operation. It combines:
+A **VehicleJourney** represents a *scheduled theoretical train run* applying to one or several days of operation. It combines:
 
-- a **ServiceJourneyPattern** (direction + stop sequence),
+- A **ServiceJourneyPattern** (direction + stop sequence);
 - **timetabled passing times** at each stop,
-- the **calendar of operation** through DayTypeRef,
-- optional commercial or operational identifiers.
+- The **calendar of operation** through DayTypeRef,
+- Optional commercial or operational identifiers.
 
-It is the core scheduled entity used by downstream systems (SIV, timetable
-publication, journey planners, and real-time SIRI-ET/SIRI-VM integration).
+It is the core scheduled entity used by downstream systems (SIV, timetable publication, journey planners, and real-time SIRI-ET/SIRI-VM integration).
 
-A VehicleJourney does **not** represent the actual run of the day (handled by
-DatedVehicleJourney). It represents the *template* applicable on the days
-defined by its DayTypeRef.
+A VehicleJourney does **not** represent the actual run of the day (handled by `DatedVehicleJourney`). It represents the *template* applicable on the days defined by its DayTypeRef.
 
 ---
 
@@ -24,9 +20,9 @@ defined by its DayTypeRef.
 ### Link to the ServiceJourneyPattern
 A VehicleJourney SHALL reference exactly one ServiceJourneyPattern, which defines:
 
-- the ordered list of ScheduledStopPoints,
-- the direction of travel,
-- the variant of the service (e.g. via Howald, limited stops).
+- The ordered list of ScheduledStopPoints,
+- The direction of travel,
+- The variant of the service (e.g. via Howald, limited stops).
 
 ### Timetabled times
 The VehicleJourney provides theoretical times:
@@ -34,32 +30,30 @@ The VehicleJourney provides theoretical times:
 - `DepartureTime` (optional at the origin),
 - `ArrivalTime` (optional at the terminus).
 
-Each TimetabledPassingTime references a StopPointInJourneyPattern element, and
-their order is inherited from the ServiceJourneyPattern structure.
+Each `TimetabledPassingTime` references a `StopPointInJourneyPattern` element, and their order is inherited from the ServiceJourneyPattern structure (i.e., it should be exactly the same).
 
 ### Calendar of operation
 Operating days are defined through one or more `DayTypeRef` elements.
 
 Separate VehicleJourneys SHALL be created when:
 
-- running days differ (e.g., weekdays vs weekends),
-- the stop pattern changes,
-- the times differ.
+- Running days differ (e.g., weekdays v.s weekends);
+- The stop pattern changes;
+- The times differ.
 
 ### Identifiers
 A VehicleJourney identifier SHALL be:
 
-- stable,
-- unique in the CFL codespace,
-- preferably human-readable and meaningful for analysts.
+- Stable;
+- Unique in the CFL codespace;
+- Preferably human-readable and meaningful for analysts.
 
 Example convention:
 
 `LU:CFL:VJ:<TrainNumber>_<Origin>-<Destination>`
 
 ### Commercial codes
-If a public train number exists (e.g. RE407), it SHOULD be represented through
-`PublicCode`.
+If a public train number exists (e.g. RE407), it SHOULD be represented through `PublicCode`.
 
 ### Operator and mode
 In the CFL MVP:
