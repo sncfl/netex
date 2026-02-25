@@ -1,4 +1,4 @@
-# Timetable entities
+# 7.4 Timetable entities
 
 # StopPointInJourneyPattern (ServiceFrame)
 
@@ -813,4 +813,5 @@ Assignments are associated to a VehicleJourney through containment (`stopAssignm
     </stopAssignments>
 </VehicleJourney>
 ```
+
 
