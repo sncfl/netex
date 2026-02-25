@@ -1,4 +1,4 @@
-# 7.2 Stops and places
+# 7.2 Stops and places entities
 
 # StopPlace (SiteFrame)
 
@@ -369,5 +369,6 @@ It uses human-readable identifiers as defined in the CFL conventions.
     <StopPlaceRef ref="LU:CFL:StopPlace:SP00001"/>
 </ScheduledStopPoint>
 ```
+
 
 
