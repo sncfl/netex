@@ -1,4 +1,6 @@
-# 7.2 StopPlace (SiteFrame)
+# 7.2 Stops and places
+
+# StopPlace (SiteFrame)
 
 ## Functional description
 
@@ -100,7 +102,7 @@ All other frames reference these elements through identifiers, ensuring consiste
 
 ---
 
-# 7.3 Quay (SiteFrame)
+# Quay (SiteFrame)
 
 ## Functional description
 
@@ -227,9 +229,9 @@ Example:
 
 ---
 
-# 7.7 ScheduledStopPoint (ServiceFrame)
+# ScheduledStopPoint (ServiceFrame)
 
-## 7.7.1 Purpose and scope
+## Purpose and scope
 
 A **ScheduledStopPoint** represents a *logical stop* within a journey pattern, i.e.  a point where a vehicle may stop to allow passengers to board or alight.
 
@@ -255,7 +257,7 @@ In the CFL MVP:
 
 ---
 
-## 7.7.2 Modelling principles
+## Modelling principles
 
 ### Logical vs Physical
 
@@ -313,7 +315,7 @@ There is no requirement nor expectation for the ScheduledStopPoint identifier to
 
 ---
 
-## 7.7.3 Elements and attributes retained in the CFL MVP
+## Elements and attributes retained in the CFL MVP
 
 | Element / Attribute       | Description                                   | Cardinality (CFL MVP) | Notes / Constraints                                                | Example value |
 |---------------------------|-----------------------------------------------|------------------------|--------------------------------------------------------------------|----------------|
@@ -333,7 +335,7 @@ There is no requirement nor expectation for the ScheduledStopPoint identifier to
 
 ---
 
-## 7.7.4 Rules and cardinalities
+## Rules and cardinalities
 
 | Relationship / Rule                                   | Cardinality | Description and LU-specific constraints |
 |--------------------------------------------------------|-------------|------------------------------------------|
@@ -351,7 +353,7 @@ There is no requirement nor expectation for the ScheduledStopPoint identifier to
 
 ---
 
-## 7.7.5 XML example
+## XML example
 
 The example below illustrates a typical CFL ScheduledStopPoint referencing a StopPlace.
 It uses human-readable identifiers as defined in the CFL conventions.
@@ -367,4 +369,5 @@ It uses human-readable identifiers as defined in the CFL conventions.
     <StopPlaceRef ref="LU:CFL:StopPlace:SP00001"/>
 </ScheduledStopPoint>
 ```
+
 
