@@ -1,17 +1,20 @@
 # 7.4 Timetable entities
 
+---
+
 # StopPointInJourneyPattern (ServiceFrame)
 
 ## Purpose and scope
 
-A **StopPointInJourneyPattern** represents the *ordered occurrence* of a ScheduledStopPoint within a ServiceJourneyPattern. It defines the structural path of a commercial service variant.
+A **StopPointInJourneyPattern** represents the *ordered occurrence* of a `ScheduledStopPoint` within a `ServiceJourneyPattern` (pattern of VehicleJourneys).  
+It defines the structural path of a commercial service variant.
 
 It is used to express:
 
 - The **sequence** of logical stops,
-- The **reference** to the underlying ScheduledStopPoint,
-- An optional **stable platform assignment** (QuayRef), if and only if all VehicleJourneys
-  using the ServiceJourneyPattern share the same platform at that stop.
+- The **reference** to the underlying `ScheduledStopPoint`,
+- An optional **stable platform assignment** (`QuayRef`), if and only if all VehicleJourneys
+  using the `ServiceJourneyPattern` share the same platform at that stop.
 
 A StopPointInJourneyPattern does **not** contain any timing information.  
 It purely describes the **structure** of the journey.
@@ -21,38 +24,39 @@ It purely describes the **structure** of the journey.
 ## Modelling principles
 
 ### Structural component of a ServiceJourneyPattern
-A ServiceJourneyPattern is composed of an ordered list of StopPointInJourneyPattern elements.
-Each element identifies a logical stop (`ScheduledStopPointRef`). 
 
-NeTEx v2.0 favours the natural ordering of XML, which means that the order in which each `StopPointInJourneyPattern` is listed gives the order in which they are served by the `ServiceJourneyPattern` (i.e., its sequence of stops)
+A `ServiceJourneyPattern` is composed of an ordered list of `StopPointInJourneyPattern` elements.  
+Each element references a logical stop (`ScheduledStopPointRef`).
+
+NeTEx v2.0 favours the natural ordering of XML, which means that the order in which each `StopPointInJourneyPattern` is listed defines the order in which they are served by the `ServiceJourneyPattern` (i.e., its stop sequence).
 
 ### Platform assignment
+
 In the CFL MVP:
 
-- Platform assignment is **normally dynamic** → handled in `VehicleJourneyStopAssignment`.
-- `QuayRef` MAY appear in the StopPointInJourneyPattern **only when the platform is constant** for all trains using that ServiceJourneyPattern.
+- Platform assignment may be known **per journey** → handled via `VehicleJourneyStopAssignment` (optional).
+- `QuayRef` MAY appear in the StopPointInJourneyPattern **only when the platform is structurally constant** for all VehicleJourneys using that `ServiceJourneyPattern`.
 - This is not typical for CFL rail operations today.
 
 ---
 
 ## Elements and attributes retained in the CFL MVP
 
-| Element / Attribute        | Description                                        | Cardinality (CFL MVP) | Notes / Constraints                                                   | Example value |
-|----------------------------|----------------------------------------------------|-------------------------|-----------------------------------------------------------------------|----------------|
-| `@id`                      | Identifier of the StopPointInJourneyPattern        | 1..1                    | Must be stable and unique in the CFL codespace.                      | `LU:CFL:SPJP:LuxGare_1` |
-| `@order`                   | Position in the stop sequence                      | 1..1                    | Integer ≥1, strictly increasing across the ServiceJourneyPattern.           | `1` |
-| `ScheduledStopPointRef`    | Reference to the logical ScheduledStopPoint        | 1..1                    | Mandatory. Identifies the commercial stop.                           | `LU:CFL:ScheduledStopPoint:LuxGare` |
-| `QuayRef`                  | Stable platform reference                          | 0..1                    | Only if all trains share the same stable platform for this pattern.  | — |
+| Element / Attribute        | Description                                 | Cardinality (CFL MVP) | Notes / Constraints                                                   | Example value |
+|----------------------------|---------------------------------------------|------------------------|-----------------------------------------------------------------------|--------------|
+| `@id`                      | Identifier of the StopPointInJourneyPattern | 1..1                   | Must be stable and unique in the CFL codespace.                       | `LU:CFL:SPJP:LuxGare_1` |
+| `ScheduledStopPointRef`    | Reference to the logical ScheduledStopPoint | 1..1                   | Mandatory. Identifies the commercial stop.                            | `LU:CFL:ScheduledStopPoint:LuxGare` |
+| `QuayRef`                  | Stable platform reference                   | 0..1                   | Only if all journeys share the same stable platform for this pattern. | — |
 
 ---
 
 ## Rules and cardinalities
 
-| Relationship / Rule                         | Cardinality | Description |
-|---------------------------------------------|-------------|-------------|
-| JourneyPattern → StopPointInJourneyPattern  | 1..*        | A ServiceJourneyPattern SHALL contain one or more StopPointInJourneyPattern elements in ordered sequence. |
-| StopPointInJourneyPattern → ScheduledStopPoint | 1..1      | Each element SHALL reference exactly one ScheduledStopPoint. |
-| StopPointInJourneyPattern → QuayRef         | 0..1        | MAY be present only if the quay assignment is structurally constant. |
+| Relationship / Rule                                    | Cardinality | Description |
+|--------------------------------------------------------|-------------|-------------|
+| ServiceJourneyPattern → StopPointInJourneyPattern       | 1..*        | A `ServiceJourneyPattern` SHALL contain one or more `StopPointInJourneyPattern` elements in ordered sequence (natural XML order). |
+| StopPointInJourneyPattern → ScheduledStopPoint          | 1..1        | Each element SHALL reference exactly one `ScheduledStopPoint`. |
+| StopPointInJourneyPattern → QuayRef                     | 0..1        | MAY be present only if the quay assignment is structurally constant. |
 
 ---
 
@@ -61,7 +65,7 @@ In the CFL MVP:
 ### Example 1 — Typical CFL case (no stable platform assignment)
 
 ```xml
-<ServiceJourneyPattern id="LU:CFL:JP:LUX-ESCH" version="1">
+<ServiceJourneyPattern id="LU:CFL:SJP:LUX-ESCH_v1" version="1">
     <pointsInSequence>
 
         <StopPointInJourneyPattern id="LU:CFL:SPJP:LuxGare_1" version="1">
@@ -83,7 +87,7 @@ In the CFL MVP:
 ### Example 2 - With stable platform (illustrative only)
 
 ```xml
-<ServiceJourneyPattern id="LU:CFL:JP:LUX-HWD" version="1">
+<ServiceJourneyPattern id="LU:CFL:SJP:LUX-HWD_v1" version="1">
     <pointsInSequence>
 
         <StopPointInJourneyPattern id="LU:CFL:SPJP:LuxGare_1" version="1">
@@ -106,16 +110,17 @@ In the CFL MVP:
 
 ## Purpose and scope
 
-A **ServiceJourneyPattern** represents a *directional commercial pattern* used by a family of ServiceJourneys. It defines the ordered sequence of logical stops (ScheduledStopPoints) that characterise one variant of the service offer.
+A **ServiceJourneyPattern** represents a *directional commercial pattern* used by a family of VehicleJourneys.  
+It defines the ordered sequence of logical stops (ScheduledStopPoints) that characterise one variant of the service offer.
 
 A ServiceJourneyPattern:
 
 - Is **directional** (e.g. Luxembourg → Esch-sur-Alzette);
-- Groups all ServiceJourneys that share the same stopping pattern;
+- Groups all VehicleJourneys that share the same stopping pattern;
 - Includes an ordered list of StopPointInJourneyPattern elements;
 - May define a stable platform assignment when applicable.
 
-It does **not** contain times; these belong to ServiceJourney or VehicleJourney.
+It does **not** contain times; these belong to VehicleJourney and TimetabledPassingTime.
 
 In the CFL MVP:
 
@@ -148,7 +153,7 @@ All ServiceJourneyPatterns of a given Line MUST:
 
 ### Platform assignment
 Platform assignment is normally **dynamic**, handled through `VehicleJourneyStopAssignment`.  
-`QuayRef` MAY appear inside `StopPointInJourneyPattern` **only if stable** across all ServiceJourneys using the pattern.
+`QuayRef` MAY appear inside `StopPointInJourneyPattern` **only if stable** across all VehicleJourneys using the pattern.
 
 ---
 
@@ -169,16 +174,15 @@ Platform assignment is normally **dynamic**, handled through `VehicleJourneyStop
 | Relationship / Rule                                 | Cardinality | Description |
 |------------------------------------------------------|-------------|-------------|
 | Line → ServiceJourneyPattern                         | 2..*        | A Line SHALL contain at least two patterns (one per direction). |
-| ServiceJourneyPattern → StopPointInJourneyPattern    | 1..*        | Ordered list defining the stop sequence. |
+| ServiceJourneyPattern → StopPointInJourneyPattern    | 1..*        | Ordered list defining the stop sequence (natural XML order). |
 | StopPointInJourneyPattern → ScheduledStopPoint       | 1..1        | Each occurrence references exactly one logical stop. |
-| `order` attribute                                    | 1..1        | MUST be strictly increasing within the pattern. |
-| Stable platform assignment                           | 0..1 (per stop) | `QuayRef` MAY be present only when constant across all services of the pattern. |
+| Stable platform assignment | 0..1 (per stop) | `QuayRef` MAY be present only when constant across all VehicleJourneys using the pattern. |
 
 ---
 
 ## XML examples
 
-### Example 1 — Outbound direction (Luxembourg → Esch-sur-Alzette)
+### Example — Outbound direction (Luxembourg → Esch-sur-Alzette)
 
 ```xml
 <ServiceJourneyPattern id="LU:CFL:SJP:LUX-ESCH_v1" version="1">
@@ -204,7 +208,7 @@ Platform assignment is normally **dynamic**, handled through `VehicleJourneyStop
 
 ---
 
-# VehicleJourney (ServiceFrame)
+# VehicleJourney (TimetableFrame)
 
 ## Purpose and scope
 
@@ -292,8 +296,8 @@ In the CFL MVP:
 | VehicleJourney → ServiceJourneyPattern               | 1..1        | Each journey SHALL refer to exactly one SJP. |
 | VehicleJourney → DayTypeRef                          | 1..*        | At least one calendar MUST be defined. |
 | VehicleJourney → passingTimes                        | 1..1        | A complete list of passing times SHALL be provided. |
-| TimetabledPassingTime → ArrivalTime                  | 0..1        | Optional at the first stop. |
-| TimetabledPassingTime → DepartureTime                | 0..1        | Optional at the final stop. |
+| TimetabledPassingTime → DepartureTime                  | 0..1        | Optional at the first stop. |
+| TimetabledPassingTime → ArrivalTime                | 0..1        | Optional at the final stop. |
 | PublicCode                                           | 0..1        | SHOULD be used when a commercial train number exists. |
 
 ---
@@ -747,6 +751,7 @@ Assignments are associated to a VehicleJourney through containment (`stopAssignm
     </stopAssignments>
 </VehicleJourney>
 ```
+
 
 
 
