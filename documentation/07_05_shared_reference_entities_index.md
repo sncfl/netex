@@ -32,8 +32,8 @@ All identifiers used in the CFL NeTEx MVP dataset rely on Codespaces declared in
 | Element / Attribute | Description | Cardinality (CFL MVP) | Notes / Constraints |
 |---------------------|-------------|------------------------|----------------------|
 | `@id` | Identifier of the Codespace | 1..1 | Stable identifier defined by CFL or national governance. |
-| `Xmlns` | XML namespace URI | 1..1 | Must be unique. |
-| `XmlnsUrl` | Documentation URL | 0..1 | Optional. |
+| `xmlns` | XML namespace URI | 1..1 | Must be unique. |
+| `xmlnsUrl` | Documentation URL | 0..1 | Optional. |
 | `Description` | Human-readable description | 0..1 | Informative only. |
 
 ---
@@ -41,9 +41,10 @@ All identifiers used in the CFL NeTEx MVP dataset rely on Codespaces declared in
 ### CFL-specific modelling rules
 
 - All identifiers used in the dataset **must reference a declared Codespace**.
-- The CFL MVP uses the codespace **`LU:CFL`**.
 - Codespaces are stable and must not change across deliveries.
-- Future LU-level codespaces (e.g. for other operators) will be added in the same ResourceFrame.
+- The CFL MVP uses `LU:CFL` as its primary codespace.
+- Other LU-level codespaces may be declared in the same ResourceFrame when needed (e.g., national aggregation or multi-operator contexts).
+
 
 ---
 
@@ -70,8 +71,9 @@ In the CFL NeTEx MVP, a single Operator is defined and reused across all Lines a
 
 ### CFL-specific modelling rules
 
-- The CFL MVP defines **exactly one Operator**.
+- The CFL MVP defines **exactly one Operator** for the rail MVP dataset.
 - All Line and service entities reference this Operator using `OperatorRef`.
+- Additional Operators (e.g., CFL bus, CFL Flex) may be introduced in later extensions or in multi-operator publications.
 - Operator identifiers are stable and never reused.
 
 ---
@@ -151,4 +153,3 @@ The ResourceFrame provides the **shared foundation** of the CFL NeTEx MVP datase
 - And a clear extension point for future shared reference data.
 
 All other Frames rely on the ResourceFrame for stable, dataset-wide references.
-
