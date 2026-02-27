@@ -1,10 +1,27 @@
 # 7.2 Stops and places entities
 
+## Scope (CFL MVP)
+
+This section documents both:
+- **physical stop infrastructure** defined in `stop.xml` (`StopPlace`, `Quay`), and
+- the **logical stop model and mapping** used by line files (`ScheduledStopPoint`, `PassengerStopAssignment`).
+
+Although `ScheduledStopPoint` and `PassengerStopAssignment` are defined in the **ServiceFrame of `line_<LineId>.xml`**, they are documented here because they define the boundary between **logical service stops** and **physical stop infrastructure**.
+
 ---
 
-# StopPlace (SiteFrame)
+## Structure
 
-## Functional description
+1. [StopPlace (SiteFrame)](#stopplace-siteframe) — physical stop places defined in `stop.xml`.
+2. [Quay (SiteFrame)](#quay-siteframe) — physical boarding locations (platforms) defined in `stop.xml`.
+3. [PassengerStopAssignment (ServiceFrame)](#passengerstopassignment-serviceframe) — stable mapping from logical stops to StopPlace/Quay (defined in `line_<LineId>.xml`).
+4. [ScheduledStopPoint (ServiceFrame)](#scheduledstoppoint-serviceframe) — logical stop points used in patterns and timetables (defined in `line_<LineId>.xml`).
+
+---
+
+## StopPlace (SiteFrame)
+
+### Functional description
 
 A **StopPlace** represents a physical location where passengers may access the public transport system (rail station, funicular station, shuttle stop).  
 It serves as the **spatial anchor** for all stop-related elements referenced across the dataset.
@@ -15,12 +32,12 @@ A StopPlace is the authoritative source for:
 - Its internal components (Quays, Entrances, etc.),
 - Its public-facing identifiers.
 
-StopPlaces are defined **exclusively** in the *SiteFrame* and referenced by the ServiceFrame through `PassengerStopAssignment` (see **PassengerStopAssignment (ServiceFrame)** below).  
+StopPlaces are defined **exclusively** in the *SiteFrame* and referenced from line files (ServiceFrame) through `PassengerStopAssignment` (see **PassengerStopAssignment (ServiceFrame)** below).  
 They may also be referenced indirectly when journey-level quay/platform assignment is published (via `VehicleJourneyStopAssignment`, optional in MVP).
 
 ---
 
-## Elements and attributes retained in the CFL MVP
+### Elements and attributes retained in the CFL MVP
 
 | Element / Attribute | Description | Cardinality (CFL MVP) | Notes / Constraints |
 |---------------------|-------------|------------------------|---------------------|
@@ -35,38 +52,38 @@ They may also be referenced indirectly when journey-level quay/platform assignme
 | `TopographicPlaceRef` | Reference to locality | 0..1 | Optional, used if available. |
 | `ParentSiteRef` | Hierarchical parent | 0..1 | Used for nested structures (optional). |
 
-### Notes
+#### Notes
 - Attributes not listed above are not used in the CFL MVP.
 - Additional details (equipment, entrances, accessibility) may be added in later work packages.
 
 ---
 
-## CFL-specific modelling rules
+### CFL-specific modelling rules
 
-### Names
+#### Names
 - **Name** must reflect the official published station name.  
 - Accents and hyphens are allowed.  
 - If multilingual names are provided, they must be equivalent.
 
-### Identifiers
+#### Identifiers
 - Must follow the format:  
   **`LU:CFL:StopPlace:<LocalId>`**  
   e.g., `LU:CFL:StopPlace:SP00032`.
 
 - Identifiers never change, even when the name is updated.
 
-### Coordinates
+#### Coordinates
 - Coordinates must be WGS84 decimal degrees.  
 - Coordinates represent the *logical centre* of the station (not the platform).
 
-### Quays
+#### Quays
 - Every StopPlace must contain **at least one** Quay.  
 - Quays must be defined within the same SiteFrame.  
 - Quay identifiers must be globally unique.
 
 ---
 
-## Minimal XML example (illustrative only)
+### Minimal XML example (illustrative only)
 
 ⚠️ *This example is illustrative. Identifiers, names, coordinates and codes are not real CFL production data.*
 
@@ -90,7 +107,7 @@ They may also be referenced indirectly when journey-level quay/platform assignme
 
 ---
 
-## Summary
+### Summary
 
 The StopPlace is the foundational spatial object of the CFL timetable dataset.
 It provides the authoritative definition of each station or stop, including:
@@ -104,9 +121,9 @@ Other frames resolve StopPlaces through references, primarily via PassengerStopA
 
 ---
 
-# Quay (SiteFrame)
+## Quay (SiteFrame)
 
-## Functional description
+### Functional description
 
 A **Quay** represents a physical boarding or alighting point within a StopPlace.  
 For rail, this corresponds to a **platform** (e.g., “Platform 1”), a boarding edge, or a clearly identifiable passenger access point.
@@ -120,7 +137,7 @@ Each Quay belongs to **exactly one** StopPlace.
 
 ---
 
-## Elements and attributes retained in the CFL MVP
+### Elements and attributes retained in the CFL MVP
 
 | Element / Attribute | Description | Cardinality (CFL MVP) | Notes / Constraints |
 |---------------------|-------------|-------------------------|----------------------|
@@ -132,21 +149,21 @@ Each Quay belongs to **exactly one** StopPlace.
 | `ParentSiteRef` | Reference to parent StopPlace | 1..1 | Must reference the enclosing StopPlace. |
 | `QuayType` | Type of quay or platform | 0..1 | If used: `platform`, `bay`, etc. (NeTEx enumeration values). |
 
-### Notes
+#### Notes
 - In the MVP, equipment (signage, shelter, accessibility features) is **not** included.  
   These elements may be provided in WP3 “Accessibility”.
 - A Quay must always be part of a StopPlace structure.
 
 ---
 
-## CFL-specific modelling rules
+### CFL-specific modelling rules
 
-### Names
+#### Names
 - **Name** must correspond to the public-facing platform or boarding label.  
   Examples: “Platform 1”, “Platform 3B”.  
 - Multilingual representations may be provided via multiple `<Text>` elements.
 
-### Identifiers
+#### Identifiers
 - Must follow the format:  
   **`LU:CFL:Quay:<LocalId>`**  
   e.g., `LU:CFL:Quay:LuxGare-1`.
@@ -156,13 +173,13 @@ Each Quay belongs to **exactly one** StopPlace.
   - Stable across updates,  
   - Unchanged if the platform is renamed.
 
-### Relationship to StopPlace
+#### Relationship to StopPlace
 - A Quay **must** have a `ParentSiteRef` pointing to its StopPlace.  
 - Every StopPlace must contain one or more Quays.
 
 ---
 
-## Minimal XML example (illustrative only)
+### Minimal XML example (illustrative only)
 
 ⚠️ *Illustrative only — not real CFL data.*
 
@@ -178,9 +195,9 @@ Each Quay belongs to **exactly one** StopPlace.
 </Quay>
 ```
 
-## Usage in other NeTEx frames
+### Usage in other NeTEx frames
 
-### Stable logical-to-physical mapping (ServiceFrame)
+#### Stable logical-to-physical mapping (ServiceFrame)
 
 When a stable mapping to a physical location is published, a Quay may be referenced via:
 - `PassengerStopAssignment/QuayRef` (optional)
@@ -196,7 +213,7 @@ Example:
 
 ```
 
-### Journey-level quay/platform assignment (TimetableFrame, optional)
+#### Journey-level quay/platform assignment (TimetableFrame, optional)
 
 When quay/platform is known per journey, a Quay may be referenced via:
 - `VehicleJourneyStopAssignment/QuayRef`
@@ -212,7 +229,7 @@ Example:
 
 ---
 
-## Summary of CFL MVP restrictions
+### Summary of CFL MVP restrictions
 
 - Quays are mandatory within the StopPlace structure.
 - No equipment or accessibility features in MVP.
@@ -221,9 +238,9 @@ Example:
 - Stable and deterministic identifier scheme required.
 
 ---
-# PassengerStopAssignment (ServiceFrame)
+## PassengerStopAssignment (ServiceFrame)
 
-## Purpose and scope
+### Purpose and scope
 
 A **PassengerStopAssignment** links a logical stop used in the service structure (`ScheduledStopPoint`) to the physical stop infrastructure (`StopPlace`, and optionally `Quay`).
 
@@ -237,7 +254,7 @@ PassengerStopAssignment is used to:
 
 ---
 
-## Elements and attributes retained in the CFL MVP
+### Elements and attributes retained in the CFL MVP
 
 | Element / Attribute | Description | Cardinality (CFL MVP) | Notes / Constraints |
 |---------------------|-------------|------------------------|---------------------|
@@ -246,13 +263,13 @@ PassengerStopAssignment is used to:
 | `StopPlaceRef` | Reference to the physical StopPlace | 1..1 | References a `StopPlace` defined in the SiteFrame. |
 | `QuayRef` | Reference to the physical Quay | 0..1 | Optional. Used only when a stable quay-level assignment is published. |
 
-### Notes
+#### Notes
 - `StopPlaceRef` is mandatory in the MVP.
 - `QuayRef` is optional and should not be used for information that varies per journey; use `VehicleJourneyStopAssignment` for that case.
 
 ---
 
-## CFL-specific modelling rules
+### CFL-specific modelling rules
 
 - Each `ScheduledStopPoint` SHALL have exactly one `PassengerStopAssignment` linking it to a `StopPlaceRef`.
 - `QuayRef` MAY be provided only when the quay/platform assignment is considered stable in published data.
@@ -260,7 +277,7 @@ PassengerStopAssignment is used to:
 
 ---
 
-## Minimal XML example (illustrative only)
+### Minimal XML example (illustrative only)
 
 ```xml
 <PassengerStopAssignment id="LU:CFL:PassengerStopAssignment:LuxGare" version="1">
@@ -270,9 +287,9 @@ PassengerStopAssignment is used to:
 ```
 
 ---
-# ScheduledStopPoint (ServiceFrame)
+## ScheduledStopPoint (ServiceFrame)
 
-## Purpose and scope
+### Purpose and scope
 
 A **ScheduledStopPoint** represents a *logical stop* within a journey pattern, i.e.  a point where a vehicle may stop to allow passengers to board or alight.
 
@@ -292,9 +309,9 @@ In the CFL MVP:
 
 ---
 
-## Modelling principles
+### Modelling principles
 
-### Logical vs Physical
+#### Logical vs Physical
 
 A ScheduledStopPoint is *logical*:
 
@@ -307,25 +324,25 @@ Physical details are handled via:
 
 ---
 
-## Identifier strategy and rationale
+### Identifier strategy and rationale
 
 In the CFL profile, `ScheduledStopPoint` identifiers are intentionally designed to be **human-readable** and derived from the public station name (e.g. “LuxGare”), rather than using opaque technical codes such as `SSP0001`.
 
 This approach is chosen for several reasons:
 
-### Debuggability and maintainability
+#### Debuggability and maintainability
 ScheduledStopPoints appear extensively in timetables (ServiceFrame patterns and TimetableFrame structures).  
 Readable identifiers make it significantly easier for analysts, developers and operational staff to interpret timetable structures directly from XML files, logs, diffs or diagnostic tools, without requiring a lookup table.
 
-### Operational transparency
+#### Operational transparency
 Many CFL teams (planning, SIV, operational support) consult or manipulate timetable data.  
 Using meaningful identifiers allows non-technical users to immediately recognise stations when inspecting exports or troubleshooting integrations.
 
-### Stability and long-term maintainability
+#### Stability and long-term maintainability
 Unlike StopPlace identifiers, which may be aligned with a future national stop register, ScheduledStopPoints are internal timetable objects.  
 Giving them human-readable identifiers ensures long-term clarity and avoids spreading opaque or temporary codes into downstream systems.
 
-### Alignment with other CFL identifiers
+#### Alignment with other CFL identifiers
 The CFL MVP already uses recognisable patterns for StopPlace and Quay identifiers.  
 Using the same strategy for ScheduledStopPoint keeps the profile consistent and predictable across frames.
 
@@ -344,7 +361,7 @@ where `<ReadableStationId>` is a short, human-friendly identifier derived from t
 
 ---
 
-## Elements and attributes retained in the CFL MVP
+### Elements and attributes retained in the CFL MVP
 
 | Element / Attribute | Description | Cardinality (CFL MVP) | Notes / Constraints | Example value |
 |---------------------|-------------|------------------------|---------------------|--------------|
@@ -352,13 +369,13 @@ where `<ReadableStationId>` is a short, human-friendly identifier derived from t
 | `version` | Object version | 1..1 | Incremented only when the semantic meaning of the stop changes. | `1` |
 | `Name` | Human-readable stop name | 1..1 | Multilingual `<Text>` elements allowed. | `Luxembourg` |
 
-### Notes
+#### Notes
 - ScheduledStopPoint does not carry geographic coordinates; location is resolved via the mapped StopPlace/Quay.
 - The mapping to physical infrastructure is expressed via PassengerStopAssignment.
 
 ---
 
-## Rules and cardinalities
+### Rules and cardinalities
 
 | Relationship / Rule | Cardinality | Description and LU-specific constraints |
 |---------------------|-------------|------------------------------------------|
@@ -368,13 +385,13 @@ where `<ReadableStationId>` is a short, human-friendly identifier derived from t
 | VehicleJourneyStopAssignment → QuayRef | 0..1 | Optional. Used when quay/platform is known per journey. |
 | StopPointInJourneyPattern → ScheduledStopPointRef | 1..1 | Each StopPointInJourneyPattern SHALL reference exactly one ScheduledStopPoint. |
 
-### Notes
+#### Notes
 - The ScheduledStopPoint defines the logical stop used in patterns and timetables.
 - Ordering of stops is defined at the level of StopPointInJourneyPattern, never on the ScheduledStopPoint itself.
 
 ---
 
-## XML example
+### XML example
 
 The example below illustrates a typical CFL ScheduledStopPoint with a human-readable identifier.
 
@@ -387,3 +404,4 @@ The example below illustrates a typical CFL ScheduledStopPoint with a human-read
     </Name>
 </ScheduledStopPoint>
 ```
+
