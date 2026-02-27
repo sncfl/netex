@@ -18,6 +18,21 @@ Each shared entity used in the CFL MVP is described in a dedicated subsection be
 
 ---
 
+## Structure
+
+1. [Codespace](#codespace)
+2. [Operator](#operator)
+3. [Branding](#branding)
+4. [Shared calendar entities (ServiceCalendarFrame)](#shared-calendar-entities-servicecalendarframe)
+   - [DayType (ServiceCalendarFrame)](#daytype-servicecalendarframe)
+   - [OperatingPeriod (ServiceCalendarFrame)](#operatingperiod-servicecalendarframe)
+   - [DayTypeAssignment (ServiceCalendarFrame)](#daytypeassignment-servicecalendarframe)
+5. [Optional / future shared entities in `resource.xml`](#optional--future-shared-entities-in-resourcexml)
+6. [Scope limitations and summary](#scope-limitations-and-summary)
+7. [TypeOfParking (ResourceFrame)](#typeofparking-resourceframe)
+
+---
+
 ## Codespace
 
 ### Functional description
@@ -27,6 +42,47 @@ It ensures global uniqueness and enables unambiguous cross-file referencing.
 
 All identifiers used in the CFL NeTEx MVP dataset rely on Codespaces declared in the **ResourceFrame of `resource.xml`**.
 
+```xml
+<Codespace id="CFL:Codespace:1">
+  <Xmlns>CFL</Xmlns>
+  <XmlnsUrl>https://data.cfl.lu/netex/codespace</XmlnsUrl>
+  <Description>CFL NeTEx codespace for CFL datasets</Description>
+</Codespace>
+```
+
+---
+
+### `XmlnsUrl` principle and CFL usage
+
+`XmlnsUrl` is an **identifier of the documentation location** for a Codespace.  
+It provides a **canonical reference string** associated with the namespace, but it does **not** guarantee that the URL is publicly reachable, resolvable, or stable for all consumers.
+
+In the CFL NeTEx MVP, the Codespace is declared as:
+
+- `Xmlns = CFL`
+- `XmlnsUrl = https://data.cfl.lu/netex/codespace`
+
+This value is used as the **chosen reference URI** for the CFL NeTEx codespace. It may be:
+- publicly accessible in the future,
+- accessible only within CFL networks,
+- or serve only as a stable identifier even if not directly reachable by consumers.
+
+#### How to use it (developer guidance)
+
+- Treat `XmlnsUrl` as **informative metadata / reference URI**: consumers MUST NOT depend on it for processing, validation, or ID resolution.
+- The Codespace prefix (`Xmlns`) is what matters for qualifying identifiers used in `@id` and `ref`.
+- CFL SHOULD keep `XmlnsUrl` stable over time. If the actual documentation location changes, prefer using redirections or maintaining the reference URI rather than changing the value in published datasets.
+
+#### Usage for objects other than Codespace
+
+`XmlnsUrl` is **specific to Codespace declarations** and SHOULD NOT be replicated at object level (`StopPlace`, `Quay`, `Parking`, `Line`, `VehicleJourney`, etc.).
+
+If object-level links are needed, use the **domain-specific fields** intended for that purpose (examples):
+- `BookingUrl` for booking/registration links (e.g. bikebox),
+- `ContactDetails/Url` for organisation or support pages.
+
+In short: `XmlnsUrl` documents the **namespace reference** (Codespace), not individual objects, and it is not an availability guarantee.
+
 ---
 
 ### Elements and attributes retained in the CFL MVP
@@ -34,8 +90,8 @@ All identifiers used in the CFL NeTEx MVP dataset rely on Codespaces declared in
 | Element / Attribute | Description | Cardinality (CFL MVP) | Notes / Constraints |
 |---------------------|-------------|------------------------|----------------------|
 | `@id` | Identifier of the Codespace | 1..1 | Stable identifier defined by CFL or national governance. |
-| `xmlns` | XML namespace URI | 1..1 | Must be unique. |
-| `xmlnsUrl` | Documentation URL | 0..1 | Optional. |
+| `Xmlns` | XML namespace URI | 1..1 | Must be unique. |
+| `XmlnsUrl` | Documentation URL | 0..1 | Optional. |
 | `Description` | Human-readable description | 0..1 | Informative only. |
 
 ---
@@ -44,7 +100,8 @@ All identifiers used in the CFL NeTEx MVP dataset rely on Codespaces declared in
 
 - All identifiers used in the dataset **must reference a declared Codespace**.
 - Codespaces are stable and must not change across deliveries.
-- The CFL MVP uses `LU:CFL` as its primary codespace.
+- `XmlnsUrl` SHOULD be provided when a stable documentation URL exists for the codespace.
+- The CFL MVP uses the codespace declared in resource.xml as primary
 - Other LU-level codespaces may be declared in the same ResourceFrame when needed (e.g., national aggregation or multi-operator contexts).
 
 ---
@@ -83,41 +140,61 @@ In the CFL NeTEx MVP, a single Operator is defined and reused across all Lines a
 
 ### Functional description
 
-**Branding** defines visual or commercial branding information that may be associated with services or Lines.
+**Branding** defines visual identity information that may be associated with service structures in order to support consistent passenger-facing presentation (e.g. colours, logos).
 
-It enables downstream systems to apply a consistent visual identity (e.g., colours, logos) when presenting services to passengers.
+In the CFL NeTEx MVP, Branding is used to represent a **single colour per `GroupOfLines`**.  
+Lines inherit the colour through their membership in a `GroupOfLines`.
 
 ---
 
 ### Elements and attributes retained in the CFL MVP
 
 | Element / Attribute | Description | Cardinality (CFL MVP) | Notes / Constraints |
-|---------------------|-------------|------------------------|----------------------|
+|---------------------|-------------|------------------------|---------------------|
 | `@id` | Identifier of the Branding | 1..1 | Stable identifier. |
-| `Name` | Branding name | 1..1 | Human-readable label. |
+| `Name` | Branding name | 1..1 | Human-readable label (typically aligned with the target `GroupOfLines`). |
 | `Description` | Description of branding | 0..1 | Optional. |
+| `Colour` *(or equivalent presentation element in CEN NeTEx 2.0)* | Primary colour | 0..1 | Used in CFL MVP to publish the group colour. Source format is `#RRGGBB`; published value SHALL follow the format required by the schema. |
+
+#### Notes
+- The exact XML element used to carry the colour depends on the CEN NeTEx 2.0 schema structure (e.g. direct `Colour` element or a presentation sub-structure). The CFL MVP uses the schema-supported standard element; no extension is used.
 
 ---
 
 ### CFL-specific modelling rules
 
-- Branding entities are defined **once** in the ResourceFrame.
-- Branding may be referenced from Line or service entities if required.
-- Branding usage remains optional in the MVP and may be expanded later.
+- Branding entities are defined **once** in the ResourceFrame of `resource.xml`.
+- CFL defines **one Branding per GroupOfLines** to represent the passenger-facing group colour.
+- Each `GroupOfLines` SHALL reference exactly one Branding (group-level colouring).
+- Lines SHALL NOT carry colours directly in the MVP; they inherit the colour through their `GroupOfLines` membership.
+- Colour values are maintained in source systems as `#RRGGBB`. The published value SHALL be transformed to the format expected by the XSD (typically `RRGGBB` without `#`).
+
+---
+
+### XML examples (CFL pattern)
+
+#### Example 1 — Branding definition in `resource.xml`
+
+```xml
+<Branding id="CFL:Branding:GroupOfLines:L10" version="1">
+  <Name>Ligne 10</Name>
+  <!-- colour element name/location depends on the CEN NeTEx 2.0 schema -->
+  <Colour>009BD4</Colour>
+</Branding>
+```
+
+#### Example 2 — GroupOfLines referencing Branding (in service structure)
+
+```xml
+<GroupOfLines id="CFL:GroupOfLines:L10" version="1">
+  <Name>Ligne 10</Name>
+  <BrandingRef ref="CFL:Branding:GroupOfLines:L10"/>
+</GroupOfLines>
+```
 
 ---
 
 ## Shared calendar entities (ServiceCalendarFrame)
-
-The **ServiceCalendarFrame** in `resource.xml` contains calendar primitives that are **reused by multiple line files**.  
-Line timetables reference these objects (e.g., via `DayTypeRef`) and must not redefine them locally.
-
-The CFL MVP documents here the baseline calendar building blocks:
-- `DayType`
-- `OperatingPeriod`
-- `DayTypeAssignment`
-
----
 
 ## DayType (ServiceCalendarFrame)
 
@@ -401,3 +478,41 @@ The shared frames published in `resource.xml` in the CFL NeTEx MVP:
 - And shared calendar primitives reused across line files.
 
 All other frames rely on shared entities defined in `resource.xml` through stable references.
+
+---
+
+## TypeOfParking (ResourceFrame)
+
+### Functional description
+
+**TypeOfParking** is a shared classification value used to type `Parking` entities (e.g. car park, bicycle parking, secure bicycle boxes).
+
+In the CFL MVP, it is used to identify **bikebox** parkings published in `stop.xml`.
+
+---
+
+### Elements and attributes retained in the CFL MVP
+
+| Element / Attribute | Description | Cardinality (CFL MVP) | Notes / Constraints |
+|---------------------|-------------|------------------------|---------------------|
+| `@id` | Identifier of the TypeOfParking | 1..1 | Stable identifier referenced from `Parking/TypeOfParkingRef`. |
+| `Name` | Label of the parking type | 1..1 | Human-readable. |
+| `Description` | Description of the value | 0..1 | Optional. |
+
+---
+
+### CFL-specific modelling rules
+
+- `TypeOfParking` values are defined once in `resource.xml` under `ResourceFrame/typesOfValue`.
+- Parkings in `stop.xml` MUST reference these values via `TypeOfParkingRef`.
+
+---
+
+### XML example (extract from CFL data)
+
+```xml
+<TypeOfParking id="CFL:TypeOfParking:BIKEBOX" version="1">
+  <Name>Bikebox</Name>
+  <Description>Secure bicycle parking (Bikebox).</Description>
+</TypeOfParking>
+```
