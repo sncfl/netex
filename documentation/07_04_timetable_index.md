@@ -36,6 +36,7 @@ It purely describes the **structure** of the journey.
 
 A `ServiceJourneyPattern` is composed of an ordered list of `StopPointInJourneyPattern` elements.  
 Each element references a logical stop (`ScheduledStopPointRef`).
+Logical stop definitions (`ScheduledStopPoint`) and the logical-to-physical mapping (`PassengerStopAssignment`) are documented in [07_02_stops_and_places_index](07_02_stops_and_places_index.md).
 
 NeTEx v2.0 favours the natural ordering of XML, which means that the order in which each `StopPointInJourneyPattern` is listed defines the order in which they are served by the `ServiceJourneyPattern` (i.e., its stop sequence).
 
@@ -467,6 +468,8 @@ VehicleJourneyStopAssignment acts as a bridge between:
 - The **timetable layer** (VehicleJourney, ScheduledStopPoint);
 - The **infrastructure layer** (Quay, StopPlace in the SiteFrame).
 
+The stop infrastructure (`StopPlace`, `Quay`) and the mapping from `ScheduledStopPoint` via `PassengerStopAssignment` are documented in [07_02_stops_and_places_index](07_02_stops_and_places_index.md).
+
 #### Scope of use in the CFL MVP
 
 - MAY be used when CFL wishes to communicate planned platforms.
@@ -530,6 +533,7 @@ Assignments are associated to a VehicleJourney through containment (`stopAssignm
     </stopAssignments>
 </VehicleJourney>
 ```
+
 
 
 
