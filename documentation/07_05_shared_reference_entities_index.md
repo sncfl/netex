@@ -1,18 +1,35 @@
-# 7.5 Shared reference entities (ResourceFrame)
+# 7.5 Shared reference entities (resource.xml)
 
 ## Overview
 
-The **ResourceFrame** contains shared reference entities that are reused across the entire CFL NeTEx MVP dataset.
+The `resource.xml` file contains **shared reference entities reused across the CFL NeTEx MVP bundle**.
 
-Unlike most other entities described in Chapter 7, which are documented in dedicated sections, ResourceFrame entities are **grouped in this section** because they:
+These entities are grouped here because they:
+- are transversal by nature;
+- are not tied to a specific commercial line (`line_<LineId>.xml`);
+- and are published together in `resource.xml` under shared frames.
 
-- Are transversal by nature;
-- Are not tied to a specific service, stop or timetable;
-- And are published together in `resource.xml`.
+In the CFL MVP, `resource.xml` may include:
+- a **ResourceFrame** (organisations, reusable reference objects, etc.),
+- a **ServiceCalendarFrame** (calendar primitives reused by multiple line files),
+- and, when needed, a **ServiceFrame** for shared transfer connections.
 
-Each ResourceFrame entity used in the CFL MVP is described in a dedicated subsection below and can be referenced individually from other parts of the documentation.
+Each shared entity used in the CFL MVP is described in a dedicated subsection below and can be referenced from other parts of the documentation.
 
-The ResourceFrame is published exclusively in `resource.xml`.
+---
+
+## Structure
+
+1. [Codespace](#codespace)
+2. [Operator](#operator)
+3. [Branding](#branding)
+4. [Shared calendar entities (ServiceCalendarFrame)](#shared-calendar-entities-servicecalendarframe)
+   - [DayType (ServiceCalendarFrame)](#daytype-servicecalendarframe)
+   - [OperatingPeriod (ServiceCalendarFrame)](#operatingperiod-servicecalendarframe)
+   - [DayTypeAssignment (ServiceCalendarFrame)](#daytypeassignment-servicecalendarframe)
+5. [Optional / future shared entities in `resource.xml`](#optional--future-shared-entities-in-resourcexml)
+6. [Scope limitations and summary](#scope-limitations-and-summary)
+7. [TypeOfParking (ResourceFrame)](#typeofparking-resourceframe)
 
 ---
 
@@ -23,7 +40,48 @@ The ResourceFrame is published exclusively in `resource.xml`.
 A **Codespace** defines a namespace used to qualify identifiers (`id`) in the dataset.  
 It ensures global uniqueness and enables unambiguous cross-file referencing.
 
-All identifiers used in the CFL NeTEx MVP dataset rely on Codespaces declared in the ResourceFrame.
+All identifiers used in the CFL NeTEx MVP dataset rely on Codespaces declared in the **ResourceFrame of `resource.xml`**.
+
+```xml
+<Codespace id="CFL:Codespace:1">
+  <Xmlns>CFL</Xmlns>
+  <XmlnsUrl>https://data.cfl.lu/netex/codespace</XmlnsUrl>
+  <Description>CFL NeTEx codespace for CFL datasets</Description>
+</Codespace>
+```
+
+---
+
+### `XmlnsUrl` principle and CFL usage
+
+`XmlnsUrl` is an **identifier of the documentation location** for a Codespace.  
+It provides a **canonical reference string** associated with the namespace, but it does **not** guarantee that the URL is publicly reachable, resolvable, or stable for all consumers.
+
+In the CFL NeTEx MVP, the Codespace is declared as:
+
+- `Xmlns = CFL`
+- `XmlnsUrl = https://data.cfl.lu/netex/codespace`
+
+This value is used as the **chosen reference URI** for the CFL NeTEx codespace. It may be:
+- publicly accessible in the future,
+- accessible only within CFL networks,
+- or serve only as a stable identifier even if not directly reachable by consumers.
+
+#### How to use it (developer guidance)
+
+- Treat `XmlnsUrl` as **informative metadata / reference URI**: consumers MUST NOT depend on it for processing, validation, or ID resolution.
+- The Codespace prefix (`Xmlns`) is what matters for qualifying identifiers used in `@id` and `ref`.
+- CFL SHOULD keep `XmlnsUrl` stable over time. If the actual documentation location changes, prefer using redirections or maintaining the reference URI rather than changing the value in published datasets.
+
+#### Usage for objects other than Codespace
+
+`XmlnsUrl` is **specific to Codespace declarations** and SHOULD NOT be replicated at object level (`StopPlace`, `Quay`, `Parking`, `Line`, `VehicleJourney`, etc.).
+
+If object-level links are needed, use the **domain-specific fields** intended for that purpose (examples):
+- `BookingUrl` for booking/registration links (e.g. bikebox),
+- `ContactDetails/Url` for organisation or support pages.
+
+In short: `XmlnsUrl` documents the **namespace reference** (Codespace), not individual objects, and it is not an availability guarantee.
 
 ---
 
@@ -32,8 +90,8 @@ All identifiers used in the CFL NeTEx MVP dataset rely on Codespaces declared in
 | Element / Attribute | Description | Cardinality (CFL MVP) | Notes / Constraints |
 |---------------------|-------------|------------------------|----------------------|
 | `@id` | Identifier of the Codespace | 1..1 | Stable identifier defined by CFL or national governance. |
-| `xmlns` | XML namespace URI | 1..1 | Must be unique. |
-| `xmlnsUrl` | Documentation URL | 0..1 | Optional. |
+| `Xmlns` | XML namespace URI | 1..1 | Must be unique. |
+| `XmlnsUrl` | Documentation URL | 0..1 | Optional. |
 | `Description` | Human-readable description | 0..1 | Informative only. |
 
 ---
@@ -42,9 +100,9 @@ All identifiers used in the CFL NeTEx MVP dataset rely on Codespaces declared in
 
 - All identifiers used in the dataset **must reference a declared Codespace**.
 - Codespaces are stable and must not change across deliveries.
-- The CFL MVP uses `LU:CFL` as its primary codespace.
+- `XmlnsUrl` SHOULD be provided when a stable documentation URL exists for the codespace.
+- The CFL MVP uses the codespace declared in resource.xml as primary
 - Other LU-level codespaces may be declared in the same ResourceFrame when needed (e.g., national aggregation or multi-operator contexts).
-
 
 ---
 
@@ -82,33 +140,300 @@ In the CFL NeTEx MVP, a single Operator is defined and reused across all Lines a
 
 ### Functional description
 
-**Branding** defines visual or commercial branding information that may be associated with services or Lines.
+**Branding** defines visual identity information that may be associated with service structures in order to support consistent passenger-facing presentation (e.g. colours, logos).
 
-It enables downstream systems to apply a consistent visual identity (e.g., colours, logos) when presenting services to passengers.
+In the CFL NeTEx MVP, Branding is used to represent a **single colour per `GroupOfLines`**.  
+Lines inherit the colour through their membership in a `GroupOfLines`.
 
 ---
 
 ### Elements and attributes retained in the CFL MVP
 
 | Element / Attribute | Description | Cardinality (CFL MVP) | Notes / Constraints |
-|---------------------|-------------|------------------------|----------------------|
+|---------------------|-------------|------------------------|---------------------|
 | `@id` | Identifier of the Branding | 1..1 | Stable identifier. |
-| `Name` | Branding name | 1..1 | Human-readable label. |
+| `Name` | Branding name | 1..1 | Human-readable label (typically aligned with the target `GroupOfLines`). |
 | `Description` | Description of branding | 0..1 | Optional. |
+| `Colour` *(or equivalent presentation element in CEN NeTEx 2.0)* | Primary colour | 0..1 | Used in CFL MVP to publish the group colour. Source format is `#RRGGBB`; published value SHALL follow the format required by the schema. |
+
+#### Notes
+- The exact XML element used to carry the colour depends on the CEN NeTEx 2.0 schema structure (e.g. direct `Colour` element or a presentation sub-structure). The CFL MVP uses the schema-supported standard element; no extension is used.
 
 ---
 
 ### CFL-specific modelling rules
 
-- Branding entities are defined **once** in the ResourceFrame.
-- Branding may be referenced from Line or service entities if required.
-- Branding usage remains optional in the MVP and may be expanded later.
+- Branding entities are defined **once** in the ResourceFrame of `resource.xml`.
+- CFL defines **one Branding per GroupOfLines** to represent the passenger-facing group colour.
+- Each `GroupOfLines` SHALL reference exactly one Branding (group-level colouring).
+- Lines SHALL NOT carry colours directly in the MVP; they inherit the colour through their `GroupOfLines` membership.
+- Colour values are maintained in source systems as `#RRGGBB`. The published value SHALL be transformed to the format expected by the XSD (typically `RRGGBB` without `#`).
 
 ---
 
-## Optional / future ResourceFrame entities
+### XML examples (CFL pattern)
 
-The following ResourceFrame entities are **not part of the CFL MVP baseline**, but may be introduced in future extensions of the profile.
+#### Example 1 — Branding definition in `resource.xml`
+
+```xml
+<Branding id="CFL:Branding:GroupOfLines:L10" version="1">
+  <Name>Ligne 10</Name>
+  <!-- colour element name/location depends on the CEN NeTEx 2.0 schema -->
+  <Colour>009BD4</Colour>
+</Branding>
+```
+
+#### Example 2 — GroupOfLines referencing Branding (in service structure)
+
+```xml
+<GroupOfLines id="CFL:GroupOfLines:L10" version="1">
+  <Name>Ligne 10</Name>
+  <BrandingRef ref="CFL:Branding:GroupOfLines:L10"/>
+</GroupOfLines>
+```
+
+---
+
+## Shared calendar entities (ServiceCalendarFrame)
+
+## DayType (ServiceCalendarFrame)
+
+### Purpose and scope
+
+A **DayType** represents a reusable *category of operational days* on which one or several VehicleJourneys run.  
+It defines **patterns of service availability**, such as:
+
+- Weekdays  
+- Weekends  
+- Saturday only  
+- Public holidays  
+
+In the CFL MVP, DayTypes:
+- Provide the **basic calendar structure** used by VehicleJourneys,
+- Are referenced through `DayTypeRef`,
+- Remain simple and limited to the operational needs of the rail timetable.
+
+A DayType does **not** represent individual dates.  
+Concrete date assignment is handled via **DayTypeAssignment**.
+
+---
+
+### Modelling principles
+
+#### Reusability
+A DayType is a *named bucket of days* that may be reused by many VehicleJourneys.
+
+#### Human-readable naming
+Names shall clearly describe the operational meaning (e.g. “Weekdays”).  
+Multilingual forms are allowed.
+
+#### Stability
+DayTypes shall be **stable** and reused across timetable updates when their definition does not change.
+
+#### Relationship with VehicleJourney
+- A VehicleJourney **must** reference at least one DayType.
+- Multiple DayTypes MAY be referenced when needed.
+
+---
+
+### Elements and attributes retained in the CFL MVP
+
+| Element / Attribute | Description | Cardinality (MVP) | Notes / Constraints | Example value |
+|---------------------|-------------|-------------------|----------------------|--------------|
+| `@id` | Unique identifier of the DayType | 1..1 | Stable CFL identifier | `LU:CFL:DayType:WEEKDAYS` |
+| `version` | Object version | 1..1 | Incremented if meaning or name changes | `1` |
+| `Name` | Human-readable name | 1..1 | Multilingual `<Text>` allowed | “Weekdays” |
+| `ShortName` | Abbreviated form | 0..1 | Optional | “MF” |
+| `Properties` | Weekly pattern | 0..1 | Used when the DayType represents a weekly pattern (e.g. MondayToFriday). | `MondayToFriday` |
+
+---
+
+### Rules and cardinalities
+
+| Rule | Description |
+|------|-------------|
+| DayType → Name | SHALL be present at least in French. |
+| DayType → Properties | MAY be used when the DayType represents a weekly pattern. |
+| Identifiers | SHALL be stable and descriptive (`LU:CFL:DayType:WEEKDAYS`). |
+| VehicleJourney → DayTypeRef | A VehicleJourney SHALL reference ≥1 DayType. |
+
+---
+
+### XML example
+
+```xml
+<DayType id="LU:CFL:DayType:WEEKDAYS" version="1">
+    <Name>
+        <Text xml:lang="fr">Jours ouvrables</Text>
+        <Text xml:lang="en">Weekdays</Text>
+    </Name>
+</DayType>
+```
+
+---
+
+## OperatingPeriod (ServiceCalendarFrame)
+
+### Purpose and scope
+
+An **OperatingPeriod** defines a *continuous date range* during which a timetable or a set of VehicleJourneys is valid.
+
+It provides the temporal boundaries of the timetable dataset, typically aligned with seasonal timetable changes (e.g. winter period, summer period).
+
+An OperatingPeriod does **not** specify which days within the period are operational.  
+It only defines the *outer validity range*.  
+Actual running days are determined by **DayType** and **DayTypeAssignment**.
+
+In the CFL MVP:
+
+- At least one OperatingPeriod SHALL be defined per dataset.
+- A VehicleJourney MAY (optionally) reference an OperatingPeriod through calendar assignments.
+
+---
+
+### Modelling principles
+
+#### Continuous range
+
+An OperatingPeriod represents an uninterrupted period starting on `FromDate` and ending on `ToDate` (inclusive).
+
+#### Stability
+
+OperatingPeriods remain stable across timetable updates as long as the date range does not change.
+
+#### Independence from DayType
+
+OperatingPeriods do not imply any pattern (e.g. weekdays, weekends).  
+They only define *when the timetable is active* at a high level.
+
+---
+
+### Elements and attributes retained in the CFL MVP
+
+| Element / Attribute | Description | Cardinality (MVP) | Notes / Constraints | Example value |
+|---------------------|-------------|-------------------|----------------------|--------------|
+| `@id` | Unique identifier | 1..1 | Stable identifier for the period | `LU:CFL:OP_2025_WINTER` |
+| `version` | Object version | 1..1 | Incremented if dates change | `1` |
+| `FromDate` | Start date (YYYY-MM-DD) | 1..1 | Inclusive | `2025-12-15` |
+| `ToDate` | End date (YYYY-MM-DD) | 1..1 | Inclusive | `2026-06-14` |
+
+---
+
+### Rules and cardinalities
+
+| Rule | Description |
+|------|-------------|
+| OperatingPeriod → FromDate | SHALL be present. |
+| OperatingPeriod → ToDate | SHALL be present. |
+| Identifier | SHALL be stable and descriptive. |
+| Usage | At least one OperatingPeriod SHALL exist in the dataset. |
+
+---
+
+### XML example
+
+```xml
+<OperatingPeriod id="LU:CFL:OP_2025_WINTER" version="1">
+    <FromDate>2025-12-15</FromDate>
+    <ToDate>2026-06-14</ToDate>
+</OperatingPeriod>
+```
+
+---
+
+## DayTypeAssignment (ServiceCalendarFrame)
+
+### Purpose and scope
+
+A **DayTypeAssignment** links a DayType to actual dates or date patterns.  
+It defines *when* a DayType is available within an OperatingPeriod, through:
+
+- A weekly pattern (e.g. Monday to Friday),
+- A continuous date range,
+- Individual dates,
+- Exceptions (inclusion or exclusion).
+
+In the CFL MVP, DayTypeAssignment provides the **operational calendar** used by VehicleJourneys to determine on which days they run.
+
+---
+
+### Modelling principles
+
+#### Linking abstract and concrete calendars
+
+A DayType is an *abstract category* (“WEEKDAYS”).  
+DayTypeAssignment defines *how that category is realised*:
+
+- Monday to Friday during the operating period,
+- Excluding public holidays,
+- Including special running days.
+
+#### Weekly patterns
+
+The most common case is a weekly repetition (Monday–Friday, Saturday only, etc.).  
+This is represented using a weekly pattern structure under `Properties` (exact XML structure depends on the NeTEx XSD used).
+
+#### Operating period association
+
+A DayTypeAssignment MAY reference an OperatingPeriod to indicate that the rule is valid only during a specific timetable period.
+
+#### Inclusion / exclusion
+
+- `isAvailable="true"` → the DayType applies on the specified days.  
+- `isAvailable="false"` → the DayType does *not* apply (exception).
+
+#### MVP simplification
+
+In the CFL MVP:
+
+- Weekly patterns are allowed but optional.  
+- Public holiday exceptions are optional.  
+- One DayTypeAssignment per DayType is typically sufficient for the MVP.
+
+---
+
+### Elements and attributes retained in the CFL MVP
+
+| Element / Attribute | Description | Card. (MVP) | Notes / Constraints | Example value |
+|---------------------|-------------|-------------|----------------------|--------------|
+| `@id` | Unique identifier of the assignment | 1..1 | Stable CFL identifier | `LU:CFL:DTA:WEEKDAYS` |
+| `version` | Object version | 1..1 | Incremented when logic changes | `1` |
+| `DayTypeRef` | Reference to the DayType | 1..1 | Mandatory | `LU:CFL:DayType:WEEKDAYS` |
+| `OperatingPeriodRef` | Validity period | 0..1 | Optional in MVP | `LU:CFL:OP_2025_WINTER` |
+| `Properties` | Weekly pattern definition | 0..1 | Used when pattern repeats weekly | `MondayToFriday` |
+| `isAvailable` | Inclusion/exclusion flag | 0..1 | Default = true | `true` |
+
+---
+
+### XML examples
+
+#### Example 1 — WEEKDAYS pattern during winter timetable
+
+```xml
+<DayTypeAssignment id="LU:CFL:DTA:WEEKDAYS" version="1" isAvailable="true">
+    <DayTypeRef ref="LU:CFL:DayType:WEEKDAYS"/>
+    <OperatingPeriodRef ref="LU:CFL:OP_2025_WINTER"/>
+
+    <Properties>
+        <DaysOfWeek>MondayToFriday</DaysOfWeek>
+    </Properties>
+</DayTypeAssignment>
+```
+
+### Example 2 - Exception: service does not run on a public holiday
+
+```xml
+<DayTypeAssignment id="LU:CFL:DTA:WEEKDAYS_NO_HOLIDAY" version="1" isAvailable="false">
+    <DayTypeRef ref="LU:CFL:DayType:WEEKDAYS"/>
+    <Date>2025-12-25</Date>
+</DayTypeAssignment>
+```
+
+---
+
+## Optional / future shared entities in `resource.xml`
+
+The following shared entities are **not part of the CFL MVP baseline**, but may be introduced in future extensions of the profile.
 
 They are listed here to document their **expected location and role** when introduced.
 
@@ -138,18 +463,56 @@ These entities are not included in the CFL MVP baseline.
 
 ## Scope limitations and summary
 
-The ResourceFrame in the CFL NeTEx MVP:
+The shared frames published in `resource.xml` in the CFL NeTEx MVP:
 
-- Does not model networks or organisational hierarchies beyond the Operator;
-- Does not include fare-related reference data;
-- Does not include accessibility metadata (covered by later work packages);
-- Does not include real-time or operational reference entities.
+- Do not model networks or organisational hierarchies beyond the Operator;
+- Do not include fare-related reference data;
+- Do not include accessibility metadata (covered by later work packages);
+- Do not include real-time or operational reference entities.
 
-The ResourceFrame provides the **shared foundation** of the CFL NeTEx MVP dataset by ensuring:
+`resource.xml` provides the **shared foundation** of the CFL NeTEx MVP dataset by ensuring:
 
 - Consistent identifier namespaces;
 - A single authoritative Operator definition;
 - Reusable branding information;
-- And a clear extension point for future shared reference data.
+- And shared calendar primitives reused across line files.
 
-All other Frames rely on the ResourceFrame for stable, dataset-wide references.
+All other frames rely on shared entities defined in `resource.xml` through stable references.
+
+---
+
+## TypeOfParking (ResourceFrame)
+
+### Functional description
+
+**TypeOfParking** is a shared classification value used to type `Parking` entities (e.g. car park, bicycle parking, secure bicycle boxes).
+
+In the CFL MVP, it is used to identify **bikebox** parkings published in `stop.xml`.
+
+---
+
+### Elements and attributes retained in the CFL MVP
+
+| Element / Attribute | Description | Cardinality (CFL MVP) | Notes / Constraints |
+|---------------------|-------------|------------------------|---------------------|
+| `@id` | Identifier of the TypeOfParking | 1..1 | Stable identifier referenced from `Parking/TypeOfParkingRef`. |
+| `Name` | Label of the parking type | 1..1 | Human-readable. |
+| `Description` | Description of the value | 0..1 | Optional. |
+
+---
+
+### CFL-specific modelling rules
+
+- `TypeOfParking` values are defined once in `resource.xml` under `ResourceFrame/typesOfValue`.
+- Parkings in `stop.xml` MUST reference these values via `TypeOfParkingRef`.
+
+---
+
+### XML example (extract from CFL data)
+
+```xml
+<TypeOfParking id="CFL:TypeOfParking:BIKEBOX" version="1">
+  <Name>Bikebox</Name>
+  <Description>Secure bicycle parking (Bikebox).</Description>
+</TypeOfParking>
+```
