@@ -16,6 +16,7 @@ Although `ScheduledStopPoint` and `PassengerStopAssignment` are defined in the *
 2. [Quay (SiteFrame)](#quay-siteframe) — physical boarding locations (platforms) defined in `stop.xml`.
 3. [PassengerStopAssignment (ServiceFrame)](#passengerstopassignment-serviceframe) — stable mapping from logical stops to StopPlace/Quay (defined in `line_<LineId>.xml`).
 4. [ScheduledStopPoint (ServiceFrame)](#scheduledstoppoint-serviceframe) — logical stop points used in patterns and timetables (defined in `line_<LineId>.xml`).
+5. [Parking (SiteFrame)](#parking-siteframe) — fixed parking places defined in `stop.xml` (including Bikebox).
 
 ---
 
@@ -404,4 +405,169 @@ The example below illustrates a typical CFL ScheduledStopPoint with a human-read
     </Name>
 </ScheduledStopPoint>
 ```
+---
 
+## Parking (SiteFrame)
+
+### Functional description
+
+A **Parking** represents a fixed parking place that can be used by passengers as part of their journey access/egress (e.g. car parks, bicycle parks, secured bicycle boxes).
+
+In the CFL MVP, Parkings are published in the **SiteFrame** of `stop.xml`, because they are **place-based infrastructure objects** (not timetable objects).
+
+In a first stage, Parkings are published as **standalone place objects** and can be consumed without relying on any link to `StopPlace`.
+
+The target model may later introduce a differentiated approach:
+- some Parkings will be **linked to a StopPlace** when the parking is part of a station site and the relationship is stable and maintainable;
+- other Parkings will remain **unlinked** when no stable station attachment exists or when the parking is not functionally associated with a specific StopPlace.
+
+---
+
+### Elements and attributes retained in the CFL MVP
+
+| Element / Attribute | Description | Cardinality (CFL MVP) | Notes / Constraints |
+|---------------------|-------------|------------------------|---------------------|
+| `@id` | Identifier of the Parking | 1..1 | CFL identifier scheme (see 5.1). For Bikebox: includes the Bikebox code (e.g. `BK0001`). |
+| `Name` | Public name/label of the parking | 1..1 | For Bikebox, includes the Bikebox code and station label. |
+| `Description` | Passenger-facing description | 0..1 | For Bikebox, used to describe secure access conditions. |
+| `Centroid/Location` | Geographic coordinates (WGS84) | 1..1 | Mandatory longitude/latitude. |
+| `TypeOfParkingRef` | Parking type reference | 1..1 | MUST reference a `TypeOfParking` defined in `resource.xml`. |
+| `TotalCapacity` | Total number of places | 0..1 | Mandatory for Bikebox in CFL MVP. |
+| `ParkingPaymentProcess` | Payment model | 0..1 | Used for Bikebox (`free`). |
+| `ParkingReservation` | Reservation / entitlement model | 0..1 | Used for Bikebox (`registrationRequired`). |
+| `BookingUrl` | URL for booking/registration | 0..1 | Mandatory for Bikebox in CFL MVP. |
+| `parkingProperties/ParkingProperties` | Additional parking properties | 0..n | Used for Bikebox (secure parking, max stay, allowed vehicle types). |
+| `placeEquipments/*` | Equipment installed at the parking | 0..n | Optional in MVP; used when known (e.g. CCTV, access control). |
+
+#### Notes
+- Attributes not listed above are not used in the CFL MVP.
+- `StopPlace` attachment is intentionally not required in the MVP (standalone publication), but may be introduced later for a subset of Parkings.
+
+---
+
+### CFL-specific modelling rules (generic)
+
+- Parkings are published in `stop.xml` under `SiteFrame/.../parkings`.
+- `TypeOfParkingRef` MUST point to a shared `TypeOfParking` value published in `resource.xml`.
+- `Centroid/Location` MUST be provided.
+- `TotalCapacity` SHOULD be provided whenever the capacity is known and stable.
+
+---
+
+### Minimal XML example (illustrative only)
+
+⚠️ *Illustrative only — not real CFL data.*
+
+```xml
+<Parking id="LU:CFL:Parking:PARK001" version="1">
+  <Name>Station X - Car park</Name>
+  <Centroid>
+    <Location>
+      <Longitude>6.1000</Longitude>
+      <Latitude>49.6000</Latitude>
+    </Location>
+  </Centroid>
+  <TypeOfParkingRef ref="LU:CFL:TypeOfParking:CARPARK" versionRef="1"/>
+  <TotalCapacity>120</TotalCapacity>
+</Parking>
+```
+
+---
+
+## bikebox (CFL specialisation of Parking)
+
+### Purpose and scope
+
+**bikebox** facilities are published as **secure bicycle parkings**. In the CFL MVP, they are modelled as `Parking` entities typed as **bikebox**, and are published as **standalone place objects** in `stop.xml`.
+
+This section documents the CFL-specific rules for bikebox, on top of the generic `Parking` description above.
+
+---
+
+### Publication and frame
+
+- Publication file: `stop.xml` *(renamed from the former `bikebox.xml`)*
+- Frame: `SiteFrame` `CFL:SiteFrame:Bikebox:1`
+- Content: `parkings/Parking` (one `Parking` per bikebox location)
+- Prerequisite: `ResourceFrameRef ref="CFL:ResourceFrame:Resources:1" versionRef="1"`
+
+---
+
+### Typing and shared references
+
+Each bikebox location MUST be represented by exactly one `Parking` using:
+
+- `Parking@id` = `CFL:Parking:Bikebox:<BikeboxId>` (e.g. `CFL:Parking:Bikebox:BK0010`)
+- `TypeOfParkingRef` = `CFL:TypeOfParking:BIKEBOX` (published in `resource.xml`)
+
+The corresponding shared value is defined as:
+
+- `TypeOfParking id="CFL:TypeOfParking:BIKEBOX" version="1"`
+
+---
+
+### Elements and constraints for bikebox (CFL MVP)
+
+For bikebox Parkings, the following fields MUST be provided:
+
+- `Centroid/Location` (longitude/latitude)
+- `TypeOfParkingRef ref="CFL:TypeOfParking:BIKEBOX" versionRef="1"`
+- `TotalCapacity`
+- `ParkingPaymentProcess` (expected value: `free`)
+- `ParkingReservation` (expected value: `registrationRequired`)
+- `BookingUrl`
+- `parkingProperties/ParkingProperties` including at least:
+  - `ParkingVehicleTypes` (e.g. `cycle eCycle pedalCycle`)
+  - `MaximumStay` (e.g. `P30D`)
+  - `SecureParking` (`true`)
+
+The following elements are OPTIONAL in the MVP and may be provided when known:
+
+- `Description`
+- `placeEquipments/*` (e.g. `PassengerSafetyEquipment/Cctv`, `VehicleReleaseEquipment/RemoteControl`)
+
+---
+
+### CFL-specific modelling rules
+
+- bikebox are published as **standalone Parkings** in the MVP (no required link to `StopPlace`).
+- If bikebox-to-station attachment is introduced later, it SHALL only be done when the relationship is stable and maintainable.
+- bikebox identifiers are stable and MUST not change even if the public label is updated.
+
+---
+
+### XML example
+
+```xml
+<Parking id="CFL:Parking:Bikebox:BK0001" version="1">
+  <Name>BK0001 - LUX01 - Sandweiler-Contern, Gare Nord</Name>
+  <Description>Bikebox: secure bicycle parking. Access restricted to registered users. 24/7 access.</Description>
+  <Centroid>
+    <Location>
+      <Longitude>6.13292</Longitude>
+      <Latitude>49.598314</Latitude>
+    </Location>
+  </Centroid>
+  <placeEquipments>
+    <PassengerSafetyEquipment id="CFL:InstalledEquipment:Bikebox:BK0001:SAFETY" version="1">
+      <Cctv>false</Cctv>
+    </PassengerSafetyEquipment>
+    <VehicleReleaseEquipment id="CFL:InstalledEquipment:Bikebox:BK0001:ACCESS_CONTROL" version="1">
+      <RemoteControl>false</RemoteControl>
+    </VehicleReleaseEquipment>
+  </placeEquipments>
+  <TypeOfParkingRef ref="CFL:TypeOfParking:BIKEBOX" versionRef="1"/>
+  <TotalCapacity>32</TotalCapacity>
+  <ParkingPaymentProcess>free</ParkingPaymentProcess>
+  <ParkingReservation>registrationRequired</ParkingReservation>
+  <BookingUrl>https://luxembourg.diwio.com/custom/luxembourg/register</BookingUrl>
+  <parkingProperties>
+    <ParkingProperties id="CFL:ParkingProperties:Bikebox:BK0001" version="1">
+      <Name>Bikebox terms</Name>
+      <ParkingVehicleTypes>cycle eCycle pedalCycle</ParkingVehicleTypes>
+      <MaximumStay>P30D</MaximumStay>
+      <SecureParking>true</SecureParking>
+    </ParkingProperties>
+  </parkingProperties>
+</Parking>
+```
