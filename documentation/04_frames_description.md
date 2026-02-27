@@ -2,18 +2,17 @@
 
 ## 4.1 Overview of Frames Used in the MVP
 
-The MVP relies on a focused subset of NeTEx frames.
-Each frame groups entities that share a common conceptual scope (referentials, stops, service structure, timetables, calendars).
+The MVP relies on a focused subset of NeTEx frames.  
+Each frame groups entities that share a common conceptual scope (referentials, stops, service structure, timetables, calendars).  
 The table below summarises the frames used and their purposes.
 
 | Frame | Conceptual scope | Key entities (MVP) | Purpose |
 |-------|------------------|---------------------|---------|
-| **[ResourceFrame](#42-resourceframe)** | Shared reference data | Codespace, Operator, Notice, ValueSet, Calendar primitives | Provides global identifiers, shared definitions and calendar elements. |
+| **[ResourceFrame](#42-resourceframe)** | Shared reference data | Codespace, Operator, Notice, ValueSet, calendar primitives | Provides global identifiers, shared definitions and calendar elements. |
 | **[ServiceCalendarFrame](#43-servicecalendarframe)** | Calendar definitions | DayType, OperatingPeriod, OperatingDay, DayTypeAssignment | Defines the operational calendar used by all scheduled circulations. |
-| **[SiteFrame](#44-siteframe)** | Stop referential | StopPlace, Quay | Provides the authoritative registry of stops and quays. |
-| **[ServiceFrame (per line)](#45-serviceframe-per-line)** | Service structure | Line, JourneyPattern, StopPointInJourneyPattern | Defines the public line identity and stop sequences for each pattern. |
-| **[TimetableFrame](#46-timetableframe)** | Scheduled times | VehicleJourney, PassingTime | Describes planned train circulations and their scheduled times. |
-
+| **[SiteFrame](#44-siteframe)** | Stop referential (physical infrastructure) | StopPlace, Quay | Provides the authoritative registry of stops and quays. |
+| **[ServiceFrame (per line)](#45-serviceframe-per-line)** | Service structure (logical layer) | Line, Direction, ScheduledStopPoint, PassengerStopAssignment, JourneyPattern, StopPointInJourneyPattern, ServiceLink | Defines the line identity, the logical stop structure and patterns, and the mapping to physical stops. |
+| **[TimetableFrame](#46-timetableframe)** | Scheduled times | VehicleJourney, TimetabledPassingTime | Describes planned circulations and their scheduled times aligned with the service structure. |
 
 This overview introduces the frames that are described in detail in sections
 [4.2](#42-resourceframe) to [4.6](#46-timetableframe).
@@ -63,7 +62,7 @@ Only concepts strictly required for the MVP timetable modelling are included.
 - OperatingDay  
 - DayTypeAssignment  
 
-These elements form the base calendar model used by all ServiceJourneys.
+These elements form the base calendar model used by all VehicleJourneys.
 
 **Transfer connections** *(included only if modelled in MVP)*  
 - Connection  
@@ -108,7 +107,7 @@ The ServiceCalendarFrame groups the elements that define:
 - Individual dates (operating days);
 - How day types are assigned to dates.
 
-Its purpose is to supply a unified, reusable calendar model shared by all ServiceJourneys.
+Its purpose is to supply a unified, reusable calendar model shared by all VehicleJourneys.
 
 This separation ensures that the service structure (ServiceFrame) and the timetable (TimetableFrame) can reference a stable, centralised calendar.
 
@@ -120,7 +119,7 @@ The MVP profile uses the core NeTEx calendar primitives:
 
 #### **DayType**
 Represents a category of days (e.g., weekday, weekend, specific holiday group).  
-Used by ServiceJourney and VehicleJourney to indicate the type of days on which they run.
+Used by VehicleJourney to indicate the type of days on which it runs.
 
 #### **OperatingPeriod**
 Defines continuous date ranges during which services operate (e.g., "01/12/2025–14/12/2025" for a seasonal timetable).
@@ -153,7 +152,7 @@ The calendar model in the MVP follows these principles:
 
 - **DayTypeAssignments combine all components**, ensuring that each date can be interpreted unambiguously.
 
-- **DayTypes referenced by ServiceJourneys** must be defined in the ServiceCalendarFrame.
+- **DayTypes referenced by VehicleJourneys** must be defined in the ServiceCalendarFrame.
 
 - **Calendar definitions must be consistent across all lines**: a DayType represents the same concept for all services.
 
@@ -188,12 +187,12 @@ This frame forms the authoritative stop referential for the MVP.
 
 The SiteFrame models the components that describe:
 
-- The physical and logical structure of stops and stations;
-- The access points used by services (quays/platform edges);
+- The physical structure of stops and stations;
+- The boarding locations used by passengers (quays/platform edges);
 - The associated identifiers, names and coordinates.
 
 It defines the stop topology independently from any specific line or timetable.  
-ServiceFrames and TimetableFrames refer to the stop elements defined here.
+ServiceFrames link their logical stop structure to StopPlace and Quay through PassengerStopAssignment (see section 4.5).
 
 ---
 
@@ -205,7 +204,7 @@ The MVP focuses on the core stop entities required for scheduled services:
 Represents a station or stop area.  
 Key roles in MVP:
 - Defines the geographical location of a stop;
-- Groups one or several quays,
+- Groups one or several quays;
 - Provides the stable, public-facing stop identity.
 
 Typical attributes:
@@ -218,16 +217,16 @@ Typical attributes:
 
 #### **Quay**
 Represents a platform edge or boarding position within a StopPlace.  
-It is the physical point at which a ServiceJourney stops. Said otherwise, it is the physical place from which a passenger meets a vehicle for their trip.
+It is the physical place from which a passenger boards or alights.
 
 Key roles:
-- The primary reference used in JourneyPatterns and PassingTimes;
-- Uniquely identifies the physical platform used for boarding/alighting.
+- Provides quay-level boarding information when required by consumers;
+- May be referenced from PassengerStopAssignment when stable quay assignment is published.
 
 Typical attributes:
 - Name  
 - PublicCode (e.g. platform number)  
-- privateCodes (i.e., the internal code of a scheduling system)
+- privateCodes (i.e., the internal code of a scheduling or infrastructure system)
 - QuayType  
 - Coordinates (expressed with Latitude/Longitude in WGS84)
 
@@ -248,9 +247,6 @@ The MVP does **not** model complex hierarchies beyond what is strictly required 
 - **Geographical coordinates are attached to StopPlace**  
   (Quays may also carry coordinates if required for precision).
 
-- **Quays represent boarding positions, not sector boards.**  
-  Sector-level information (e.g., A/B/C) is not modelled in MVP unless explicitly needed.
-
 - **Multilingual naming is optional**  
   and included only when available in source systems.
 
@@ -270,7 +266,7 @@ The SiteFrame in the MVP does **not** include:
 - Commercial areas;
 - 3D geometry or indoor navigation structures.
 
-The MVP restricts itself to the elements required for describing stop identity and platform references.
+The MVP restricts itself to the elements required for describing stop identity and (when needed) quay-level boarding references.
 
 ---
 
@@ -289,7 +285,10 @@ It provides:
 
 - The **public-facing identity** of the line;  
 - One or more **JourneyPatterns** representing service variants;
-- The ordered **StopPointInJourneyPattern** elements forming each pattern.
+- The ordered **StopPointInJourneyPattern** elements forming each pattern;
+- The set of logical stop points served by the line (`ScheduledStopPoint`);
+- The mapping between logical stops and physical stop infrastructure (`PassengerStopAssignment`);
+- (Optional) the topology between consecutive logical stops (`ServiceLink`).
 
 This structure is reused by all `VehicleJourney` instances belonging to the same line.
 
@@ -309,6 +308,29 @@ Typical attributes:
 
 ---
 
+#### **ScheduledStopPoint**
+Represents a logical stop point used to describe the service structure.  
+This layer is distinct from the physical stop infrastructure described in the SiteFrame.
+
+ScheduledStopPoints are used consistently across:
+- ServiceLinks (topology),
+- JourneyPatterns (stop sequences),
+- and, indirectly, passing times through the pattern structure.
+
+---
+
+#### **PassengerStopAssignment**
+Links a ScheduledStopPoint to the physical stop infrastructure defined in the SiteFrame.
+
+A PassengerStopAssignment:
+- references the logical stop (`ScheduledStopPointRef`);
+- references the physical station/stop area (`StopPlaceRef`);
+- may reference a physical boarding location (`QuayRef`) when stable quay assignment is published.
+
+This entity ensures that the dataset explicitly models the difference between logical stops (service design) and physical stops (infrastructure), while still allowing consumers to resolve the physical location.
+
+---
+
 #### **JourneyPattern**
 Represents an ordered sequence of stops served by a particular pattern of the line.  
 A line may have several JourneyPatterns to represent:
@@ -324,11 +346,17 @@ JourneyPatterns structure the relationship between the line and the timetable.
 Represents a single stop within a JourneyPattern.  
 It:
 
-- References a Quay (from the SiteFrame);
-- Provides the order of stops;
-- Forms the anchor point for PassingTimes in the TimetableFrame.
+- Anchors the stop sequence and order within the pattern;
+- Provides passenger exchange rules (ForBoarding / ForAlighting), where relevant;
+- Acts as the reference point for scheduled times in the TimetableFrame via `StopPointInJourneyPatternRef`.
 
-It is the lowest-level structural element used to attach timing information.
+In the CFL MVP, the physical resolution (StopPlace/Quay) is handled via PassengerStopAssignment rather than by embedding physical stop infrastructure in the pattern itself.
+
+---
+
+#### **(Optional) ServiceLink**
+Represents the link between two consecutive logical stops in the service structure.  
+It references logical stop points via `FromPointRef` / `ToPointRef` (ScheduledStopPoint).
 
 ---
 
@@ -337,10 +365,9 @@ It is the lowest-level structural element used to attach timing information.
 - The ServiceFrame contains **exactly one Line**.  
 - All JourneyPatterns defined in the frame must belong to this Line.  
 - JourneyPatterns represent **service variants**, not route geometry.  
-- StopPointInJourneyPattern must always reference a **Quay** (no alternative stop representation is used).  
-- Public codes such as RB/RE/IC express **service classification** and are not part of the Line identifier.  
+- The ServiceFrame contains the logical stop structure and the mapping to physical infrastructure (PassengerStopAssignment).  
 - The ServiceFrame remains independent from calendar definitions and from timing information. 
-- ServiceJourneys refer to a JourneyPattern and apply time data through the TimetableFrame.
+- VehicleJourneys refer to a JourneyPattern and apply time data through the TimetableFrame.
 
 ---
 
@@ -350,12 +377,12 @@ The MVP ServiceFrame does **not** model:
 
 - Route geometry or network topology;
 - Operational train paths;
-- Consist or Composition information on rolling stock;
+- Consist or composition information on rolling stock;
 - Platform sectors or sub-quay subdivisions;
 - Intermodal structures;
 - Operational rules or signalling constraints.
 
-Its purpose is limited to the **logical service structure** required for associating stops and scheduled times within a Line.
+Its purpose is limited to the **logical service structure** required for associating patterns and scheduled times within a Line.
 
 ---
 
@@ -366,7 +393,7 @@ It provides the **temporal dimension** of the offer by modelling the planned cir
 
 It depends on three other frames:
 
-- The **SiteFrame**, which defines the stop topology;  
+- The **SiteFrame**, which defines the physical stop infrastructure (StopPlace, Quay);  
 - The **ServiceFrame**, which defines the logical service structure (Line, JourneyPattern, StopPointInJourneyPattern);  
 - The **ServiceCalendarFrame**, which defines the operating days (DayTypes, OperatingPeriods, OperatingDays).
 
@@ -380,7 +407,7 @@ Its role is to express **when** each circulation operates and **what times** it 
 The TimetableFrame contains all elements required to represent:
 
 - Individual scheduled circulations (**VehicleJourney**); 
-- The sequence of planned times at each stop (**PassingTime**);
+- The sequence of planned times at each stop (**TimetabledPassingTime**);
 - The association of each circulation with operational days (**DayTypeRef**);
 - The alignment between temporal data and the service structure.
 
@@ -400,7 +427,7 @@ A `VehicleJourney`:
 
 - References **exactly one `JourneyPattern`**; 
 - References **one or more `DayTypes`** via `DayTypeRef`;
-- Contains one `PassingTime` element per `StopPointInJourneyPattern`.
+- Contains one `TimetabledPassingTime` element per `StopPointInJourneyPattern`.
 
 **Typical attributes:**
 
@@ -413,21 +440,21 @@ In the MVP, **VehicleJourney is the primary timetable entity**.
 
 ---
 
-#### **PassingTime**
+#### **TimetabledPassingTime**
 
-A `PassingTime` represents the scheduled time of a VehicleJourney:
+A `TimetabledPassingTime` represents the scheduled time of a VehicleJourney:
 
 - Arrives at a stop;
 - Departs from a stop;
 - Or passes through it.
 
-Each `PassingTime`:
+Each `TimetabledPassingTime`:
 
-- Is attached to one `StopPointInJourneyPattern`;
+- Is attached to one `StopPointInJourneyPattern` via `StopPointInJourneyPatternRef`;
 - Provides `ArrivalTime` and/or `DepartureTime`;
 - Must follow the exact order defined by the `JourneyPattern`.
 
-`PassingTime` elements provide the essential temporal information of the timetable.
+`TimetabledPassingTime` elements provide the essential temporal information of the timetable.
 
 ---
 
@@ -448,8 +475,8 @@ No further operational modelling is included.
 #### **Link between structure and timetable**
 
 - Each `VehicleJourney` must reference **one `JourneyPattern`**.  
-- All `PassingTime` elements must match the stop sequence of that `JourneyPattern`.  
-- No `PassingTime` may exist without a corresponding `StopPointInJourneyPattern`.
+- All `TimetabledPassingTime` elements must match the stop sequence of that `JourneyPattern`.  
+- No `TimetabledPassingTime` may exist without a corresponding `StopPointInJourneyPattern`.
 
 The structural and temporal models must remain fully aligned.
 
@@ -468,7 +495,7 @@ No validity information is carried directly in the TimetableFrame.
 #### **Temporal consistency**
 
 - `ArrivalTime` and `DepartureTime` must be consistent and non-contradictory.  
-- `PassingTime` elements must form a coherent sequence (no negative travel times).  
+- `TimetabledPassingTime` elements must form a coherent sequence (no negative travel times).  
 - Times must be present for all stops actually served.
 
 ---
@@ -508,12 +535,15 @@ Its scope is intentionally limited to **planned, published timetable data**.
 | **OperatingDay** | ServiceCalendarFrame | Single calendar date. | Used when dates must be enumerated. | ⚪ Optional |
 | **DayTypeAssignment** | ServiceCalendarFrame | Assignment of DayType to specific dates. | Produces the final operational calendar. | ✅ |
 | **StopPlace** | SiteFrame | Station or stop area. | Public identity of a stop. | ✅ |
-| **Quay** | SiteFrame | Boarding point / platform edge. | Referenced by StopPointInJourneyPattern. | ✅ |
+| **Quay** | SiteFrame | Boarding point / platform edge. | Physical boarding location; referenced via PSA when quay-level assignment is published. | ✅ |
 | **Line** | ServiceFrame | Public axis of service (e.g., “Luxembourg–Arlon”). | Groups all patterns and journeys of the line. | ✅ |
+| **Direction** | ServiceFrame | Direction of travel. | Structures offer for passenger information. | ✅ |
+| **ScheduledStopPoint** | ServiceFrame | Logical stop point used in service design. | Anchor for patterns and topology; mapped to physical stops via PSA. | ✅ |
+| **PassengerStopAssignment** | ServiceFrame | Mapping between logical stop and physical infrastructure. | Links ScheduledStopPoint to StopPlace (and optionally Quay). | ✅ |
 | **JourneyPattern** | ServiceFrame | Ordered sequence of stops for a service variant. | Structural reference for VehicleJourneys. | ✅ |
-| **StopPointInJourneyPattern** | ServiceFrame | One stop in the pattern referencing a Quay. | Defines stop order used by PassingTimes. | ✅ |
+| **StopPointInJourneyPattern** | ServiceFrame | One stop in the pattern. | Defines stop order used by passing times. | ✅ |
 | **VehicleJourney** | TimetableFrame | One scheduled circulation of a vehicle. | Core unit of the timetable (planned run). | ✅ |
-| **PassingTime** | TimetableFrame | Arrival/departure time at a stop. | Provides the temporal dimension of the timetable. | ✅ |
+| **TimetabledPassingTime** | TimetableFrame | Arrival/departure time at a pattern stop. | Provides the temporal dimension of the timetable. | ✅ |
 
 ---
 
@@ -521,53 +551,27 @@ Its scope is intentionally limited to **planned, published timetable data**.
 
 The frames described in this chapter are not isolated components: they work together to form a coherent, structured timetable dataset.
 
-This section provides a visual summary of how the main frames relate to one another and how information flows between them.
-
 - **SiteFrame** defines the physical locations used by services (StopPlace, Quay).  
-- **ServiceFrame** reuses these locations to define the logical service structure (Line, JourneyPattern).  
-- **TimetableFrame** instantiates concrete journeys and their times (VehicleJourney, PassingTime).  
-- **ServiceCalendarFrame** defines when these journeys operate (DayType, OperatingPeriod).  
+- **ServiceFrame** defines the logical service structure (Line, ScheduledStopPoint, JourneyPattern) and maps logical stops to physical infrastructure via PassengerStopAssignment.  
+- **TimetableFrame** instantiates concrete journeys and their times (VehicleJourney, TimetabledPassingTime).  
+- **ServiceCalendarFrame** defines when these journeys operate (DayType, assignments).  
 - **ResourceFrame** provides shared metadata required by all other frames (Codespace, Operator, Notices).
 
 The diagram below summarises these interactions:
 
 ```mermaid
 flowchart LR
-    subgraph SITE ["SiteFrame"]
-        S1["StopPlace"]
-        S2["Quay"]
-    end
+  SITE[SiteFrame]
+  SVC[ServiceFrame]
+  TT[TimetableFrame]
+  CAL[ServiceCalendarFrame]
+  RES[ResourceFrame]
 
-    subgraph SERVICE ["ServiceFrame"]
-        J1["JourneyPattern"]
-        J2["StopPointInJourneyPattern"]
-        L1["Line"]
-    end
-
-    subgraph TIMETABLE ["TimetableFrame"]
-        V1["VehicleJourney"]
-        P1["PassingTime"]
-    end
-
-    subgraph CAL ["ServiceCalendarFrame"]
-        C1["DayType"]
-        C2["OperatingPeriod"]
-    end
-
-    subgraph RES ["ResourceFrame"]
-        R1["Codespace"]
-        R2["Operator"]
-        R3["Notice"]
-    end
-
-    S2 --> J2
-    J2 --> P1
-    J1 --> V1
-    C1 --> V1
-
-    RES -. reused by .- SITE
-    RES -. reused by .- SERVICE
-    RES -. reused by .- TIMETABLE
-    RES -. reused by .- CAL
+  SVC -->|PSA references| SITE
+  TT -->|references| SVC
+  TT -->|DayTypeRef| CAL
+  RES -.-> SITE
+  RES -.-> SVC
+  RES -.-> TT
+  RES -.-> CAL
 ```
-
