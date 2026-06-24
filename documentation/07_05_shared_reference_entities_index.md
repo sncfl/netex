@@ -27,9 +27,9 @@ Each shared entity used in the CFL MVP is described in a dedicated subsection be
    - [DayType (ServiceCalendarFrame)](#daytype-servicecalendarframe)
    - [OperatingPeriod (ServiceCalendarFrame)](#operatingperiod-servicecalendarframe)
    - [DayTypeAssignment (ServiceCalendarFrame)](#daytypeassignment-servicecalendarframe)
-5. [Optional / future shared entities in `resource.xml`](#optional--future-shared-entities-in-resourcexml)
-6. [Scope limitations and summary](#scope-limitations-and-summary)
-7. [TypeOfParking (ResourceFrame)](#typeofparking-resourceframe)
+5. [TypeOfParking (ResourceFrame)](#typeofparking-resourceframe)
+6. [Optional / future shared entities in `resource.xml`](#optional--future-shared-entities-in-resourcexml)
+7. [Scope limitations and summary](#scope-limitations-and-summary)
 
 ---
 
@@ -485,34 +485,124 @@ All other frames rely on shared entities defined in `resource.xml` through stabl
 
 ### Functional description
 
-**TypeOfParking** is a shared classification value used to type `Parking` entities (e.g. car park, bicycle parking, secure bicycle boxes).
+**TypeOfParking** is a shared classification value used to type `Parking` entities published in the CFL NeTEx dataset.
 
-In the CFL MVP, it is used to identify **bikebox** parkings published in `stop.xml`.
+In the CFL profile, `TypeOfParking` is used to distinguish CFL functional parking types that may not all be fully covered by the standard NeTEx `ParkingType` enumeration.
+
+The following CFL parking types are currently expected:
+
+- P+R car parks;
+- Kiss & Ride / drop-off parkings;
+- Bikebox secure bicycle parkings.
+
+`TypeOfParking` values are defined once in `resource.xml` and referenced from `Parking/TypeOfParkingRef`.
 
 ---
 
-### Elements and attributes retained in the CFL MVP
+### Relationship with `ParkingType`
 
-| Element / Attribute | Description | Cardinality (CFL MVP) | Notes / Constraints |
-|---------------------|-------------|------------------------|---------------------|
-| `@id` | Identifier of the TypeOfParking | 1..1 | Stable identifier referenced from `Parking/TypeOfParkingRef`. |
-| `Name` | Label of the parking type | 1..1 | Human-readable. |
-| `Description` | Description of the value | 0..1 | Optional. |
+`TypeOfParkingRef` is used for the CFL-specific functional classification of parking facilities.
+
+`ParkingType` MAY also be used when a suitable standard NeTEx value exists.
+
+For example, a P+R parking may use both:
+
+```xml
+<ParkingType>parkAndRide</ParkingType>
+<TypeOfParkingRef ref="LU:CFL:TypeOfParking:P_R" versionRef="1"/>
+```
+
+For Bikebox facilities, no standard `ParkingType` value is currently required, because the CFL Bikebox concept is represented through the shared `TypeOfParking` value `BIKEBOX`.
+
+For Kiss & Ride facilities, the functional type is represented through `TypeOfParkingRef = LU:CFL:TypeOfParking:KISS_AND_RIDE`. The short-stay / drop-off usage may additionally be represented in `ParkingProperties`, for example with `ParkingStayList = dropoff` and `MaximumStay = PT30M`.
+
+---
+
+### Expected `TypeOfParking` values
+
+The CFL profile currently expects the following shared `TypeOfParking` values:
+
+| TypeOfParking id | Name | Description | Usage |
+|------------------|------|-------------|-------|
+| `LU:CFL:TypeOfParking:P_R` | P+R | Park-and-ride parking associated with access to the rail network. | Used for CFL P+R car parks. |
+| `LU:CFL:TypeOfParking:KISS_AND_RIDE` | Kiss & Ride | Short-stay drop-off parking. | Used for Kiss & Ride / drop-off parking facilities. |
+| `LU:CFL:TypeOfParking:BIKEBOX` | Bikebox | Secure bicycle parking facility. | Used for CFL Bikebox facilities. |
+
+---
+
+### Elements and attributes retained in the CFL profile
+
+| Element / Attribute | Description | Cardinality (CFL profile) | Notes / Constraints |
+|---------------------|-------------|----------------------------|---------------------|
+| `@id` | Identifier of the `TypeOfParking` value | 1..1 | Stable identifier referenced from `Parking/TypeOfParkingRef`. |
+| `version` | Version of the shared value | 1..1 | Current value: `1`. |
+| `Name` | Human-readable label of the parking type | 1..1 | Should be short and stable. |
+| `Description` | Description of the parking type | 0..1 | Recommended for clarity. |
 
 ---
 
 ### CFL-specific modelling rules
 
-- `TypeOfParking` values are defined once in `resource.xml` under `ResourceFrame/typesOfValue`.
-- Parkings in `stop.xml` MUST reference these values via `TypeOfParkingRef`.
+- `TypeOfParking` values SHALL be defined once in `resource.xml`.
+- `Parking` entities SHALL reference these values through `TypeOfParkingRef`.
+- `TypeOfParkingRef` SHALL be used for CFL-specific functional parking classification.
+- `ParkingType` MAY be used in addition when a suitable standard NeTEx value exists.
+- `TypeOfParking` identifiers SHALL be stable and SHALL NOT be changed when labels or descriptions are updated.
+- New parking types SHALL only be added when they represent a distinct functional parking category in the CFL profile.
+- Technical qualifications such as smartparking SHALL NOT be modelled as `TypeOfParking` values. They shall be represented through parking properties, equipment or availability-related fields.
 
 ---
 
-### XML example (extract from CFL data)
+### XML example: P+R
 
 ```xml
-<TypeOfParking id="CFL:TypeOfParking:BIKEBOX" version="1">
-  <Name>Bikebox</Name>
-  <Description>Secure bicycle parking (Bikebox).</Description>
+<TypeOfParking id="LU:CFL:TypeOfParking:P_R" version="1">
+  <Name>
+    <Text lang="en">P+R</Text>
+  </Name>
+  <Description>
+    <Text lang="en">Park-and-ride parking associated with access to the rail network.</Text>
+  </Description>
 </TypeOfParking>
 ```
+
+---
+
+### XML example: Kiss & Ride
+
+```xml
+<TypeOfParking id="LU:CFL:TypeOfParking:KISS_AND_RIDE" version="1">
+  <Name>
+    <Text lang="en">Kiss & Ride</Text>
+  </Name>
+  <Description>
+    <Text lang="en">Short-stay drop-off parking facility.</Text>
+  </Description>
+</TypeOfParking>
+```
+
+---
+
+### XML example: Bikebox
+
+```xml
+<TypeOfParking id="LU:CFL:TypeOfParking:BIKEBOX" version="1">
+  <Name>
+    <Text lang="en">Bikebox</Text>
+  </Name>
+  <Description>
+    <Text lang="en">Secure bicycle parking facility.</Text>
+  </Description>
+</TypeOfParking>
+```
+---
+
+No additional shared reference entity is introduced at this stage for parking place categories.
+
+Parking place categories SHALL first be represented using standard NeTEx fields and enumerations:
+- ParkingUserType / ParkingUserTypes for user-based categories;
+- ParkingVehicleType / ParkingVehicleTypes for vehicle-based categories;
+- ParkingStayType / ParkingStayList for stay-based categories;
+- NumberOfBaysWithRecharging or NumberOfSpacesWithRechargePoint for charging places.
+
+CFL-specific controlled values MAY be introduced later only for categories that cannot be represented clearly using standard NeTEx enumerations.
