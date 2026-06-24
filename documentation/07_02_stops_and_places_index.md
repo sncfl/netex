@@ -17,7 +17,7 @@ Although `ScheduledStopPoint` and `PassengerStopAssignment` are defined in the *
 3. [PassengerStopAssignment (ServiceFrame)](#passengerstopassignment-serviceframe) — stable mapping from logical stops to StopPlace/Quay (defined in `line_<LineId>.xml`).
 4. [ScheduledStopPoint (ServiceFrame)](#scheduledstoppoint-serviceframe) — logical stop points used in patterns and timetables (defined in `line_<LineId>.xml`).
 5. [Parking (SiteFrame)](#parking-siteframe) — fixed parking places defined in `stop.xml` (including Bikebox).
-
+6. [bikebox (CFL specialisation of Parking)](#bikebox-cfl-specialisation-of-parking) — secure bicycle parking facilities modelled as a CFL specialisation of `Parking`.
 ---
 
 ## StopPlace (SiteFrame)
@@ -411,159 +411,700 @@ The example below illustrates a typical CFL ScheduledStopPoint with a human-read
 
 ### Functional description
 
-A **Parking** represents a fixed parking place that can be used by passengers as part of their journey access/egress (e.g. car parks, bicycle parks, secured bicycle boxes).
+A **Parking** represents a fixed parking facility that may be used by passengers as part of their journey access or egress.
 
-In the CFL MVP, Parkings are published in the **SiteFrame** of `stop.xml`, because they are **place-based infrastructure objects** (not timetable objects).
+In the CFL profile, Parkings are published in the **SiteFrame** of `stop.xml`, because they are **place-based infrastructure objects** and not timetable objects.
 
-In a first stage, Parkings are published as **standalone place objects** and can be consumed without relying on any link to `StopPlace`.
+The CFL Parking model covers, at least:
 
-The target model may later introduce a differentiated approach:
-- some Parkings will be **linked to a StopPlace** when the parking is part of a station site and the relationship is stable and maintainable;
-- other Parkings will remain **unlinked** when no stable station attachment exists or when the parking is not functionally associated with a specific StopPlace.
+- P+R car parks;
+- Kiss & Ride / drop-off parkings;
+- bikebox facilities, considered as a specific type of secure bicycle parking.
 
----
+A Parking may be modelled either as a standalone place object or, where relevant and maintainable, as a parking facility associated with a `StopPlace`.
 
-### Elements and attributes retained in the CFL MVP
-
-| Element / Attribute | Description | Cardinality (CFL MVP) | Notes / Constraints |
-|---------------------|-------------|------------------------|---------------------|
-| `@id` | Identifier of the Parking | 1..1 | CFL identifier scheme (see 5.1). For Bikebox: includes the Bikebox code (e.g. `BK0001`). |
-| `Name` | Public name/label of the parking | 1..1 | For Bikebox, includes the Bikebox code and station label. |
-| `Description` | Passenger-facing description | 0..1 | For Bikebox, used to describe secure access conditions. |
-| `Centroid/Location` | Geographic coordinates (WGS84) | 1..1 | Mandatory longitude/latitude. |
-| `TypeOfParkingRef` | Parking type reference | 1..1 | MUST reference a `TypeOfParking` defined in `resource.xml`. |
-| `TotalCapacity` | Total number of places | 0..1 | Mandatory for Bikebox in CFL MVP. |
-| `ParkingPaymentProcess` | Payment model | 0..1 | Used for Bikebox (`free`). |
-| `ParkingReservation` | Reservation / entitlement model | 0..1 | Used for Bikebox (`registrationRequired`). |
-| `BookingUrl` | URL for booking/registration | 0..1 | Mandatory for Bikebox in CFL MVP. |
-| `parkingProperties/ParkingProperties` | Additional parking properties | 0..n | Used for Bikebox (secure parking, max stay, allowed vehicle types). |
-| `placeEquipments/*` | Equipment installed at the parking | 0..n | Optional in MVP; used when known (e.g. CCTV, access control). |
-
-#### Notes
-- Attributes not listed above are not used in the CFL MVP.
-- `StopPlace` attachment is intentionally not required in the MVP (standalone publication), but may be introduced later for a subset of Parkings.
+In the CFL MVP, Parkings may be consumed as standalone objects. A stable relationship to a `StopPlace` may be introduced where the functional attachment to a station or stop is clear and maintainable.
 
 ---
 
-### CFL-specific modelling rules (generic)
+### Parking types in the CFL profile
+
+The main functional parking types identified in the CFL context are:
+
+| Parking type | Description | Main vehicle / user scope | Notes |
+|--------------|-------------|----------------------------|-------|
+| `P+R` | Park-and-ride parking associated with access to the rail network | Cars | Motorcycles are not allowed in CFL P+R parkings. |
+| `KissAndRide` | Short-stay drop-off parking | Cars / passenger drop-off | Used for short stops. The first 30 minutes may be free. |
+| `bikebox` | Secure bicycle parking facility | Bicycles / e-bikes / pedal cycles | Modelled as a specific type of Parking. |
+
+The parking type SHALL be expressed through `TypeOfParkingRef`, referencing a shared `TypeOfParking` value defined in `resource.xml`.
+
+`ParkingType` SHOULD also be used when a suitable standard NeTEx value exists.
+
+For P+R parkings, the recommended standard value is:
+
+```xml
+<ParkingType>parkAndRide</ParkingType>
+```
+
+For CFL-specific parking classifications such as `P+R`, `KissAndRide` or `Bikebox`, `TypeOfParkingRef` SHALL be used.
+
+---
+
+### Parking structure and zoning
+
+A Parking may be subdivided into zones when relevant.
+
+In NeTEx, this subdivision should be represented using `ParkingArea`.
+
+`ParkingArea` is used to represent meaningful subdivisions of a parking facility, without modelling each individual parking space.
+
+A `ParkingArea` may be used to distinguish:
+
+- a specific type of parking places, such as PMR, Chargy, Flex, CFlex, Family, Police / Customs;
+- a physical level or floor in a multi-level parking;
+- a part of the parking managed by a specific operator;
+- a part of the parking with specific access conditions;
+- a part of the parking covered by a specific counting or availability system.
+
+The CFL profile does not model individual parking spaces by default.
+
+Capacity is modelled at Parking level or, when more detailed data is available, at `ParkingArea` level and by type of parking place.
+
+If individual parking spaces need to be represented in a later extension, `ParkingBay` may be used. It is not retained by default in the CFL base profile.
+
+---
+### Recommended Parking structure
+
+The recommended CFL Parking structure is based on the following hierarchy:
+
+```text
+Parking
+├── ParkingType / TypeOfParkingRef
+├── ParkingLayout
+├── NumberOfParkingLevels
+├── TotalCapacity
+├── PrincipalCapacity
+├── RechargingAvailable
+├── RealTimeOccupancyAvailable
+├── ParkingPaymentProcess
+├── ParkingReservation
+├── BookingUrl
+├── parkingProperties
+│   └── ParkingProperties
+│       ├── ParkingVehicleTypes
+│       ├── ParkingUserTypes
+│       ├── ParkingStayList
+│       ├── MaximumStay
+│       ├── SecureParking
+│       ├── ParkingVisibility
+│       └── MonitoredBays
+└── parkingAreas
+    └── ParkingArea
+        ├── TotalCapacity
+        ├── NumberOfBaysWithRecharging
+        ├── parkingProperties
+        ├── bays [not used by default]
+        └── entrances
+```
+
+This structure supports both simple parking facilities and more detailed cases where the parking must be subdivided by area, level, management scope, access rule or parking place category.
+
+In the CFL base profile, the recommended granularity is:
+
+```text
+Parking
+→ ParkingArea, where needed
+→ Capacity by category or level, where available
+```
+Individual parking spaces are not modelled by default. `ParkingBay` is kept outside the CFL base profile and may be introduced later only if a specific use case requires individual parking space representation.
+
+---
+
+### Physical structure
+
+A Parking SHALL NOT be described only through a generic “surface parking” / “building parking” distinction.
+
+The CFL profile distinguishes at least two independent physical characteristics:
+
+| Characteristic | Description | Recommended NeTEx representation |
+|----------------|-------------|----------------------------------|
+| Number of levels | Indicates whether the parking has one or several levels | `NumberOfParkingLevels` |
+| Coverage / layout | Indicates whether the parking is covered, open, multi-storey, underground, etc. | `ParkingLayout` |
+
+This distinction is required because a parking may be on a single level and still be covered, for example by a roof structure or solar panels.
+
+If only minimal information is available, the following simplified attributes may be derived:
+
+- single-level / multi-level;
+- covered / uncovered / partially covered.
+
+Examples:
+
+| Business case | Recommended representation |
+|---------------|----------------------------|
+| Open surface parking | `ParkingLayout = openSpace`, `NumberOfParkingLevels = 1` |
+| Covered single-level parking | `ParkingLayout = covered`, `NumberOfParkingLevels = 1` |
+| Multi-storey parking building | `ParkingLayout = multistorey`, `NumberOfParkingLevels > 1` |
+
+---
+
+### Ownership and management
+
+Ownership and management are distinct concepts.
+
+A P+R may be owned by different entities, including:
+
+- CFL;
+- Ponts et Chaussées;
+- Fonds du Rail;
+- a municipality.
+
+The manager may be CFL or another entity.
+
+A parking may also be partially managed by CFL. In such cases, the CFL-managed part SHALL be represented as an identifiable `ParkingArea` when the data allows it.
+
+Example: in Diekirch, CFL manages approximately 100 places through the P+R application out of a total of approximately 650 places. The CFL-managed part should therefore be represented as a distinct `ParkingArea` of the physical parking.
+
+This allows the model to distinguish:
+
+- the total physical capacity of the parking;
+- the capacity managed by CFL;
+- the access rules applicable to the CFL-managed part;
+- the responsibility for management and data provision.
+
+---
+
+### Parking place categories and capacity
+
+The CFL profile supports capacity modelling by category of parking places.
+
+Identified categories include:
+
+| Category | Description |
+|----------|-------------|
+| Standard | Regular parking places |
+| PMR | Places reserved for persons with reduced mobility |
+| Chargy | Electric vehicle charging places |
+| Flex | Flex-related places |
+| CFlex | CFlex-related places |
+| Family | Wider family places, for example at Belval |
+| Police / Customs | Reserved and clearly identified places |
+
+Capacity MAY be provided:
+
+- globally at Parking level;
+- by `ParkingArea`;
+- by level;
+- by place category within a `ParkingArea` or level.
+
+The recommended modelling granularity is therefore:
+
+```text
+Parking
+→ ParkingArea / Level
+→ Parking place category
+→ Capacity
+```
+
+Individual parking spaces are not modelled in the CFL base profile.
+
+If individual parking spaces need to be represented in a later extension, `ParkingBay` may be used.
+
+---
+
+### Kiss & Ride modelling rule
+
+A Kiss & Ride facility SHALL be modelled as a standalone `Parking` when it is physically identifiable as distinct from the P+R, even if it is located close to the station or close to the P+R.
+
+A Kiss & Ride MAY be modelled as a `ParkingArea` of a larger `Parking` only when it is physically integrated into the same parking perimeter, shares the same access, and does not have a sufficiently distinct functional existence.
+
+For Luxembourg station, if the Kiss & Ride places are located next to the P+R building and not inside the P+R building, the recommended option is to model them as a standalone `Parking` of type `KissAndRide`, associated with Luxembourg station, and distinct from the P+R.
+
+---
+
+### Access control
+
+A Parking may have access control.
+
+In the CFL P+R context, access control means the presence of a barrier.
+
+When a P+R has a barrier, access is managed through the P+R application.
+
+The model should therefore be able to express:
+
+- whether access control exists;
+- whether access control is implemented through a barrier;
+- whether access is managed through the P+R application.
+
+---
+
+### Equipment and internal access
+
+A Parking may include internal equipment or infrastructure elements, such as:
+
+- lift;
+- stairs;
+- ramp.
+
+These elements may be relevant for accessibility, internal navigation and access to parking levels or zones.
+
+In the MVP, such elements may be optional and provided only when available.
+
+---
+
+### Counting, availability and smartparking
+
+The term **smartparking** is treated as a usage label or technical qualification, not as a functional parking type.
+
+A Parking may be considered a smartparking when it is equipped with intelligent counting or availability equipment.
+
+The following counting configurations are identified in the CFL context:
+
+| Counting configuration | Description |
+|------------------------|-------------|
+| No counting equipment | No automated counting or availability equipment is available. |
+| Camera-based counting with parking map | Cameras are associated with a map of the parking places. |
+| Dynamic entry / exit counting | Counting is performed at entry and exit barriers, with increment / decrement logic. This may also support identification of the vehicle country of origin for statistical purposes. |
+
+Some parkings may also have a local display showing the number of remaining available places.
+
+Where known, the model should represent:
+
+- whether availability data exists;
+- the counting method;
+- whether a remaining-places display exists;
+- the approximate update frequency.
+
+In the CFL context, the update frequency for remaining-place displays is approximately 3 minutes where such displays are available.
+
+In NeTEx, the presence of real-time occupancy data should be represented using `RealTimeOccupancyAvailable` when applicable.
+
+If individual bays are monitored, `MonitoredBays` may be used in `ParkingProperties`. However, individual `ParkingBay` objects are not modelled by default in the CFL base profile.
+
+---
+
+### Parking payment, entitlement and pass
+
+The CFL P+R context does not rely on a strict subscription principle granting a reserved space.
+
+A monthly product called **P+R Pass** may allow the user to park without additional payment, but it does not guarantee the availability of a space.
+
+The model should therefore distinguish:
+
+- payment model;
+- entitlement or pass model;
+- reservation model;
+- guarantee of space.
+
+For P+R Pass, the rule is:
+
+- monthly pass available;
+- parking allowed without additional payment;
+- no reserved place;
+- no guarantee of space.
+
+For Kiss & Ride, the first 30 minutes may be free.
+
+---
+
+### Elements and attributes retained in the CFL profile
+
+| Element / Attribute | Description | Cardinality (CFL profile) | Notes / Constraints |
+|---------------------|-------------|----------------------------|---------------------|
+| `@id` | Identifier of the Parking | 1..1 | Must follow CFL identifier scheme. |
+| `Name` | Public name or label of the parking | 1..1 | Should be understandable for passengers and operators. |
+| `Description` | Passenger-facing or operational description | 0..1 | Optional. |
+| `Centroid/Location` | Geographic coordinates, WGS84 | 1..1 | Mandatory longitude / latitude. |
+| `TypeOfParkingRef` | Parking type reference | 1..1 | References a shared `TypeOfParking` in `resource.xml`, e.g. P+R, Kiss & Ride, Bikebox. |
+| `ParkingType` | Standard NeTEx parking type | 0..1 | Used when a suitable standard value exists, e.g. `parkAndRide` for P+R. |
+| `ParkingLayout` | Physical layout of the parking | 0..1 | Used to describe open, covered, multi-storey, underground, etc. layouts. |
+| `NumberOfParkingLevels` | Number of levels | 0..1 | Should be provided for multi-level parkings and when known. |
+| `TotalCapacity` | Total number of places | 0..1 | Should be provided when known and stable. |
+| `PrincipalCapacity` | Main usable capacity | 0..1 | May be used when relevant. |
+| `parkingAreas/ParkingArea` | Functional, physical or management subdivisions | 0..n | Used when capacity, management, access or place categories differ within a parking. |
+| `parkingProperties/ParkingProperties` | Additional parking properties | 0..n | Used for vehicle types, secure parking, max stay, monitored bays, etc. |
+| `ParkingVehicleTypes` | Vehicle types allowed | 0..1 | Used to distinguish cars, cycles, e-bikes, etc. |
+| `ParkingStayList` | Type of parking stay | 0..1 | May be used for Kiss & Ride with `dropoff`. |
+| `MaximumStay` | Maximum permitted stay | 0..1 | For example `PT30M` for Kiss & Ride, if applicable. |
+| `RechargingAvailable` | Indicates whether vehicle recharging is available | 0..1 | Relevant for Chargy areas or parking places. |
+| `NumberOfBaysWithRecharging` | Number of bays with charging facilities | 0..1 | May be used at `ParkingArea` level. |
+| `RealTimeOccupancyAvailable` | Indicates whether occupancy data is available | 0..1 | Used for smartparking / availability data. |
+| `MonitoredBays` | Indicates whether individual bays are monitored | 0..1 | Used only when such information exists. |
+| `ParkingPaymentProcess` | Payment model | 0..1 | Used when the payment model is known. |
+| `ParkingReservation` | Reservation / entitlement model | 0..1 | Should distinguish pass from guaranteed reservation. |
+| `BookingUrl` | URL for booking or registration | 0..1 | Mandatory only where required by the specific parking type, e.g. Bikebox. |
+| `placeEquipments/*` | Equipment installed at the parking | 0..n | Optional; used when known. |
+
+---
+
+### CFL-specific modelling rules
 
 - Parkings are published in `stop.xml` under `SiteFrame/.../parkings`.
 - `TypeOfParkingRef` MUST point to a shared `TypeOfParking` value published in `resource.xml`.
 - `Centroid/Location` MUST be provided.
 - `TotalCapacity` SHOULD be provided whenever the capacity is known and stable.
+- P+R, Kiss & Ride and Bikebox are modelled as functional parking types.
+- Smartparking is not a functional parking type; it is a technical qualification derived from counting or availability equipment.
+- A Parking MAY be subdivided into `ParkingArea` elements when needed to represent different categories, levels, access rules, management responsibilities or counting configurations.
+- Individual parking spaces are not modelled by default.
+- `ParkingBay` is not retained in the CFL base profile, but may be used in a later extension if individual spaces need to be represented.
+- For multi-level parkings, capacity SHOULD be provided by level and by place category when the data is available.
+- For partially CFL-managed parkings, the CFL-managed part SHOULD be represented as a distinct `ParkingArea`.
+- For Kiss & Ride facilities physically distinct from a P+R, a standalone `Parking` SHOULD be created.
+- For P+R facilities with a barrier, access SHALL be understood as controlled through the P+R application.
+- `ParkingType` SHOULD be used when a suitable standard NeTEx value exists.
+- `TypeOfParkingRef` SHALL be used for CFL-specific functional classification.
 
 ---
 
-### Minimal XML example (illustrative only)
+### Minimal XML example: P+R parking
 
-⚠️ *Illustrative only — not real CFL data.*
+⚠️ *Illustrative only — not real CFL production data.*
 
 ```xml
-<Parking id="LU:CFL:Parking:PARK001" version="1">
-  <Name>Station X - Car park</Name>
+<Parking id="LU:CFL:Parking:PR001" version="1">
+  <Name>Station X - P+R</Name>
   <Centroid>
     <Location>
       <Longitude>6.1000</Longitude>
       <Latitude>49.6000</Latitude>
     </Location>
   </Centroid>
-  <TypeOfParkingRef ref="LU:CFL:TypeOfParking:CARPARK" versionRef="1"/>
-  <TotalCapacity>120</TotalCapacity>
+  <ParkingType>parkAndRide</ParkingType>
+  <TypeOfParkingRef ref="LU:CFL:TypeOfParking:P_R" versionRef="1"/>
+  <ParkingLayout>openSpace</ParkingLayout>
+  <NumberOfParkingLevels>1</NumberOfParkingLevels>
+  <TotalCapacity>650</TotalCapacity>
 </Parking>
 ```
-
 ---
 
-## bikebox (CFL specialisation of Parking)
+### Minimal XML example: Kiss & Ride parking
+
+⚠️ *Illustrative only — not real CFL production data.*
+
+```xml
+<Parking id="LU:CFL:Parking:KissAndRide:LuxGare" version="1">
+  <Name>Luxembourg Gare - Kiss & Ride</Name>
+  <Description>Short-stay drop-off parking. First 30 minutes free.</Description>
+  <Centroid>
+    <Location>
+      <Longitude>6.1333</Longitude>
+      <Latitude>49.5995</Latitude>
+    </Location>
+  </Centroid>
+  <TypeOfParkingRef ref="LU:CFL:TypeOfParking:KISS_AND_RIDE" versionRef="1"/>
+  <parkingProperties>
+    <ParkingProperties id="LU:CFL:ParkingProperties:KissAndRide:LuxGare" version="1">
+      <Name>Kiss & Ride terms</Name>
+      <ParkingStayList>dropoff</ParkingStayList>
+      <MaximumStay>PT30M</MaximumStay>
+    </ParkingProperties>
+  </parkingProperties>
+</Parking>
+```
+---
+
+### Minimal XML example: partially managed P+R parking
+
+⚠️ *Illustrative only — not real CFL production data.*
+
+```xml
+<Parking id="LU:CFL:Parking:Diekirch" version="1">
+  <Name>Diekirch - P+R</Name>
+  <Centroid>
+    <Location>
+      <Longitude>6.1550</Longitude>
+      <Latitude>49.8670</Latitude>
+    </Location>
+  </Centroid>
+  <ParkingType>parkAndRide</ParkingType>
+  <TypeOfParkingRef ref="LU:CFL:TypeOfParking:P_R" versionRef="1"/>
+  <TotalCapacity>650</TotalCapacity>
+
+  <parkingAreas>
+    <ParkingArea id="LU:CFL:ParkingArea:Diekirch:CFLManaged" version="1">
+      <Name>Diekirch - CFL managed P+R area</Name>
+      <TotalCapacity>100</TotalCapacity>
+    </ParkingArea>
+  </parkingAreas>
+</Parking>
+```
+---
+### Minimal XML example: parking with availability data
+
+⚠️ *Illustrative only — not real CFL production data.*
+
+```xml
+<Parking id="LU:CFL:Parking:PR002" version="1">
+  <Name>Station Y - P+R</Name>
+  <Centroid>
+    <Location>
+      <Longitude>6.2000</Longitude>
+      <Latitude>49.7000</Latitude>
+    </Location>
+  </Centroid>
+  <ParkingType>parkAndRide</ParkingType>
+  <TypeOfParkingRef ref="LU:CFL:TypeOfParking:P_R" versionRef="1"/>
+  <TotalCapacity>300</TotalCapacity>
+  <RealTimeOccupancyAvailable>true</RealTimeOccupancyAvailable>
+</Parking>
+```
+---
+
+## Bikebox (CFL specialisation of Parking)
 
 ### Purpose and scope
 
-**bikebox** facilities are published as **secure bicycle parkings**. In the CFL MVP, they are modelled as `Parking` entities typed as **bikebox**, and are published as **standalone place objects** in `stop.xml`.
-
-This section documents the CFL-specific rules for bikebox, on top of the generic `Parking` description above.
+**bikebox** facilities are published as **secure bicycle parkings**. In the CFL profile, each bikebox location is modelled as one `Parking` entity typed as `BIKEBOX`. Bikebox facilities are therefore not modelled as equipment of a station, but as dedicated `Parking` objects. This section documents the CFL-specific rules for bikebox parkings, on top of the generic `Parking` description above.
 
 ---
 
 ### Publication and frame
 
-- Publication file: `stop.xml` *(renamed from the former `bikebox.xml`)*
-- Frame: `SiteFrame` `CFL:SiteFrame:Bikebox:1`
-- Content: `parkings/Parking` (one `Parking` per bikebox location)
-- Prerequisite: `ResourceFrameRef ref="CFL:ResourceFrame:Resources:1" versionRef="1"`
+In the current CFL dataset, bikebox facilities are published in `parking.xml`. 
 
----
+The current publication uses a dedicated `SiteFrame` for bikebox parkings: 
+- Publication file: `parking.xml`
+- Frame: `SiteFrame`
+- Current frame identifier: `LU:CFL:SiteFrame:Bikebox:1`
+- Content: `parkings/Parking`
+- One `Parking` is published per bikebox location
+- Prerequisite: `ResourceFrameRef ref="LU:CFL:ResourceFrame:Resources:1" versionRef="1"`
+
+The current implementation therefore publishes bikebox facilities as standalone `Parking` objects. 
+
+A future consolidation may decide whether bikebox parkings remain in a dedicated `parking.xml` file or are merged into a broader `stop.xml` / stops-and-places publication structure. 
+
+--- 
 
 ### Typing and shared references
 
-Each bikebox location MUST be represented by exactly one `Parking` using:
+Each bikebox location SHALL be represented by exactly one `Parking` using: 
+- `TypeOfParkingRef = LU:CFL:TypeOfParking:BIKEBOX`
 
-- `Parking@id` = `CFL:Parking:Bikebox:<BikeboxId>` (e.g. `CFL:Parking:Bikebox:BK0010`)
-- `TypeOfParkingRef` = `CFL:TypeOfParking:BIKEBOX` (published in `resource.xml`)
+The corresponding shared value SHALL be defined in `resource.xml` as a `TypeOfParking`. 
 
-The corresponding shared value is defined as:
+Current pattern:
 
-- `TypeOfParking id="CFL:TypeOfParking:BIKEBOX" version="1"`
+```xml <TypeOfParkingRef ref="LU:CFL:TypeOfParking:BIKEBOX" versionRef="1"/> ```
 
----
-
-### Elements and constraints for bikebox (CFL MVP)
-
-For bikebox Parkings, the following fields MUST be provided:
-
-- `Centroid/Location` (longitude/latitude)
-- `TypeOfParkingRef ref="CFL:TypeOfParking:BIKEBOX" versionRef="1"`
-- `TotalCapacity`
-- `ParkingPaymentProcess` (expected value: `free`)
-- `ParkingReservation` (expected value: `registrationRequired`)
-- `BookingUrl`
-- `parkingProperties/ParkingProperties` including at least:
-  - `ParkingVehicleTypes` (e.g. `cycle eCycle pedalCycle`)
-  - `MaximumStay` (e.g. `P30D`)
-  - `SecureParking` (`true`)
-
-The following elements are OPTIONAL in the MVP and may be provided when known:
-
-- `Description`
-- `placeEquipments/*` (e.g. `PassengerSafetyEquipment/Cctv`, `VehicleReleaseEquipment/RemoteControl`)
+No standard `ParkingType` value is currently required for bikebox, since the available standard NeTEx parking types do not clearly represent a secure bicycle box facility.
 
 ---
 
-### CFL-specific modelling rules
+### Identifier strategy
 
-- bikebox are published as **standalone Parkings** in the MVP (no required link to `StopPlace`).
-- If bikebox-to-station attachment is introduced later, it SHALL only be done when the relationship is stable and maintainable.
-- bikebox identifiers are stable and MUST not change even if the public label is updated.
+Bikebox parking identifiers follow the current CFL pattern:
+
+```text
+LU:CFL:Parking:Bikebox:<BikeboxId>
+```
+
+Examples:
+
+```text
+LU:CFL:Parking:Bikebox:BK-1
+LU:CFL:Parking:Bikebox:BK-2
+LU:CFL:Parking:Bikebox:BK-3
+```
+
+The `BikeboxId` is the stable technical bikebox identifier used in the source data.
+
+Bikebox identifiers SHALL remain stable over time and SHALL NOT change when the public label or station label is updated.
+
+---
+
+### Naming rule
+
+The `Name` of a bikebox parking SHALL contain the public or operational label of the bikebox location.
+
+Current examples:
+
+```text
+LUX01 - Sandweiler-Contern, Gare Nord
+LUX03 - Troisvierges Gare
+LUX04 - Clervaux Gare
+```
+
+The name does not need to repeat the technical `Parking@id`, but it SHOULD remain understandable for operational users and data consumers.
+
+Multilingual names may be provided when available.
+
+---
+
+### Description
+
+A bikebox parking MAY include a passenger-facing description.
+
+Current standard description:
+
+```text
+Bikebox: secure bicycle parking. Access restricted to registered users. 24/7 access.
+```
+
+This description indicates that:
+
+- the facility is a secure bicycle parking;
+- access is restricted to registered users;
+- access is available 24/7.
+
+---
+
+### Elements and constraints for Bikebox
+
+For bikebox parkings, the following fields SHALL be provided:
+
+| Element / Attribute | Cardinality | Rule / Expected value |
+|---------------------|-------------|------------------------|
+| `@id` | 1..1 | Stable identifier following the current CFL bikebox pattern, e.g. `LU:CFL:Parking:Bikebox:BK-1`. |
+| `version` | 1..1 | Current value: `1`. |
+| `Name/Text` | 1..1 | Public or operational bikebox location label, e.g. `LUX01 - Sandweiler-Contern, Gare Nord`. |
+| `Description/Text` | 1..1 | Current standard description of secure access conditions. |
+| `Centroid/Location/Longitude` | 1..1 | Mandatory WGS84 longitude. |
+| `Centroid/Location/Latitude` | 1..1 | Mandatory WGS84 latitude. |
+| `placeEquipments/PassengerSafetyEquipment` | 1..1 | Safety equipment container currently provided for each bikebox. |
+| `placeEquipments/PassengerSafetyEquipment/Cctv` | 1..1 | Current value: `false`. |
+| `placeEquipments/VehicleReleaseEquipment` | 1..1 | Access-control equipment container currently provided for each bikebox. |
+| `placeEquipments/VehicleReleaseEquipment/RemoteControl` | 1..1 | Current value: `false`. |
+| `TypeOfParkingRef` | 1..1 | Must reference `LU:CFL:TypeOfParking:BIKEBOX` with `versionRef="1"`. |
+| `TotalCapacity` | 1..1 | Current value: `32` for the bikeboxes shown in the current dataset. |
+| `ParkingPaymentProcess` | 1..1 | Current value: `free`. |
+| `ParkingReservation` | 1..1 | Current value: `registrationRequired`. |
+| `parkingProperties/ParkingProperties` | 1..1 | One `ParkingProperties` element currently provided per bikebox. |
+| `parkingProperties/ParkingProperties/Name/Text` | 1..1 | Current value: `Bikebox terms`. |
+| `parkingProperties/ParkingProperties/ParkingVehicleTypes` | 1..1 | Current value: `cycle eCycle pedalCycle`. |
+| `parkingProperties/ParkingProperties/MaximumStay` | 1..1 | Current value: `P30D`. |
+| `parkingProperties/ParkingProperties/SecureParking` | 1..1 | Current value: `true`. |
+
+---
+
+### Equipment
+
+Bikebox facilities may include equipment information in `placeEquipments`.
+
+The current implementation uses:
+
+- `PassengerSafetyEquipment` for safety-related information, such as CCTV;
+- `VehicleReleaseEquipment` for access-control-related information, such as remote control.
+
+Current pattern:
+
+```xml
+<placeEquipments>
+  <PassengerSafetyEquipment id="LU:CFL:InstalledEquipment:Bikebox:BK-1:SAFETY" version="1">
+    <Cctv>false</Cctv>
+  </PassengerSafetyEquipment>
+  <VehicleReleaseEquipment id="LU:CFL:InstalledEquipment:Bikebox:BK-1:ACCESS_CONTROL" version="1">
+    <RemoteControl>false</RemoteControl>
+  </VehicleReleaseEquipment>
+</placeEquipments>
+```
+
+When provided, equipment identifiers SHOULD follow a stable and deterministic pattern based on the bikebox identifier.
+
+---
+
+### Parking properties
+
+Each bikebox parking SHALL include `ParkingProperties`.
+
+The current implementation uses one `ParkingProperties` element per bikebox parking.
+
+Current pattern:
+
+```xml
+<parkingProperties>
+  <ParkingProperties id="LU:CFL:ParkingProperties:Bikebox:BK-1" version="1">
+    <Name>
+      <Text lang="en">Bikebox terms</Text>
+    </Name>
+    <ParkingVehicleTypes>cycle eCycle pedalCycle</ParkingVehicleTypes>
+    <MaximumStay>P30D</MaximumStay>
+    <SecureParking>true</SecureParking>
+  </ParkingProperties>
+</parkingProperties>
+```
+
+The following rules apply:
+
+- `ParkingVehicleTypes` SHALL indicate that bicycles and relevant bicycle variants are allowed.
+- `MaximumStay` SHALL be provided when the maximum authorised stay is known.
+- `SecureParking` SHALL be set to `true`.
+
+---
+
+### Booking and registration
+
+Bikebox access is restricted to registered users.
+
+This is currently represented through:
+
+```xml
+<ParkingReservation>registrationRequired</ParkingReservation>
+```
+
+A `BookingUrl` may be provided when an authoritative registration or booking URL is available and stable.
+
+Unlike earlier drafts of this profile, `BookingUrl` is not considered mandatory for bikebox unless the source data reliably provides it.
+
+---
+
+### CFL-specific modelling rules for Bikebox
+
+- Bikebox facilities are modelled as `Parking` entities.
+- Each bikebox location SHALL be represented by one `Parking`.
+- Bikebox parkings SHALL use `TypeOfParkingRef = LU:CFL:TypeOfParking:BIKEBOX`.
+- Bikebox parkings are currently published in `parking.xml` within `SiteFrame id="LU:CFL:SiteFrame:Bikebox:1"`.
+- Bikebox parkings are currently published as standalone place objects.
+- A link to `StopPlace` is not mandatory in the current bikebox profile.
+- `TotalCapacity` SHALL be provided.
+- `ParkingPaymentProcess` SHALL be `free`.
+- `ParkingReservation` SHALL be `registrationRequired`.
+- `ParkingVehicleTypes` SHALL include bicycle-related vehicle types.
+- `SecureParking` SHALL be `true`.
+- `MaximumStay` SHALL be provided when the rule is known.
+- `BookingUrl` MAY be provided, but is not mandatory unless reliable source data is available.
+- Equipment information MAY be provided through `placeEquipments`.
 
 ---
 
 ### XML example
 
+⚠️ *Illustrative example based on the current CFL bikebox structure.*
+
 ```xml
-<Parking id="CFL:Parking:Bikebox:BK0001" version="1">
-  <Name>BK0001 - LUX01 - Sandweiler-Contern, Gare Nord</Name>
-  <Description>Bikebox: secure bicycle parking. Access restricted to registered users. 24/7 access.</Description>
+<Parking id="LU:CFL:Parking:Bikebox:BK-1" version="1">
+  <Name>
+    <Text lang="en">LUX01 - Sandweiler-Contern, Gare Nord</Text>
+  </Name>
+  <Description>
+    <Text lang="en">Bikebox: secure bicycle parking. Access restricted to registered users. 24/7 access.</Text>
+  </Description>
   <Centroid>
     <Location>
-      <Longitude>6.13292</Longitude>
-      <Latitude>49.598314</Latitude>
+      <Longitude>6.21269002</Longitude>
+      <Latitude>49.59911599</Latitude>
     </Location>
   </Centroid>
   <placeEquipments>
-    <PassengerSafetyEquipment id="CFL:InstalledEquipment:Bikebox:BK0001:SAFETY" version="1">
+    <PassengerSafetyEquipment id="LU:CFL:InstalledEquipment:Bikebox:BK-1:SAFETY" version="1">
       <Cctv>false</Cctv>
     </PassengerSafetyEquipment>
-    <VehicleReleaseEquipment id="CFL:InstalledEquipment:Bikebox:BK0001:ACCESS_CONTROL" version="1">
+    <VehicleReleaseEquipment id="LU:CFL:InstalledEquipment:Bikebox:BK-1:ACCESS_CONTROL" version="1">
       <RemoteControl>false</RemoteControl>
     </VehicleReleaseEquipment>
   </placeEquipments>
-  <TypeOfParkingRef ref="CFL:TypeOfParking:BIKEBOX" versionRef="1"/>
+  <TypeOfParkingRef ref="LU:CFL:TypeOfParking:BIKEBOX" versionRef="1"/>
   <TotalCapacity>32</TotalCapacity>
   <ParkingPaymentProcess>free</ParkingPaymentProcess>
   <ParkingReservation>registrationRequired</ParkingReservation>
-  <BookingUrl>https://luxembourg.diwio.com/custom/luxembourg/register</BookingUrl>
   <parkingProperties>
-    <ParkingProperties id="CFL:ParkingProperties:Bikebox:BK0001" version="1">
-      <Name>Bikebox terms</Name>
+    <ParkingProperties id="LU:CFL:ParkingProperties:Bikebox:BK-1" version="1">
+      <Name>
+        <Text lang="en">Bikebox terms</Text>
+      </Name>
       <ParkingVehicleTypes>cycle eCycle pedalCycle</ParkingVehicleTypes>
       <MaximumStay>P30D</MaximumStay>
       <SecureParking>true</SecureParking>
@@ -571,3 +1112,8 @@ The following elements are OPTIONAL in the MVP and may be provided when known:
   </parkingProperties>
 </Parking>
 ```
+
+---
+
+
+
