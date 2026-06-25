@@ -483,7 +483,7 @@ The preferred use of `ParkingArea` in the CFL profile is:
 `ParkingArea` SHALL NOT be used to represent:
 
 - a tariff rule, such as Kiss & Rail or the first 30 minutes free;
-- an access right, such as EWAPS or P+R Pass;
+- an access right, such as EWAP or P+R Pass;
 - an internal quota;
 - a non-physical entitlement;
 - a category of places if the category is only an included subset of a level or of the total parking capacity.
@@ -513,7 +513,7 @@ Parking
 ├── RechargingAvailable
 ├── RealTimeOccupancyAvailable
 ├── ParkingPaymentProcess [minimal payment indication only]
-├── ParkingReservation [only for real booking / registration cases if applicable, not for P+R Pass or EWAPS]
+├── ParkingReservation [only for real booking / registration cases if applicable, not for P+R Pass or EWAP]
 ├── BookingUrl [only when a reliable booking or registration URL exists]
 ├── parkingProperties
 │   └── ParkingProperties
@@ -531,7 +531,7 @@ Parking
         ├── parkingProperties
         ├── bays [not used by default]
         └── entrances
-````
+```
 
 This structure supports both simple parking facilities and more detailed cases where the parking must be subdivided by physical level or by a clearly identified management perimeter.
 
@@ -543,13 +543,10 @@ Parking
 → Capacity details by category within the relevant Parking or ParkingArea, where available
 ```
 
-Individual parking spaces are not modelled by default. `ParkingBay` is kept outside the CFL base profile and may be introduced later only if a specific use case requires individual parking space representation, for example a real guaranteed reservation of an individual space. This is not the case for P+R Pass or EWAPS.
-
-```
+Individual parking spaces are not modelled by default. `ParkingBay` is kept outside the CFL base profile and may be introduced later only if a specific use case requires individual parking space representation, for example a real guaranteed reservation of an individual space. This is not the case for P+R Pass or EWAP.
 
 ---
 
-````markdown id="mxvz3c"
 ### ParkingArea and capacity modelling rules
 
 `ParkingArea` is used to describe meaningful physical or management subdivisions of a `Parking`.
@@ -565,7 +562,7 @@ Typical cases include:
 | Parking level or floor | Use one `ParkingArea` per physical level when capacity or availability is known by level. |
 | CFL-managed part of a larger parking | Use a dedicated `ParkingArea` only when the CFL-managed part is clearly identifiable as a distinct management perimeter. |
 | Specific category of parking places | Do not create a parallel `ParkingArea` by default. Represent the category as capacity or property detail within the relevant `Parking` or level `ParkingArea`, unless the category corresponds to a distinct, non-overlapping physical area. |
-| Specific access right, pass or entitlement | Do not use `ParkingArea`. EWAPS and P+R Pass are rights or quotas, not physical areas. |
+| Specific access right, pass or entitlement | Do not use `ParkingArea`. EWAP and P+R Pass are rights or quotas, not physical areas. |
 | Specific tariff rule | Do not use `ParkingArea`. Kiss & Rail, free short stay and hourly tariff rules are tariff rules, not physical areas. |
 | Specific counting or availability coverage | Use `ParkingArea` only if the counting perimeter corresponds to a physical level or clearly bounded area. |
 
@@ -602,11 +599,11 @@ This distinction SHOULD be documented when level-based dynamic availability is p
 
 Physical parking capacity SHALL remain distinct from internal access quotas.
 
-EWAPS and P+R Pass allocated capacities are internal logical quotas. They SHALL NOT be published as physical parking capacity and SHALL NOT be added to `Parking/TotalCapacity` or `ParkingArea/TotalCapacity`.
+EWAP and P+R Pass allocated capacities are internal logical quotas. They SHALL NOT be published as physical parking capacity and SHALL NOT be added to `Parking/TotalCapacity` or `ParkingArea/TotalCapacity`.
 
 The CFL base profile does not model individual parking spaces.
 
-`ParkingBay` is therefore not used by default. It MAY be introduced in a later extension only if a specific use case requires individual parking space representation, for example a guaranteed reservation of an individual parking space. This is not the case for EWAPS or P+R Pass.
+`ParkingBay` is therefore not used by default. It MAY be introduced in a later extension only if a specific use case requires individual parking space representation, for example a guaranteed reservation of an individual parking space. This is not the case for EWAP or P+R Pass.
 
 ---
 
@@ -644,13 +641,11 @@ Parking
         └── Category-based capacities
             ├── PMR places = 4
             └── Family places = 6
-````
+```
 
 In this example, PMR, charging and family places are included in the level capacities. They are not added on top of the level capacities.
 
 The profile SHALL avoid modelling level areas and category areas as parallel additive `ParkingArea` elements unless the data explicitly confirms that they are non-overlapping.
-
-```
 
 ---
 
@@ -724,7 +719,7 @@ Identified physical categories include:
 | CFlex | Places or usage related to CFlex for CFL agents | Physical CFlex places are currently identified only at Luxembourg Gare P+R, with 6 spaces. |
 | Police / Customs | Reserved and clearly identified places | Should be represented only when they correspond to physical reserved places. |
 
-EWAPS and P+R Pass are not parking place categories. They are access rights or quota-based entitlements and SHALL NOT be included in physical category capacity.
+EWAP and P+R Pass are not parking place categories. They are access rights or quota-based entitlements and SHALL NOT be included in physical category capacity.
 
 Kiss & Rail is not a parking place category. It is a tariff rule corresponding to a free short-stay period of 30 minutes in the CFL P+R tariff context.
 
@@ -744,7 +739,7 @@ Parking
 → Capacity
 ```
 
-Internal quotas such as EWAPS and P+R Pass SHALL remain outside the published physical capacity model.
+Internal quotas such as EWAP and P+R Pass SHALL remain outside the published physical capacity model.
 
 Individual parking spaces are not modelled in the CFL base profile.
 
@@ -798,11 +793,11 @@ The physical access-control equipment MAY be documented where the appropriate Ne
 
 For CFL P+R parkings, `ParkingReservation` SHALL be set to `noReservations` when the information is published, because there is never a guaranteed reservation of an individual parking space.
 
-EWAPS and P+R Pass SHALL NOT be represented as `ParkingArea`, `ParkingBay`, reserved spaces or published physical capacity.
+EWAP and P+R Pass SHALL NOT be represented as `ParkingArea`, `ParkingBay`, reserved spaces or published physical capacity.
 
 They are access rights or quota-based entitlements. Their detailed modelling belongs to the fare / access-right model or to internal access-control systems.
 
-Internal quotas associated with EWAPS or P+R Pass SHALL NOT be published as physical capacity in the `SiteFrame`.
+Internal quotas associated with EWAP or P+R Pass SHALL NOT be published as physical capacity in the `SiteFrame`.
 
 The detailed hourly tariff, the conditional free-parking rule and the geographic eligibility zone SHALL be handled in the future NeTEx fare model, not in the physical parking structure.
 
@@ -879,7 +874,7 @@ If individual bays are monitored, `MonitoredBays` may be used in `ParkingPropert
 | `RealTimeOccupancyAvailable` | Indicates whether occupancy data is available | 0..1 | Used for smartparking / availability data. |
 | `MonitoredBays` | Indicates whether individual bays are monitored | 0..1 | Used only when such information exists. |
 | `ParkingPaymentProcess` | Payment model | 0..1 | Used when the payment model is known. In the CFL P+R context, the payment model is either free, payment via the P+R app, or payment at the payment terminal. |
-| `ParkingReservation` | Reservation availability | 0..1 | For CFL P+R parkings, SHALL indicate that no reservation of an individual parking space is available when this information is published. SHALL NOT be used to model P+R Pass, EWAPS or internal quotas. |
+| `ParkingReservation` | Reservation availability | 0..1 | For CFL P+R parkings, SHALL indicate that no reservation of an individual parking space is available when this information is published. SHALL NOT be used to model P+R Pass, EWAP or internal quotas. |
 | `BookingUrl` | URL for booking or registration | 0..1 | Used only when a reliable booking or registration URL exists, e.g. for Bikebox registration where applicable. SHALL NOT be used to imply that P+R spaces can be reserved. |
 | `placeEquipments` | Equipment container for the parking | 0..1 | Optional; used when equipment information is available. |
 | `placeEquipments/PassengerSafetyEquipment` | Safety-related equipment information | 0..n | May be used for safety equipment, such as CCTV. |
@@ -904,15 +899,15 @@ Note: in the CFL P+R context, payment via the P+R app is understood as a combine
 - A Parking MAY be subdivided into `ParkingArea` elements when needed to represent physical levels or clearly bounded management perimeters.
 - `ParkingArea` SHALL NOT be used for tariff rules, access rights, internal quotas or non-physical entitlements.
 - Individual parking spaces are not modelled by default.
-- `ParkingBay` is not retained in the CFL base profile, but may be used in a later extension if individual spaces need to be represented. This is not the case for EWAPS or P+R Pass.
+- `ParkingBay` is not retained in the CFL base profile, but may be used in a later extension if individual spaces need to be represented. This is not the case for EWAP or P+R Pass.
 - For multi-level parkings, capacity SHOULD be provided by level when the data is available.
 - Category-based capacities MAY be provided within the relevant `Parking` or level-based `ParkingArea`, when the information is available and intended for publication.
 - For partially CFL-managed parkings, the CFL-managed part SHOULD be represented as a distinct `ParkingArea` only when the managed perimeter is clearly identifiable.
 - In the CFL P+R context, the payment model is either free, payment via the P+R app, or payment at the payment terminal.
 - Payment via the P+R app implies controlled access through a barrier and licence plate recognition.
 - Payment at the payment terminal applies the hourly tariff for users who do not use the P+R app.
-- EWAPS and P+R Pass are access rights or quota-based entitlements. They SHALL NOT be represented as physical capacity, `ParkingArea`, `ParkingBay` or reserved spaces.
-- Internal quotas associated with EWAPS or P+R Pass SHALL NOT be published as customer-facing parking capacity.
+- EWAP and P+R Pass are access rights or quota-based entitlements. They SHALL NOT be represented as physical capacity, `ParkingArea`, `ParkingBay` or reserved spaces.
+- Internal quotas associated with EWAP or P+R Pass SHALL NOT be published as customer-facing parking capacity.
 - There is no guaranteed reservation of an individual parking space in the CFL P+R context.
 
 ---
