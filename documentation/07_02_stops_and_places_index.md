@@ -410,6 +410,22 @@ The example below illustrates a typical CFL ScheduledStopPoint with a human-read
 
 ## Parking (SiteFrame)
 
+### Table of contents
+
+- [Functional description and publication frame](#functional-description-and-publication-frame)
+- [Scope of the CFL Parking model](#scope-of-the-cfl-parking-model)
+- [Parking types and classification](#parking-types-and-classification)
+- [Core modelling principles](#core-modelling-principles)
+- [Recommended Parking structure](#recommended-parking-structure)
+- [Capacity model](#capacity-model)
+- [Physical structure and level modelling](#physical-structure-and-level-modelling)
+- [Access, payment and reservation](#access-payment-and-reservation)
+- [Counting, availability and smartparking](#counting-availability-and-smartparking)
+- [Ownership and management](#ownership-and-management)
+- [Elements and attributes retained in the CFL profile](#elements-and-attributes-retained-in-the-cfl-profile)
+- [CFL-specific modelling rules](#cfl-specific-modelling-rules)
+- [XML example](#xml-example-pr-parking-with-level-based-capacity-and-global-special-place-categories)
+
 ### Functional description and publication frame
 
 A **Parking** represents a fixed parking facility that may be used by passengers as part of their journey access or egress.
