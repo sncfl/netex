@@ -410,20 +410,11 @@ The example below illustrates a typical CFL ScheduledStopPoint with a human-read
 
 ## Parking (SiteFrame)
 
-### Functional description
+### Functional description and publication frame
 
 A **Parking** represents a fixed parking facility that may be used by passengers as part of their journey access or egress.
 
 In the CFL profile, Parkings are published in the **SiteFrame**, currently in `parking.xml`, because they are **place-based infrastructure objects** and not timetable objects.
-
-The CFL Parking model covers, at least:
-
-- P+R car parks;
-- Bikebox facilities, considered as a specific type of secure bicycle parking.
-
-Kiss & Rail is not modelled as a physical parking type in the CFL profile. It is understood as a tariff rule corresponding to a free short-stay period of 30 minutes in the CFL P+R tariff context.
-
-Physical drop-off areas may exist near stations, but they are not managed by CFL in the current business scope. They are therefore not included as CFL-managed `Parking` objects unless a future scope extension explicitly requires external or city-managed drop-off facilities to be represented.
 
 A Parking may be modelled either as a standalone place object or, where relevant and maintainable, as a parking facility associated with a `StopPlace`.
 
@@ -431,16 +422,62 @@ In the CFL MVP, Parkings may be consumed as standalone objects. A stable relatio
 
 ---
 
-### Parking types in the CFL profile
+### Scope of the CFL Parking model
 
-The main functional parking types identified in the CFL context are:
+The CFL Parking model covers physical parking facilities that are relevant for passenger access to or egress from the rail network.
 
-| Parking type | Description | Main vehicle / user scope | Notes |
-|--------------|-------------|----------------------------|-------|
-| `P+R` | Park-and-ride parking associated with access to the rail network | Cars | Motorcycles are not allowed in CFL P+R parkings. |
-| `Bikebox` | Secure bicycle parking facility | Bicycles / e-bikes / pedal cycles | Modelled as a specific type of `Parking`. |
+In the CFL base profile, the following parking objects are included:
 
-Kiss & Rail is excluded from the parking type list because it is a tariff rule, not a physical parking type.
+| Object | Included in the CFL Parking model | Modelling principle |
+|--------|-----------------------------------|---------------------|
+| P+R car parks | Yes | Modelled as `Parking` objects. |
+| Bikebox facilities | Yes | Modelled as `Parking` objects, with a CFL-specific `TypeOfParkingRef` where needed. |
+| Kiss & Rail | No, not as a physical parking object | Treated as a tariff rule, not as a `Parking`, `ParkingArea` or parking type. |
+| Physical drop-off areas | No, not in the current CFL-managed scope | Excluded when managed by the city or by another external entity. |
+| EWAP | No, not as physical capacity | Treated as an access right or internal quota, not as a `ParkingArea`, `ParkingBay` or physical category of places. |
+| P+R Pass | No, not as physical capacity | Treated as an access right or internal quota, not as a `ParkingArea`, `ParkingBay` or physical category of places. |
+
+Kiss & Rail is understood in the CFL business context as a tariff rule corresponding to a free short-stay period of 30 minutes in the CFL P+R tariff context.
+
+It SHALL NOT be modelled as:
+
+- a standalone `Parking`;
+- a `ParkingArea`;
+- a parking type;
+- a parking place category;
+- a reserved capacity;
+- an access entitlement.
+
+Physical drop-off areas may exist near stations. However, when these areas are managed by the city or by another external entity, they are outside the CFL-managed parking scope.
+
+They SHALL therefore not be published as CFL-managed `Parking` objects unless a future scope extension explicitly requires externally managed drop-off facilities to be represented.
+
+EWAP and P+R Pass are access rights or quota-based entitlements.
+
+They SHALL NOT be modelled as:
+
+- physical parking capacity;
+- `ParkingArea`;
+- `ParkingBay`;
+- reserved spaces;
+- special parking place categories.
+
+Their detailed modelling belongs to the fare / access-right model or to internal access-control systems, not to the physical parking structure in the `SiteFrame`.
+
+In the CFL P+R context, there is no guaranteed reservation of an individual parking space. Therefore, P+R parkings SHALL NOT be modelled as offering individual parking space reservation.
+
+---
+
+### Parking types and classification
+
+The CFL Parking model distinguishes the functional type of a physical parking object.
+
+The main parking types retained in the CFL base profile are:
+
+| Parking type | Description | Main vehicle / user scope | Recommended representation |
+|--------------|-------------|----------------------------|----------------------------|
+| `P+R` | Park-and-ride car park associated with access to the rail network | Cars | `ParkingType = parkAndRide` |
+| `Bikebox` | Secure bicycle parking facility | Bicycles / e-bikes / pedal cycles | `TypeOfParkingRef = LU:CFL:TypeOfParking:BIKEBOX` |
 
 The parking type SHOULD first be expressed using standard NeTEx values where a suitable value exists.
 
@@ -454,31 +491,50 @@ For parking types that are not clearly covered by a standard NeTEx `ParkingType`
 
 The proposed modelling rule is therefore:
 
-| Parking type | Primary representation | Additional CFL classification |
-|--------------|------------------------|-------------------------------|
-| `P+R` | `ParkingType = parkAndRide` | `TypeOfParkingRef = LU:CFL:TypeOfParking:P_R` only if CFL decides to keep a harmonised internal classification for all parking types. |
-| `Bikebox` | `TypeOfParkingRef = LU:CFL:TypeOfParking:BIKEBOX` | Used because no standard NeTEx `ParkingType` value clearly represents a secure bicycle box facility. |
+| Parking type | Primary representation                            | Additional CFL classification                                                                                                         |
+| ------------ | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `P+R`        | `ParkingType = parkAndRide`                       | `TypeOfParkingRef = LU:CFL:TypeOfParking:P_R` only if CFL decides to keep a harmonised internal classification for all parking types. |
+| `Bikebox`    | `TypeOfParkingRef = LU:CFL:TypeOfParking:BIKEBOX` | Used because no standard NeTEx `ParkingType` value clearly represents a secure bicycle box facility.                                  |
 
-Kiss & Rail SHALL NOT be represented as a parking type. It is a tariff rule corresponding to a free short-stay period of 30 minutes in the CFL P+R tariff context.
+Kiss & Rail SHALL NOT be represented as a parking type because it is a tariff rule, not a physical parking object.
 
-Physical drop-off areas SHALL NOT be represented as CFL-managed `Parking` objects unless they are explicitly brought into the CFL publication scope.
+Physical drop-off areas are not included as CFL parking types in the current base profile when they are managed by the city or by another external entity.
 
 The general principle is: **standard NeTEx classification first; CFL-specific reference values only where needed or explicitly useful for internal harmonisation**.
 
 ---
 
-### Parking structure and subdivision
+### Core modelling principles
 
-A `Parking` may be subdivided when the subdivision represents a meaningful physical or management perimeter.
+The CFL Parking model is based on a clear separation between physical parking infrastructure, capacity information, access rights and tariff rules.
 
-In NeTEx, this subdivision is represented using `ParkingArea`.
+#### Parking
 
-In the CFL profile, `ParkingArea` SHALL NOT be used as a generic container for any business distinction. It SHALL primarily represent physical or clearly bounded subdivisions of a parking facility.
+A `Parking` represents the physical parking facility as a whole.
 
-The preferred use of `ParkingArea` in the CFL profile is:
+It is the main object used to describe:
 
-- one `ParkingArea` per physical level or floor when the parking is multi-level and capacity or availability is known by level;
-- one `ParkingArea` for a clearly identified CFL-managed part of a larger parking, when the CFL-managed perimeter is distinct and the data allows it.
+- the public name and location of the parking;
+- the parking type;
+- the global physical layout;
+- the total physical capacity;
+- the payment and reservation information;
+- the availability of real-time occupancy data;
+- the properties and capacities that apply to the parking as a whole.
+
+#### ParkingArea
+
+In the CFL base profile, `ParkingArea` is used only to represent a physical level or floor of a parking facility.
+
+A `ParkingArea` SHALL be created only when level-based information is available and useful for publication or data consumption.
+
+Typical level-based information includes:
+
+- level name or number;
+- level capacity;
+- level-based availability;
+- level-specific charging capacity;
+- level-specific special place category capacity, where available.
 
 `ParkingArea` SHALL NOT be used to represent:
 
@@ -486,15 +542,37 @@ The preferred use of `ParkingArea` in the CFL profile is:
 - an access right, such as EWAP or P+R Pass;
 - an internal quota;
 - a non-physical entitlement;
-- a category of places if the category is only an included subset of a level or of the total parking capacity.
+- a management perimeter that is not also a physical level;
+- a category of special places, such as PMR, charging, family, Flex, CFlex, Police or Customs places.
 
-Parking place categories such as PMR, Chargy, Family, Flex, CFlex, Police or Customs SHOULD be represented as capacity details or properties within the relevant `Parking` or `ParkingArea`, not as parallel additive `ParkingArea` elements, unless they correspond to clearly distinct and non-overlapping physical areas.
+#### ParkingProperties and ParkingCapacity
 
-The CFL profile does not model individual parking spaces by default.
+Special parking place categories SHALL be represented as category-based capacity information, using the appropriate NeTEx capacity or property mechanism.
 
-Capacity is modelled at `Parking` level or, when more detailed data is available, at `ParkingArea` level. Category-based capacity may then be expressed as additional detail within the relevant level or managed area.
+This applies to categories such as:
 
-If individual parking spaces need to be represented in a later extension, `ParkingBay` may be used. It is not retained by default in the CFL base profile.
+- PMR places;
+- charging places;
+- family places;
+- Flex places, when physically identifiable;
+- CFlex places, when physically identifiable;
+- Police / Customs places, when physically identifiable.
+
+When the exact physical level of a category is not known, the category-based capacity SHOULD be expressed at `Parking` level.
+
+When the exact physical level of a category is known and intended for publication, the category-based capacity SHOULD be expressed within the relevant level-based `ParkingArea`.
+
+A special parking place category SHALL NOT be modelled as a `ParkingArea` in the CFL base profile.
+
+#### ParkingBay
+
+The CFL base profile does not model individual parking spaces by default.
+
+`ParkingBay` is therefore not retained in the CFL base profile.
+
+It MAY be introduced in a later extension only if a specific use case requires individual parking space representation, for example a guaranteed reservation of an individual parking space.
+
+This is not the case for EWAP or P+R Pass.
 
 ---
 
@@ -513,8 +591,8 @@ Parking
 ├── RechargingAvailable
 ├── RealTimeOccupancyAvailable
 ├── ParkingPaymentProcess [minimal payment indication only]
-├── ParkingReservation [only for real booking / registration cases if applicable, not for P+R Pass or EWAP]
-├── BookingUrl [only when a reliable booking or registration URL exists]
+├── ParkingReservation [e.g. noReservations for P+R; registrationRequired where applicable]
+├── BookingUrl [booking / registration URL; not for individual P+R space reservation]
 ├── parkingProperties
 │   └── ParkingProperties
 │       ├── ParkingVehicleTypes
@@ -523,109 +601,160 @@ Parking
 │       ├── MaximumStay
 │       ├── SecureParking
 │       ├── ParkingVisibility
-│       └── MonitoredBays
+│       ├── MonitoredBays
+│       └── spaces
+│           └── ParkingCapacity [category-based capacity when not level-specific]
+│               ├── ParkingUserType [e.g. registeredDisabled for PMR places]
+│               ├── ParkingVehicleType
+│               ├── ParkingStayType
+│               ├── NumberOfSpaces
+│               └── NumberOfSpacesWithRechargePoint
 └── parkingAreas
-    └── ParkingArea
+    └── ParkingArea [physical level only]
         ├── TotalCapacity
         ├── NumberOfBaysWithRecharging
         ├── parkingProperties
+        │   └── ParkingProperties
+        │       └── spaces
+        │           └── ParkingCapacity [category-based capacity when level-specific]
         ├── bays [not used by default]
         └── entrances
 ```
 
-This structure supports both simple parking facilities and more detailed cases where the parking must be subdivided by physical level or by a clearly identified management perimeter.
+This structure supports both simple parking facilities and more detailed cases where the parking must be subdivided by physical level.
 
 In the CFL base profile, the recommended granularity is:
 
 ```text
 Parking
-→ ParkingArea for physical levels or clearly bounded managed areas, where needed
-→ Capacity details by category within the relevant Parking or ParkingArea, where available
+→ ParkingArea for physical levels, where level-based data is available
+→ Category-based capacity within Parking, when not level-specific
+→ Category-based capacity within ParkingArea, when level-specific
 ```
 
 Individual parking spaces are not modelled by default. `ParkingBay` is kept outside the CFL base profile and may be introduced later only if a specific use case requires individual parking space representation, for example a real guaranteed reservation of an individual space. This is not the case for P+R Pass or EWAP.
 
 ---
 
-### ParkingArea and capacity modelling rules
+### Capacity model
 
-`ParkingArea` is used to describe meaningful physical or management subdivisions of a `Parking`.
+Capacity in the CFL Parking profile describes physical parking capacity.
 
-A `ParkingArea` SHALL be created only when the subdivision carries useful information for publication or data consumption and corresponds to a clearly identifiable perimeter.
+It SHALL remain distinct from:
 
-In the CFL base profile, the preferred use of `ParkingArea` is level-based subdivision.
+- tariff rules;
+- access rights;
+- internal quotas;
+- entitlement-based access mechanisms;
+- individual parking space reservations.
 
-Typical cases include:
+#### Total physical capacity
 
-| Business case | Recommended use of `ParkingArea` |
-|---------------|----------------------------------|
-| Parking level or floor | Use one `ParkingArea` per physical level when capacity or availability is known by level. |
-| CFL-managed part of a larger parking | Use a dedicated `ParkingArea` only when the CFL-managed part is clearly identifiable as a distinct management perimeter. |
-| Specific category of parking places | Do not create a parallel `ParkingArea` by default. Represent the category as capacity or property detail within the relevant `Parking` or level `ParkingArea`, unless the category corresponds to a distinct, non-overlapping physical area. |
-| Specific access right, pass or entitlement | Do not use `ParkingArea`. EWAP and P+R Pass are rights or quotas, not physical areas. |
-| Specific tariff rule | Do not use `ParkingArea`. Kiss & Rail, free short stay and hourly tariff rules are tariff rules, not physical areas. |
-| Specific counting or availability coverage | Use `ParkingArea` only if the counting perimeter corresponds to a physical level or clearly bounded area. |
+`Parking/TotalCapacity` describes the total physical capacity of the parking facility.
 
-A `ParkingArea` SHOULD NOT be created only to duplicate information already expressed at `Parking` level.
+It SHOULD be provided whenever the total physical capacity is known and stable.
 
-A `ParkingArea` SHALL NOT be created for internal quotas that are not intended for publication.
+The total physical capacity includes all physical parking places that belong to the parking, including special place categories such as PMR, charging, family, Flex, CFlex, Police or Customs places.
 
----
+These special categories are therefore included subsets of `Parking/TotalCapacity`. They SHALL NOT be added on top of the total capacity.
 
-#### Capacity modelling
+#### Level-based capacity
 
-Capacity MAY be provided at different levels of detail, depending on the available source data.
+When capacity is known by physical level, one `ParkingArea` SHOULD be created per level.
 
-The preferred order is:
+`ParkingArea/TotalCapacity` describes the physical capacity of that level.
 
-1. `Parking/TotalCapacity` for the total physical parking capacity;
-2. `ParkingArea/TotalCapacity` when the capacity is known for a physical level or for a clearly identified managed part;
-3. `ParkingCapacity/NumberOfSpaces` when capacity must be expressed by user type, vehicle type or stay type within the relevant `Parking` or `ParkingArea`;
-4. `NumberOfBaysWithRecharging` or `NumberOfSpacesWithRechargePoint` for charging places.
+When all physical levels are represented, the sum of `ParkingArea/TotalCapacity` values SHOULD equal `Parking/TotalCapacity`.
 
-When capacity is known by floor, one `ParkingArea` SHOULD be created per physical level.
+In the CFL base profile, `ParkingArea` SHALL be used only for physical levels or floors.
 
-When dynamic availability is available by floor, it SHOULD be associated with the relevant level-based `ParkingArea`, where the data model and publication format allow it.
+It SHALL NOT be used for:
 
-In the CFL P+R context, dynamic availability may be calculated using differential counting.
+- management perimeters that are not also physical levels;
+- tariff rules;
+- access rights;
+- internal quotas;
+- special place categories.
 
-Where this applies:
+#### Special place category capacity
 
-- availability is measured per level, except for level 0;
-- level 0 availability may be calculated rather than directly measured;
-- counting errors may therefore be reflected in the calculated availability of level 0.
+Special place categories are represented as category-based capacity information, not as `ParkingArea`.
 
-This distinction SHOULD be documented when level-based dynamic availability is published.
+This applies to physical categories such as:
+
+- PMR places;
+- charging places;
+- family places;
+- Flex places, when physically identifiable;
+- CFlex places, when physically identifiable;
+- Police / Customs places, when physically identifiable.
+
+Category-based capacities SHOULD be expressed using the appropriate NeTEx capacity or property mechanism, such as `ParkingProperties/spaces/ParkingCapacity`.
+
+When the exact physical level of a category is not known, the category-based capacity SHOULD be expressed at `Parking` level.
+
+When the exact physical level of a category is known and intended for publication, the category-based capacity SHOULD be expressed within the relevant level-based `ParkingArea`.
+
+#### Access quotas and non-physical capacity
 
 Physical parking capacity SHALL remain distinct from internal access quotas.
 
-EWAP and P+R Pass allocated capacities are internal logical quotas. They SHALL NOT be published as physical parking capacity and SHALL NOT be added to `Parking/TotalCapacity` or `ParkingArea/TotalCapacity`.
+EWAP and P+R Pass allocated capacities are internal logical quotas.
+
+They SHALL NOT be published as physical parking capacity and SHALL NOT be added to `Parking/TotalCapacity` or `ParkingArea/TotalCapacity`.
+
+They SHALL NOT be represented as:
+
+- `ParkingArea`;
+- `ParkingBay`;
+- reserved spaces;
+- special parking place categories.
+
+#### Individual parking spaces
 
 The CFL base profile does not model individual parking spaces.
 
-`ParkingBay` is therefore not used by default. It MAY be introduced in a later extension only if a specific use case requires individual parking space representation, for example a guaranteed reservation of an individual parking space. This is not the case for EWAP or P+R Pass.
+`ParkingBay` is therefore not used by default.
 
----
+It MAY be introduced in a later extension only if a specific use case requires individual parking space representation, for example a guaranteed reservation of an individual parking space.
 
-#### Combining level-based and category-based capacity
+This is not the case for EWAP or P+R Pass.
 
-When both level-based and category-based capacity information is available, the physical level SHOULD be used as the primary `ParkingArea` subdivision.
+#### Progressive data maturity and double-counting prevention
 
-Category-based capacities SHOULD then be expressed within the relevant level area, using the appropriate NeTEx capacity or property mechanism.
+The CFL profile supports progressive data maturity for special parking place categories.
 
-In the current CFL business context, special parking place categories such as PMR or electric charging places are not necessarily communicated to customers by level.
+At an initial stage, special place category capacities may be known only globally for the whole parking.
 
-The CFL profile nevertheless allows category-based capacities to be expressed within the relevant level `ParkingArea` when the data becomes available and when publication by level is required.
+At a later stage, the same category capacities may become available by physical level.
 
-Until such level-based category information is available and intended for publication, category-based capacities MAY remain expressed at `Parking` level or as non-level-specific capacity details.
+The model SHALL support both situations without requiring artificial `ParkingArea` elements for categories.
 
-This means that:
+When only global category-based capacity is available, the category capacity SHOULD be expressed at `Parking` level.
 
-- the sum of level capacities SHOULD equal the total parking capacity;
-- category-based capacities are treated as included subsets of the relevant level capacity;
-- category-based capacities SHALL NOT be added on top of level capacities unless the data explicitly confirms that they represent separate, non-overlapping areas.
+Conceptual structure:
 
-Conceptual structure when level-based category information is available and intended for publication:
+```text
+Parking
+├── TotalCapacity = 280
+├── Category-based capacities
+│   ├── PMR places = 8
+│   ├── Charging places = 12
+│   └── Family places = 6
+└── parkingAreas
+    ├── ParkingArea Level 0
+    │   └── TotalCapacity = 140
+    └── ParkingArea Level 1
+        └── TotalCapacity = 140
+```
+
+In this case, PMR, charging and family capacities are known for the whole parking, but not by level.
+
+They are included in `Parking/TotalCapacity`. They are not added on top of the level capacities.
+
+When level-based category information is available and intended for publication, the category capacity SHOULD be expressed within the relevant level-based `ParkingArea`.
+
+Conceptual structure:
 
 ```text
 Parking
@@ -640,40 +769,214 @@ Parking
         ├── TotalCapacity = 140
         └── Category-based capacities
             ├── PMR places = 4
+            ├── Charging places = 4
             └── Family places = 6
 ```
 
-In this example, PMR, charging and family places are included in the level capacities. They are not added on top of the level capacities.
+In this case, PMR, charging and family capacities are known by level.
 
-The profile SHALL avoid modelling level areas and category areas as parallel additive `ParkingArea` elements unless the data explicitly confirms that they are non-overlapping.
+They are included in the relevant `ParkingArea/TotalCapacity`. They are not added on top of the level capacities.
+
+The same category SHOULD NOT be published at both `Parking` level and `ParkingArea` level, unless the `Parking`-level value is explicitly documented as an aggregate of the level-based values.
+
+In all cases:
+
+* the sum of level capacities SHOULD equal the total parking capacity, when all levels are represented;
+* category-based capacities are included subsets of the relevant total capacity;
+* category-based capacities SHALL NOT be added on top of `Parking/TotalCapacity` or `ParkingArea/TotalCapacity`;
+* category-based capacities SHALL NOT be used to create parallel additive `ParkingArea` elements.
+
+The refinement from parking-level category capacity to level-based category capacity SHALL preserve the same total-capacity interpretation and SHALL avoid double counting.
 
 ---
 
-### Physical structure
+### Physical structure and level modelling
 
-A Parking SHALL NOT be described only through a generic “surface parking” / “building parking” distinction.
+The CFL profile distinguishes between:
 
-The CFL profile distinguishes at least two independent physical characteristics:
+- the global physical layout of the parking facility;
+- level-specific physical information, when the parking is modelled with level-based `ParkingArea` elements.
 
-| Characteristic | Description | Recommended NeTEx representation |
-|----------------|-------------|----------------------------------|
-| Number of levels | Indicates whether the parking has one or several levels | `NumberOfParkingLevels` |
-| Coverage / layout | Indicates whether the parking is covered, open, multi-storey, underground, etc. | `ParkingLayout` |
+At `Parking` level, `ParkingLayout` SHOULD describe the overall layout of the parking.
 
-This distinction is required because a parking may be on a single level and still be covered, for example by a roof structure or solar panels.
+When all levels have the same physical layout, the information MAY be provided only at `Parking` level.
 
-If only minimal information is available, the following simplified attributes may be derived:
+When a parking contains both covered and uncovered levels, the parking SHOULD be considered mixed or partially covered at global level where a suitable `ParkingLayout` value is available.
 
-- single-level / multi-level;
-- covered / uncovered / partially covered.
+The detailed covered / uncovered information by level is a CFL business requirement.
 
-Examples:
+However, in the NeTEx XSD structures reviewed so far, `ParkingLayout` is available at `Parking` level. No dedicated standard element has been identified to encode covered / uncovered information directly at `ParkingArea` level.
 
-| Business case | Recommended representation |
-|---------------|----------------------------|
-| Open surface parking | `ParkingLayout = openSpace`, `NumberOfParkingLevels = 1` |
-| Covered single-level parking | `ParkingLayout = covered`, `NumberOfParkingLevels = 1` |
-| Multi-storey parking building | `ParkingLayout = multistorey`, `NumberOfParkingLevels > 1` |
+Therefore, level-specific covered / uncovered information SHALL NOT be encoded using a non-standard element such as `ParkingArea/ParkingLayout` or `ParkingArea/Coverage`.
+
+If this information must be published before a standard-compliant structure is confirmed, it MAY only be provided as descriptive information on the relevant `ParkingArea`, for example in a label or description field accepted by the implementation profile.
+
+When a parking is multi-level, one `ParkingArea` SHOULD be created per physical level when level-based information is available.
+
+Each level-based `ParkingArea` MAY then carry level-specific information such as:
+
+- level name or number;
+- level capacity;
+- level-based availability;
+- charging capacity;
+- category-based capacities, such as PMR or family places, when known by level;
+- descriptive indication of whether the level is covered or uncovered, if required and if encoded through an implementation-profile-compliant mechanism.
+
+A global attribute at `Parking` level SHALL NOT be used to imply that all levels have the same characteristic when relevant level-specific differences are known and intended for publication.
+
+This applies in particular to covered / uncovered information: when a parking contains both covered and uncovered levels, the global `Parking/ParkingLayout` SHALL only describe the overall mixed nature of the parking and SHALL NOT be interpreted as providing the covered / uncovered status of each individual level.
+
+If level-specific information is required for publication, it must be provided separately for each level-based `ParkingArea`, using only a standard-compliant or implementation-profile-compliant mechanism.
+
+Conversely, when all levels have the same physical layout, the information MAY be provided only at `Parking` level to avoid unnecessary duplication.
+
+#### Level access and internal equipment
+
+A parking may include internal equipment or infrastructure elements, such as:
+
+- lifts;
+- stairs;
+- ramps;
+- entrances;
+- internal pedestrian paths;
+- equipment relevant for accessibility or internal navigation.
+
+These elements may be relevant for passenger accessibility, internal navigation and access to parking levels.
+
+In the CFL MVP, such elements are optional and SHOULD be provided only when the information is available, reliable and useful for publication.
+
+Equipment and internal access elements SHALL NOT be used to create artificial `ParkingArea` subdivisions.
+
+When equipment is specific to a physical level, it SHOULD be associated with the relevant level-based `ParkingArea` where the NeTEx structure and the CFL implementation profile allow it.
+
+---
+
+### Access, payment and reservation
+
+A `Parking` MAY include standard NeTEx information about payment and reservation facilities.
+
+In the CFL P+R context, the payment model is one of the following:
+
+| Business case | Interpretation | Recommended NeTEx representation |
+|--------------|----------------|----------------------------------|
+| Free parking | No payment is required | `ParkingPaymentProcess = free` |
+| Payment via the P+R application | Payment and access are handled through the P+R app. This implies controlled access through a barrier and licence plate recognition. | `ParkingPaymentProcess = payByMobileDevice payByPlate`, and `PaymentByMobile` where app/payment URL information is available |
+| Payment at the payment terminal | Used for users who have not installed the P+R app. The hourly tariff applies. | `ParkingPaymentProcess` should indicate a payment-required process; the detailed hourly tariff is handled in the fare model |
+
+In the CFL profile, payment via the P+R application is understood as a combined business process covering:
+
+- app-based payment;
+- controlled access through a barrier;
+- licence plate recognition.
+
+These elements SHALL NOT be modelled as:
+
+- parking types;
+- `ParkingArea` elements;
+- physical capacity;
+- special parking place categories.
+
+The physical access-control equipment MAY be documented where the appropriate NeTEx equipment structure is confirmed, but the main information retained in the parking profile is the payment and access process.
+
+For CFL P+R parkings, `ParkingReservation` SHALL be set to `noReservations` when the information is published, because there is no guaranteed reservation of an individual parking space.
+
+EWAP and P+R Pass SHALL NOT be represented as:
+
+- `ParkingArea`;
+- `ParkingBay`;
+- reserved spaces;
+- physical capacity;
+- special parking place categories.
+
+They are access rights or quota-based entitlements.
+
+Their detailed modelling belongs to the fare / access-right model or to internal access-control systems, not to the physical parking structure in the `SiteFrame`.
+
+Internal quotas associated with EWAP or P+R Pass SHALL NOT be published as customer-facing physical parking capacity.
+
+The detailed hourly tariff, the conditional free-parking rule and the geographic eligibility zone SHALL be handled in the future NeTEx fare model, not in the physical parking structure.
+
+`BookingUrl` SHALL be used only when a reliable booking or registration URL exists.
+
+It SHALL NOT be used to imply that P+R spaces can be reserved individually.
+
+For example, `BookingUrl` may be relevant for Bikebox registration where applicable, but not for individual P+R parking space reservation.
+
+---
+
+### Counting, availability and smartparking
+
+Counting and availability information describe the operational monitoring of a parking facility.
+
+They SHALL remain distinct from:
+
+- the physical parking type;
+- the physical capacity model;
+- tariff rules;
+- access rights;
+- internal quotas.
+
+The term **smartparking** is treated as a technical or operational qualification, not as a functional parking type.
+
+A parking may be considered a smartparking when it is equipped with intelligent counting, monitoring or availability equipment.
+
+Smartparking SHALL NOT be represented as:
+
+- a `ParkingType`;
+- a `TypeOfParkingRef`;
+- a `ParkingArea`;
+- a parking place category.
+
+In NeTEx, the presence of real-time occupancy data SHOULD be represented using `RealTimeOccupancyAvailable` when applicable.
+
+Availability information may be available:
+
+- globally for the whole `Parking`;
+- by physical level, when level-based `ParkingArea` elements are represented;
+- for specific monitored bays, only if such information exists and is intended for publication.
+
+The following counting configurations are identified in the CFL context:
+
+| Counting configuration | Description | Modelling note |
+|------------------------|-------------|----------------|
+| No counting equipment | No automated counting or availability equipment is available. | `RealTimeOccupancyAvailable` should not be set to `true`. |
+| Camera-based counting with parking map | Cameras are associated with a map of the parking places. | May support occupancy or bay-level monitoring, depending on the source data. |
+| Dynamic entry / exit counting | Counting is performed at entry and exit barriers, with increment / decrement logic. | May support global or level-based availability. It may also support statistical information such as vehicle country of origin. |
+
+Some parkings may also have a local display showing the number of remaining available places.
+
+Where known, the model SHOULD document:
+
+- whether real-time or near-real-time availability data exists;
+- whether availability is available globally or by physical level;
+- the counting method;
+- whether level-based availability is directly measured or calculated;
+- whether a local remaining-places display exists;
+- the approximate update frequency, where available.
+
+In the CFL P+R context, dynamic availability may be available by floor.
+
+When availability is available by floor, it SHOULD be associated with the relevant level-based `ParkingArea`, where the NeTEx structure and CFL implementation profile allow it.
+
+In some CFL P+R configurations, dynamic availability may be calculated using differential counting.
+
+Where this applies:
+
+- availability is measured per level, except for level 0;
+- level 0 availability may be calculated rather than directly measured;
+- counting errors may therefore be reflected in the calculated availability of level 0.
+
+This distinction SHOULD be documented when level-based dynamic availability is published.
+
+If individual bays are monitored, `MonitoredBays` may be used in `ParkingProperties`.
+
+However, individual `ParkingBay` objects are not modelled by default in the CFL base profile.
+
+Availability values SHALL NOT be confused with physical capacity values:
+
+- `TotalCapacity` describes the stable physical capacity;
+- availability describes the current or dynamic number of available places;
+- internal EWAP or P+R Pass quotas SHALL NOT be published as physical capacity or as customer-facing availability unless a separate access-right model explicitly supports this distinction.
 
 ---
 
@@ -686,167 +989,34 @@ A P+R may be owned by different entities, including:
 - CFL;
 - Ponts et Chaussées;
 - Fonds du Rail;
-- a municipality.
+- a municipality;
+- another public or private entity.
 
 The manager may be CFL or another entity.
 
-A parking may also be partially managed by CFL. In such cases, the CFL-managed part SHALL be represented as an identifiable `ParkingArea` when the data allows it.
+Ownership or management information SHALL NOT drive the creation of `ParkingArea` elements. A `ParkingArea` may only be created when it represents a physical level or floor.
 
-Example: in Diekirch, CFL manages approximately 100 places through the P+R application out of a total of approximately 650 places. The CFL-managed part should therefore be represented as a distinct `ParkingArea` of the physical parking.
+However, ownership or management information SHALL NOT drive the creation of `ParkingArea` elements.
 
-This allows the model to distinguish:
+In the CFL base profile, `ParkingArea` is reserved for physical levels or floors only.
+
+A partially CFL-managed parking SHALL therefore NOT be subdivided into a `ParkingArea` only because part of the capacity is managed by CFL.
+
+If a parking is partially managed by CFL, this information SHOULD be documented as business or operational metadata, where a suitable standard-compliant or implementation-profile-compliant mechanism exists.
+
+Example: in Diekirch, CFL manages approximately 100 places through the P+R application out of a total of approximately 650 places.
+
+This CFL-managed capacity is relevant for business understanding and access-control logic, but it SHALL NOT be represented as a `ParkingArea` unless it corresponds to a physical level or floor.
+
+This allows the CFL profile to distinguish clearly between:
 
 - the total physical capacity of the parking;
-- the capacity managed by CFL;
+- the physical subdivision by level, where applicable;
+- the capacity or quota managed through CFL operational processes;
 - the access rules applicable to the CFL-managed part;
 - the responsibility for management and data provision.
 
----
-
-### Parking place categories and capacity
-
-The CFL profile supports capacity modelling by category of parking places.
-
-Identified physical categories include:
-
-| Category | Description | Modelling note |
-|----------|-------------|----------------|
-| Standard | Regular parking places | Included in the general physical capacity. |
-| PMR | Places reserved for persons with reduced mobility | Physical category. May be represented using `ParkingUserType = impairedMobility` when the capacity is known. |
-| Chargy | Electric vehicle charging places | Physical category. Should be represented using recharging-related NeTEx capacity or property fields. |
-| Family | Wider family places, for example at Belval | Physical category when such places are explicitly identified. |
-| Flex | Places or usage related to Flex for private individuals | Exists in all P+R. Should be represented as a physical category only when the places are physically identifiable. |
-| CFlex | Places or usage related to CFlex for CFL agents | Physical CFlex places are currently identified only at Luxembourg Gare P+R, with 6 spaces. |
-| Police / Customs | Reserved and clearly identified places | Should be represented only when they correspond to physical reserved places. |
-
-EWAP and P+R Pass are not parking place categories. They are access rights or quota-based entitlements and SHALL NOT be included in physical category capacity.
-
-Kiss & Rail is not a parking place category. It is a tariff rule corresponding to a free short-stay period of 30 minutes in the CFL P+R tariff context.
-
-Capacity MAY be provided:
-
-- globally at `Parking` level;
-- by physical level, using `ParkingArea`;
-- by clearly identified managed perimeter, using `ParkingArea`;
-- by physical place category, within the relevant `Parking` or `ParkingArea`.
-
-The recommended modelling granularity is therefore:
-
-```text
-Parking
-→ ParkingArea / physical level, where relevant
-→ Physical place category, where available and publishable
-→ Capacity
-```
-
-Internal quotas such as EWAP and P+R Pass SHALL remain outside the published physical capacity model.
-
-Individual parking spaces are not modelled in the CFL base profile.
-
-If individual parking spaces need to be represented in a later extension, `ParkingBay` may be used.
-
----
-
-### Kiss & Rail and drop-off scope
-
-Kiss & Rail SHALL NOT be modelled as a standalone `Parking` or as a `ParkingArea` in the CFL parking profile.
-
-In the CFL business context, Kiss & Rail is understood as a tariff rule corresponding to a free short-stay period of 30 minutes in the CFL P+R tariff context. It does not correspond to a specific physical set of parking spaces.
-
-The Kiss & Rail rule SHALL therefore be treated as tariff information associated with a parking, not as:
-
-- a parking type;
-- a physical parking area;
-- a parking place category;
-- a reserved capacity;
-- an access entitlement.
-
-Physical drop-off areas may exist near stations. However, according to the current business scope, these areas are managed by the city and not by CFL.
-
-They SHALL therefore remain outside the CFL-managed parking profile unless a future scope extension explicitly requires city-managed or externally managed drop-off facilities to be represented.
-
-If such external drop-off facilities are introduced in a later extension, they SHALL be clearly distinguished from CFL-managed P+R parkings and from the Kiss & Rail tariff rule.
-
----
-
-### Access control, payment and reservation
-
-A `Parking` MAY include standard NeTEx information about payment and reservation facilities.
-
-In the CFL P+R context, the payment model is one of the following:
-
-| Business case | Interpretation | Recommended NeTEx representation |
-|--------------|----------------|----------------------------------|
-| Free parking | No payment is required | `ParkingPaymentProcess = free` |
-| Payment via the P+R application | Payment and access are handled through the P+R app. This implies a barrier and a camera reading the licence plate. | `ParkingPaymentProcess = payByMobileDevice payByPlate`, and `PaymentByMobile` where app/payment URL information is available |
-| Payment at the payment terminal | Used for users who have not installed the P+R app. The hourly tariff applies. | `ParkingPaymentProcess` should indicate a payment-required process; the detailed hourly tariff is handled in the fare model |
-
-In the CFL profile, payment via the P+R application is understood as a combined business process covering:
-
-- app-based payment;
-- controlled access through a barrier;
-- licence plate recognition.
-
-These elements SHALL NOT be modelled as separate parking types or physical subdivisions.
-
-The physical access-control equipment MAY be documented where the appropriate NeTEx equipment structure is confirmed, but the main information retained in the parking profile is the payment/access process.
-
-For CFL P+R parkings, `ParkingReservation` SHALL be set to `noReservations` when the information is published, because there is never a guaranteed reservation of an individual parking space.
-
-EWAP and P+R Pass SHALL NOT be represented as `ParkingArea`, `ParkingBay`, reserved spaces or published physical capacity.
-
-They are access rights or quota-based entitlements. Their detailed modelling belongs to the fare / access-right model or to internal access-control systems.
-
-Internal quotas associated with EWAP or P+R Pass SHALL NOT be published as physical capacity in the `SiteFrame`.
-
-The detailed hourly tariff, the conditional free-parking rule and the geographic eligibility zone SHALL be handled in the future NeTEx fare model, not in the physical parking structure.
-
----
-
-### Equipment and internal access
-
-A Parking may include internal equipment or infrastructure elements, such as:
-
-- lift;
-- stairs;
-- ramp.
-
-These elements may be relevant for accessibility, internal navigation and access to parking levels or zones.
-
-In the MVP, such elements may be optional and provided only when available.
-
----
-
-### Counting, availability and smartparking
-
-The term **smartparking** is treated as a usage label or technical qualification, not as a functional parking type.
-
-A Parking may be considered a smartparking when it is equipped with intelligent counting or availability equipment.
-
-The following counting configurations are identified in the CFL context:
-
-| Counting configuration | Description |
-|------------------------|-------------|
-| No counting equipment | No automated counting or availability equipment is available. |
-| Camera-based counting with parking map | Cameras are associated with a map of the parking places. |
-| Dynamic entry / exit counting | Counting is performed at entry and exit barriers, with increment / decrement logic. This may also support identification of the vehicle country of origin for statistical purposes. |
-
-Some parkings may also have a local display showing the number of remaining available places.
-
-Where known, the model should represent:
-
-- whether availability data exists;
-- whether availability is available globally or by physical level;
-- the counting method;
-- whether level-based availability is directly measured or calculated;
-- whether a remaining-places display exists;
-- the approximate update frequency.
-
-In the CFL P+R context, dynamic availability may be available by floor.
-
-In NeTEx, the presence of real-time occupancy data should be represented using `RealTimeOccupancyAvailable` when applicable.
-
-If individual bays are monitored, `MonitoredBays` may be used in `ParkingProperties`. However, individual `ParkingBay` objects are not modelled by default in the CFL base profile.
+Managed capacity, access rights and internal quotas SHALL remain distinct from physical capacity and physical level modelling.
 
 ---
 
@@ -854,245 +1024,229 @@ If individual bays are monitored, `MonitoredBays` may be used in `ParkingPropert
 
 | Element / Attribute | Description | Cardinality (CFL profile) | Notes / Constraints |
 |---------------------|-------------|----------------------------|---------------------|
-| `@id` | Identifier of the Parking | 1..1 | Must follow CFL identifier scheme. |
+| `@id` | Identifier of the `Parking` | 1..1 | Must follow the CFL identifier scheme. |
 | `Name` | Public name or label of the parking | 1..1 | Should be understandable for passengers and operators. |
-| `Description` | Passenger-facing or operational description | 0..1 | Optional. |
+| `Description` | Passenger-facing or operational description | 0..1 | Optional. May be used to provide additional contextual information when no more specific standard-compliant structure is available. |
 | `Centroid/Location` | Geographic coordinates, WGS84 | 1..1 | Mandatory longitude / latitude. |
 | `ParkingType` | Standard NeTEx parking type | 0..1 | SHALL be used when a suitable standard value exists, e.g. `parkAndRide` for P+R. |
 | `TypeOfParkingRef` | CFL-specific parking type reference | 0..1 | References a shared `TypeOfParking` in `resource.xml` when no suitable standard value exists or when CFL requires an internal functional classification, e.g. Bikebox. Kiss & Rail SHALL NOT be represented as a `TypeOfParkingRef`. |
-| `ParkingLayout` | Physical layout of the parking | 0..1 | Used to describe open, covered, multi-storey, underground, etc. layouts. |
-| `NumberOfParkingLevels` | Number of levels | 0..1 | Should be provided for multi-level parkings and when known. |
-| `TotalCapacity` | Total number of places | 0..1 | Should be provided when known and stable. |
-| `PrincipalCapacity` | Main usable capacity | 0..1 | May be used when relevant. |
-| `parkingAreas/ParkingArea` | Physical or clearly bounded management subdivisions | 0..n | Used primarily for physical levels when capacity or availability is known by level, or for a clearly identified CFL-managed perimeter. SHALL NOT be used for tariff rules, access rights, internal quotas or non-physical entitlements. |
-| `parkingProperties/ParkingProperties` | Additional parking properties | 0..n | Used for vehicle types, secure parking, max stay, monitored bays, etc. |
+| `ParkingLayout` | Global physical layout of the parking | 0..1 | Used at `Parking` level to describe the overall layout, such as open, covered, multi-storey or underground. It SHALL NOT be used to imply level-specific covered / uncovered information when the parking is mixed. |
+| `NumberOfParkingLevels` | Number of physical levels | 0..1 | Should be provided for multi-level parkings and when known. |
+| `TotalCapacity` | Total physical capacity of the parking | 0..1 | Should be provided when known and stable. Special place categories are included subsets of this capacity and SHALL NOT be added on top of it. |
+| `PrincipalCapacity` | Main usable capacity | 0..1 | May be used when relevant and clearly distinguished from total physical capacity. |
+| `parkingAreas/ParkingArea` | Physical level or floor of the parking | 0..n | Used only for physical levels or floors in the CFL base profile. SHALL NOT be used for tariff rules, access rights, internal quotas, management perimeters, non-physical entitlements or special place categories. |
+| `ParkingArea/Name` | Name or label of the physical level | 0..1 | May be used to identify the level, e.g. Level 0, Level 1. |
+| `ParkingArea/Description` | Descriptive information about the physical level | 0..1 | May be used for level-specific information such as covered / uncovered indication only when no dedicated standard-compliant structure is available and when accepted by the implementation profile. |
+| `ParkingArea/TotalCapacity` | Physical capacity of the level | 0..1 | Used when capacity is known by level. When all levels are represented, the sum of level capacities SHOULD equal `Parking/TotalCapacity`. |
+| `parkingProperties/ParkingProperties` | Additional parking properties | 0..n | Used for vehicle types, user types, secure parking, max stay, monitored bays and category-based capacity information. |
 | `ParkingVehicleTypes` | Vehicle types allowed | 0..1 | Used to distinguish cars, cycles, e-bikes, etc. |
+| `ParkingUserTypes` | User types associated with the parking or with a category-based capacity | 0..1 | May be used for special user categories, e.g. PMR / disabled users or families, where the relevant standard value is confirmed. |
+| `spaces/ParkingCapacity` | Category-based capacity information | 0..n | Used to express special place category capacity, such as PMR, charging, family, Flex, CFlex, Police or Customs places. May be used at `Parking` level when the category is not level-specific, or within a level-based `ParkingArea` when the category is known by level. |
+| `ParkingCapacity/ParkingUserType` | User category associated with a capacity | 0..1 | May be used for PMR or family capacity where the relevant standard value is confirmed. |
+| `ParkingCapacity/ParkingVehicleType` | Vehicle category associated with a capacity | 0..1 | May be used where capacity is specific to a vehicle type. |
+| `ParkingCapacity/ParkingStayType` | Stay category associated with a capacity | 0..1 | May be used only when a stay-related category is physically relevant and intended for publication. |
+| `ParkingCapacity/NumberOfSpaces` | Number of spaces for a category | 0..1 | Category-based capacity is an included subset of the relevant total capacity and SHALL NOT be added on top of it. |
+| `RechargingAvailable` | Indicates whether vehicle recharging is available | 0..1 | Relevant for charging facilities. |
+| `NumberOfBaysWithRecharging` | Number of bays with charging facilities | 0..1 | May be used at `ParkingArea` level when charging capacity is known by level. |
+| `ParkingCapacity/NumberOfSpacesWithRechargePoint` | Number of spaces with recharge point | 0..1 | May be used to express charging capacity as category-based capacity. |
 | `ParkingStayList` | Type of parking stay | 0..1 | May be used only when the parking has an actual stay-related property to publish. SHALL NOT be used to model Kiss & Rail as a physical parking type. |
 | `MaximumStay` | Maximum permitted stay | 0..1 | Used only when a maximum physical stay rule is directly applicable to the parking object. Detailed tariff rules, such as the first 30 minutes free, belong to the future fare model. |
-| `RechargingAvailable` | Indicates whether vehicle recharging is available | 0..1 | Relevant for Chargy areas or parking places. |
-| `NumberOfBaysWithRecharging` | Number of bays with charging facilities | 0..1 | May be used at `ParkingArea` level. |
-| `RealTimeOccupancyAvailable` | Indicates whether occupancy data is available | 0..1 | Used for smartparking / availability data. |
-| `MonitoredBays` | Indicates whether individual bays are monitored | 0..1 | Used only when such information exists. |
+| `SecureParking` | Indicates secure parking characteristics | 0..1 | Relevant especially for Bikebox or other secure parking facilities. |
+| `ParkingVisibility` | Visibility or accessibility of the parking | 0..1 | Optional, when relevant and supported by the implementation profile. |
+| `RealTimeOccupancyAvailable` | Indicates whether occupancy data is available | 0..1 | Used for smartparking / availability data. Does not represent capacity itself. |
+| `MonitoredBays` | Indicates whether individual bays are monitored | 0..1 | Used only when such information exists. Individual `ParkingBay` objects are not modelled by default in the CFL base profile. |
 | `ParkingPaymentProcess` | Payment model | 0..1 | Used when the payment model is known. In the CFL P+R context, the payment model is either free, payment via the P+R app, or payment at the payment terminal. |
+| `PaymentByMobile` | Mobile payment information | 0..1 | May be used when payment through the P+R app is available and reliable app/payment URL information is known. |
 | `ParkingReservation` | Reservation availability | 0..1 | For CFL P+R parkings, SHALL indicate that no reservation of an individual parking space is available when this information is published. SHALL NOT be used to model P+R Pass, EWAP or internal quotas. |
-| `BookingUrl` | URL for booking or registration | 0..1 | Used only when a reliable booking or registration URL exists, e.g. for Bikebox registration where applicable. SHALL NOT be used to imply that P+R spaces can be reserved. |
-| `placeEquipments` | Equipment container for the parking | 0..1 | Optional; used when equipment information is available. |
-| `placeEquipments/PassengerSafetyEquipment` | Safety-related equipment information | 0..n | May be used for safety equipment, such as CCTV. |
-| `placeEquipments/VehicleReleaseEquipment` | Access-control-related equipment information | 0..n | May be used for access or release equipment, such as remote control. |
+| `BookingUrl` | URL for booking or registration | 0..1 | Used only when a reliable booking or registration URL exists, e.g. for Bikebox registration where applicable. SHALL NOT be used to imply that P+R spaces can be reserved individually. |
+| `placeEquipments` | Equipment container for the parking | 0..1 | Optional; used when equipment information is available and relevant. |
+| `placeEquipments/PassengerSafetyEquipment` | Safety-related equipment information | 0..n | May be used for safety equipment, such as CCTV, where relevant. |
+| `placeEquipments/VehicleReleaseEquipment` | Access-control-related equipment information | 0..n | May be used for access or release equipment where the appropriate structure is confirmed. |
+| `ParkingBay` | Individual parking space | Not used by default | Not retained in the CFL base profile. May be introduced later only if a specific use case requires individual space representation, such as guaranteed reservation of an individual parking space. |
 
-Note: in the CFL P+R context, payment via the P+R app is understood as a combined payment and access process. It implies controlled access through a barrier and licence plate recognition. These mechanisms are not modelled as parking types, `ParkingArea` elements or physical capacity.
+Note: in the CFL P+R context, payment via the P+R app is understood as a combined payment and access process. It implies controlled access through a barrier and licence plate recognition. These mechanisms are not modelled as parking types, `ParkingArea` elements, physical capacity or special parking place categories.
 
 ---
 
 ### CFL-specific modelling rules
 
 - Parkings are published under `SiteFrame/.../parkings`, currently in `parking.xml`.
+- `Parking` represents the physical parking facility as a whole.
+- `Centroid/Location` MUST be provided.
+- `TotalCapacity` SHOULD be provided whenever the physical capacity is known and stable.
 - `ParkingType` SHALL be used when a suitable standard NeTEx value exists, e.g. `parkAndRide` for P+R.
 - `TypeOfParkingRef` SHALL be used when no suitable standard `ParkingType` value exists or when a CFL-specific functional classification is explicitly required.
 - When used, `TypeOfParkingRef` MUST point to a shared `TypeOfParking` value published in `resource.xml`.
-- `Centroid/Location` MUST be provided.
-- `TotalCapacity` SHOULD be provided whenever the physical capacity is known and stable.
-- P+R and Bikebox are modelled as parking types in the CFL profile.
-- Kiss & Rail SHALL NOT be modelled as a parking type, `ParkingArea` or physical parking place category. It is a tariff rule corresponding to a free short-stay period of 30 minutes in the CFL P+R tariff context.
-- Physical drop-off areas managed by the city are outside the CFL-managed parking scope unless a future scope extension explicitly includes them.
-- Smartparking is not a functional parking type; it is a technical qualification derived from counting or availability equipment.
-- A Parking MAY be subdivided into `ParkingArea` elements when needed to represent physical levels or clearly bounded management perimeters.
-- `ParkingArea` SHALL NOT be used for tariff rules, access rights, internal quotas or non-physical entitlements.
-- Individual parking spaces are not modelled by default.
-- `ParkingBay` is not retained in the CFL base profile, but may be used in a later extension if individual spaces need to be represented. This is not the case for EWAP or P+R Pass.
-- For multi-level parkings, capacity SHOULD be provided by level when the data is available.
-- Category-based capacities MAY be provided within the relevant `Parking` or level-based `ParkingArea`, when the information is available and intended for publication.
-- For partially CFL-managed parkings, the CFL-managed part SHOULD be represented as a distinct `ParkingArea` only when the managed perimeter is clearly identifiable.
+
+- P+R and Bikebox are modelled as physical parking objects in the CFL profile.
+- Kiss & Rail SHALL NOT be modelled as a parking type, `ParkingArea`, physical parking place category or reserved capacity.
+- Kiss & Rail is a tariff rule corresponding to a free short-stay period of 30 minutes in the CFL P+R tariff context.
+- Physical drop-off areas managed by the city or by another external entity are outside the CFL-managed parking scope unless a future scope extension explicitly includes them.
+
+- In the CFL base profile, `ParkingArea` SHALL be used only for physical levels or floors.
+- `ParkingArea` SHALL NOT be used for tariff rules, access rights, internal quotas, management perimeters, non-physical entitlements or special parking place categories.
+- For multi-level parkings, one `ParkingArea` SHOULD be created per physical level when level-based information is available and useful for publication.
+- `ParkingArea/TotalCapacity` SHOULD be provided when physical capacity is known by level.
+- When all levels are represented, the sum of `ParkingArea/TotalCapacity` values SHOULD equal `Parking/TotalCapacity`.
+
+- Special parking place categories SHALL be represented as category-based capacity information, not as `ParkingArea`.
+- This applies to PMR, charging, family, Flex, CFlex, Police and Customs places, when such categories are known and intended for publication.
+- When the exact physical level of a category is not known, category-based capacity SHOULD be expressed at `Parking` level.
+- When the exact physical level of a category is known and intended for publication, category-based capacity SHOULD be expressed within the relevant level-based `ParkingArea`.
+- Category-based capacities are included subsets of the relevant total capacity and SHALL NOT be added on top of `Parking/TotalCapacity` or `ParkingArea/TotalCapacity`.
+- The same category SHOULD NOT be published at both `Parking` level and `ParkingArea` level unless the `Parking`-level value is explicitly documented as an aggregate of the level-based values.
+
+- `ParkingLayout` SHOULD describe the global physical layout of the parking at `Parking` level.
+- When a parking contains both covered and uncovered levels, `Parking/ParkingLayout` SHALL only describe the overall mixed nature of the parking.
+- Level-specific covered / uncovered information SHALL NOT be encoded using non-standard elements such as `ParkingArea/ParkingLayout` or `ParkingArea/Coverage`.
+- If level-specific covered / uncovered information must be published before a standard-compliant structure is confirmed, it MAY only be provided as descriptive information on the relevant `ParkingArea`, using a field accepted by the implementation profile.
+
+- Smartparking is not a functional parking type; it is a technical or operational qualification derived from counting, monitoring or availability equipment.
+- `RealTimeOccupancyAvailable` SHOULD be used when real-time or near-real-time occupancy data is available.
+- When dynamic availability is available by physical level, it SHOULD be associated with the relevant level-based `ParkingArea`, where the NeTEx structure and CFL implementation profile allow it.
+- In some CFL P+R configurations, availability is measured per level except for level 0, where it may be calculated. Counting errors may therefore be reflected in the calculated availability of level 0.
+
 - In the CFL P+R context, the payment model is either free, payment via the P+R app, or payment at the payment terminal.
 - Payment via the P+R app implies controlled access through a barrier and licence plate recognition.
 - Payment at the payment terminal applies the hourly tariff for users who do not use the P+R app.
-- EWAP and P+R Pass are access rights or quota-based entitlements. They SHALL NOT be represented as physical capacity, `ParkingArea`, `ParkingBay` or reserved spaces.
-- Internal quotas associated with EWAP or P+R Pass SHALL NOT be published as customer-facing parking capacity.
-- There is no guaranteed reservation of an individual parking space in the CFL P+R context.
+- The detailed hourly tariff, the conditional free-parking rule and the geographic eligibility zone SHALL be handled in the future NeTEx fare model, not in the physical parking structure.
+
+- For CFL P+R parkings, `ParkingReservation` SHALL indicate that no reservation of an individual parking space is available when this information is published.
+- `BookingUrl` SHALL NOT be used to imply that P+R spaces can be reserved individually.
+- `BookingUrl` MAY be used only when a reliable booking or registration URL exists, e.g. for Bikebox registration where applicable.
+
+- EWAP and P+R Pass are access rights or quota-based entitlements.
+- EWAP and P+R Pass SHALL NOT be represented as physical capacity, `ParkingArea`, `ParkingBay`, reserved spaces or special parking place categories.
+- Internal quotas associated with EWAP or P+R Pass SHALL NOT be published as customer-facing physical parking capacity.
+
+- Individual parking spaces are not modelled by default.
+- `ParkingBay` is not retained in the CFL base profile.
+- `ParkingBay` MAY be introduced in a later extension only if a specific use case requires individual space representation, for example a guaranteed reservation of an individual parking space.
+- This is not the case for EWAP or P+R Pass.
+
+- Ownership and management information may be documented as business or operational metadata.
+- Ownership or management information SHALL NOT drive the creation of `ParkingArea` elements unless the managed perimeter is also a physical level or floor represented in the profile.
 
 ---
 
-### Minimal XML example: P+R parking
+### XML example: P+R parking with level-based capacity and global special place categories
 
 ⚠️ *Illustrative only — not real CFL production data.*
+
+⚠️ *This example illustrates the CFL modelling principles. The exact XML structure for `ParkingProperties/spaces/ParkingCapacity`, the retained `ParkingPaymentProcess` values and the user-type values such as `registeredDisabled` or `families` must be validated against the CEN NeTEx XSD and the CFL implementation profile before being used as a production pattern.*
+
+This example shows a multi-level P+R parking where:
+
+- the parking is represented as one `Parking`;
+- each physical level is represented as one `ParkingArea`;
+- total capacity is known globally and by level;
+- special place categories are known only globally, not yet by level;
+- PMR, charging and family places are therefore represented at `Parking` level as category-based capacities;
+- `ParkingArea` is not used for PMR, charging or family places;
+- no individual `ParkingBay` is modelled;
+- P+R spaces are not individually reservable.
 
 ```xml
 <Parking id="LU:CFL:Parking:PR001" version="1">
   <Name>Station X - P+R</Name>
+  <Description>Multi-level P+R parking with global special place category capacity and mixed covered / uncovered levels.</Description>
+
   <Centroid>
     <Location>
       <Longitude>6.1000</Longitude>
       <Latitude>49.6000</Latitude>
     </Location>
   </Centroid>
-  <ParkingType>parkAndRide</ParkingType>
-  <ParkingLayout>openSpace</ParkingLayout>
-  <NumberOfParkingLevels>1</NumberOfParkingLevels>
-  <TotalCapacity>650</TotalCapacity>
-</Parking>
-```
----
-
-### Minimal XML example: partially managed P+R parking
-
-⚠️ *Illustrative only — not real CFL production data.*
-
-```xml
-<Parking id="LU:CFL:Parking:Diekirch" version="1">
-  <Name>Diekirch - P+R</Name>
-  <Centroid>
-    <Location>
-      <Longitude>6.1550</Longitude>
-      <Latitude>49.8670</Latitude>
-    </Location>
-  </Centroid>
-  <ParkingType>parkAndRide</ParkingType>
-  <TotalCapacity>650</TotalCapacity>
-
-  <parkingAreas>
-    <ParkingArea id="LU:CFL:ParkingArea:Diekirch:CFLManaged" version="1">
-      <Name>Diekirch - CFL managed P+R area</Name>
-      <TotalCapacity>100</TotalCapacity>
-    </ParkingArea>
-  </parkingAreas>
-</Parking>
-```
----
-### Minimal XML example: parking with availability data
-
-⚠️ *Illustrative only — not real CFL production data.*
-
-```xml
-<Parking id="LU:CFL:Parking:PR002" version="1">
-  <Name>Station Y - P+R</Name>
-  <Centroid>
-    <Location>
-      <Longitude>6.2000</Longitude>
-      <Latitude>49.7000</Latitude>
-    </Location>
-  </Centroid>
-  <ParkingType>parkAndRide</ParkingType>
-  <TotalCapacity>300</TotalCapacity>
-  <RealTimeOccupancyAvailable>true</RealTimeOccupancyAvailable>
-</Parking>
-```
----
-
-### Illustrative XML example: P+R parking with level-based ParkingAreas and category-based capacity
-
-⚠️ *Illustrative only — not real CFL production data.*
-
-⚠️ *This example illustrates the intended modelling pattern. The exact XML structure for `ParkingProperties/spaces/ParkingCapacity` must be validated against the CEN NeTEx XSD and the CFL implementation profile before being used as a production pattern.*
-
-This example shows how `ParkingArea` may be used to describe a multi-level P+R parking without modelling individual parking spaces.
-
-It illustrates:
-
-- a total parking capacity at `Parking` level;
-- one `ParkingArea` per physical level;
-- category-based capacities expressed inside the relevant level area;
-- PMR places represented through `ParkingUserType = impairedMobility`;
-- charging places represented through `NumberOfSpacesWithRechargePoint`;
-- no individual `ParkingBay` modelling.
-
-The capacity interpretation is:
-
-```text
-Parking TotalCapacity = Level 0 TotalCapacity + Level 1 TotalCapacity
-280 = 140 + 140
-```
-
-Category-based capacities are included in the level capacities. They are not added on top of them.
-
-```xml
-<Parking id="LU:CFL:Parking:PR003" version="1">
-  <Name>Station Z - P+R</Name>
-  <Centroid>
-    <Location>
-      <Longitude>6.2500</Longitude>
-      <Latitude>49.7500</Latitude>
-    </Location>
-  </Centroid>
 
   <ParkingType>parkAndRide</ParkingType>
   <ParkingLayout>multistorey</ParkingLayout>
-  <NumberOfParkingLevels>2</NumberOfParkingLevels>
-  <TotalCapacity>280</TotalCapacity>
-  <ParkingReservation>noReservations</ParkingReservation>
+  <NumberOfParkingLevels>3</NumberOfParkingLevels>
+  <TotalCapacity>420</TotalCapacity>
   <RechargingAvailable>true</RechargingAvailable>
+  <RealTimeOccupancyAvailable>true</RealTimeOccupancyAvailable>
+  <ParkingPaymentProcess>payByMobileDevice payByPlate</ParkingPaymentProcess>
+  <ParkingReservation>noReservations</ParkingReservation>
+
+  <parkingProperties>
+    <ParkingProperties id="LU:CFL:ParkingProperties:PR001:Cars" version="1">
+      <Name>Car parking properties</Name>
+      <ParkingVehicleTypes>car</ParkingVehicleTypes>
+    </ParkingProperties>
+
+    <ParkingProperties id="LU:CFL:ParkingProperties:PR001:PMR" version="1">
+      <Name>PMR places - whole parking</Name>
+      <ParkingUserTypes>registeredDisabled</ParkingUserTypes>
+      <spaces>
+        <ParkingCapacity id="LU:CFL:ParkingCapacity:PR001:PMR" version="1">
+          <ParkingUserType>registeredDisabled</ParkingUserType>
+          <NumberOfSpaces>8</NumberOfSpaces>
+        </ParkingCapacity>
+      </spaces>
+    </ParkingProperties>
+
+    <ParkingProperties id="LU:CFL:ParkingProperties:PR001:Charging" version="1">
+      <Name>Charging places - whole parking</Name>
+      <spaces>
+        <ParkingCapacity id="LU:CFL:ParkingCapacity:PR001:Charging" version="1">
+          <NumberOfSpacesWithRechargePoint>12</NumberOfSpacesWithRechargePoint>
+        </ParkingCapacity>
+      </spaces>
+    </ParkingProperties>
+
+    <ParkingProperties id="LU:CFL:ParkingProperties:PR001:Family" version="1">
+      <Name>Family places - whole parking</Name>
+      <ParkingUserTypes>families</ParkingUserTypes>
+      <spaces>
+        <ParkingCapacity id="LU:CFL:ParkingCapacity:PR001:Family" version="1">
+          <ParkingUserType>families</ParkingUserType>
+          <NumberOfSpaces>6</NumberOfSpaces>
+        </ParkingCapacity>
+      </spaces>
+    </ParkingProperties>
+  </parkingProperties>
 
   <parkingAreas>
-    <ParkingArea id="LU:CFL:ParkingArea:PR003:Level0" version="1">
-      <Name>Station Z - P+R - Level 0</Name>
+    <ParkingArea id="LU:CFL:ParkingArea:PR001:Level0" version="1">
+      <Name>Station X - P+R - Level 0</Name>
+      <Description>Covered level. Covered / uncovered information is provided descriptively until a standard-compliant level-specific structure is confirmed.</Description>
       <TotalCapacity>140</TotalCapacity>
-
-      <parkingProperties>
-        <ParkingProperties id="LU:CFL:ParkingProperties:PR003:Level0:PMR" version="1">
-          <Name>Level 0 - PMR places</Name>
-          <ParkingUserTypes>impairedMobility</ParkingUserTypes>
-          <spaces>
-            <ParkingCapacity id="LU:CFL:ParkingCapacity:PR003:Level0:PMR" version="1">
-              <ParkingUserType>impairedMobility</ParkingUserType>
-              <NumberOfSpaces>4</NumberOfSpaces>
-            </ParkingCapacity>
-          </spaces>
-        </ParkingProperties>
-
-        <ParkingProperties id="LU:CFL:ParkingProperties:PR003:Level0:Charging" version="1">
-          <Name>Level 0 - charging places</Name>
-          <spaces>
-            <ParkingCapacity id="LU:CFL:ParkingCapacity:PR003:Level0:Charging" version="1">
-              <NumberOfSpacesWithRechargePoint>8</NumberOfSpacesWithRechargePoint>
-            </ParkingCapacity>
-          </spaces>
-        </ParkingProperties>
-      </parkingProperties>
     </ParkingArea>
 
-    <ParkingArea id="LU:CFL:ParkingArea:PR003:Level1" version="1">
-      <Name>Station Z - P+R - Level 1</Name>
+    <ParkingArea id="LU:CFL:ParkingArea:PR001:Level1" version="1">
+      <Name>Station X - P+R - Level 1</Name>
+      <Description>Covered level. Covered / uncovered information is provided descriptively until a standard-compliant level-specific structure is confirmed.</Description>
       <TotalCapacity>140</TotalCapacity>
+    </ParkingArea>
 
-      <parkingProperties>
-        <ParkingProperties id="LU:CFL:ParkingProperties:PR003:Level1:PMR" version="1">
-          <Name>Level 1 - PMR places</Name>
-          <ParkingUserTypes>impairedMobility</ParkingUserTypes>
-          <spaces>
-            <ParkingCapacity id="LU:CFL:ParkingCapacity:PR003:Level1:PMR" version="1">
-              <ParkingUserType>impairedMobility</ParkingUserType>
-              <NumberOfSpaces>4</NumberOfSpaces>
-            </ParkingCapacity>
-          </spaces>
-        </ParkingProperties>
-
-        <ParkingProperties id="LU:CFL:ParkingProperties:PR003:Level1:Family" version="1">
-          <Name>Level 1 - family places</Name>
-          <ParkingUserTypes>families</ParkingUserTypes>
-          <spaces>
-            <ParkingCapacity id="LU:CFL:ParkingCapacity:PR003:Level1:Family" version="1">
-              <ParkingUserType>families</ParkingUserType>
-              <NumberOfSpaces>6</NumberOfSpaces>
-            </ParkingCapacity>
-          </spaces>
-        </ParkingProperties>
-      </parkingProperties>
+    <ParkingArea id="LU:CFL:ParkingArea:PR001:Level2" version="1">
+      <Name>Station X - P+R - Level 2</Name>
+      <Description>Uncovered level. Covered / uncovered information is provided descriptively until a standard-compliant level-specific structure is confirmed.</Description>
+      <TotalCapacity>140</TotalCapacity>
     </ParkingArea>
   </parkingAreas>
 </Parking>
 ```
 
-In this example, `ParkingArea` is used for the physical subdivision by level.
-
-The category-specific capacities are expressed inside the relevant level area. They are therefore interpreted as subsets of the level capacity, not as additional capacities.
-
-The total capacity of the parking is obtained by summing only the level capacities:
+In this example, the level capacities are additive:
 
 ```text
-TotalCapacity = Level 0 + Level 1
-280 = 140 + 140
+Parking/TotalCapacity = Level 0 + Level 1 + Level 2
+420 = 140 + 140 + 140
 ```
 
-The PMR, charging and family capacities provide additional detail within each level.
+The special place category capacities are not additive to the total capacity:
+
+```text
+PMR places = 8
+Charging places = 12
+Family places = 6
+```
+
+These are included subsets of `Parking/TotalCapacity`.
+
+Because the category distribution by level is not yet available, these category-based capacities are published at `Parking` level only.
+
+When the data becomes available by level, the same category-based capacities may be moved into the relevant level-based `ParkingArea`, without creating artificial `ParkingArea` elements for categories.
 
 ---
 
