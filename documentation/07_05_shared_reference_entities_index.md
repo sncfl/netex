@@ -14,6 +14,8 @@ In the CFL MVP, `resource.xml` may include:
 - a **ServiceCalendarFrame** (calendar primitives reused by multiple line files),
 - and, when needed, a **ServiceFrame** for shared transfer connections.
 
+Codespaces and frame defaults are declared at CompositeFrame level and apply to the frames contained in the delivery.
+
 Each shared entity used in the CFL MVP is described in a dedicated subsection below and can be referenced from other parts of the documentation.
 
 ---
@@ -40,7 +42,7 @@ Each shared entity used in the CFL MVP is described in a dedicated subsection be
 A **Codespace** defines a namespace used to qualify identifiers (`id`) in the dataset.  
 It ensures global uniqueness and enables unambiguous cross-file referencing.
 
-All identifiers used in the CFL NeTEx MVP dataset rely on Codespaces declared in the **ResourceFrame of `resource.xml`**.
+All identifiers used in the CFL NeTEx MVP dataset rely on Codespaces declared at CompositeFrame level in resource.xml and referenced by the contained frames through FrameDefaults/DefaultCodespaceRef.
 
 ```xml
 <Codespace id="CFL:Codespace:1">
@@ -101,8 +103,9 @@ In short: `XmlnsUrl` documents the **namespace reference** (Codespace), not indi
 - All identifiers used in the dataset **must reference a declared Codespace**.
 - Codespaces are stable and must not change across deliveries.
 - `XmlnsUrl` SHOULD be provided when a stable documentation URL exists for the codespace.
-- The CFL MVP uses the codespace declared in resource.xml as primary
-- Other LU-level codespaces may be declared in the same ResourceFrame when needed (e.g., national aggregation or multi-operator contexts).
+- The CFL MVP uses the Codespace declared at CompositeFrame level in resource.xml as the primary Codespace.
+- Frames contained in the CompositeFrame SHOULD reference the applicable Codespace through FrameDefaults/DefaultCodespaceRef.
+- Other LU-level Codespaces may be declared in the same CompositeFrame when needed (e.g., national aggregation or multi-operator contexts).
 
 ---
 
