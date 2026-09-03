@@ -509,7 +509,7 @@ The proposed modelling rule is therefore:
 
 | Parking type | Primary representation                            | Additional CFL classification                                                                                                         |
 | ------------ | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `P+R`        | `ParkingType = parkAndRide`                       | `TypeOfParkingRef = LU:CFL:TypeOfParking:P_R` only if CFL decides to keep a harmonised internal classification for all parking types. |
+| `P+R` | `ParkingType = parkAndRide` | No CFL-specific `TypeOfParkingRef` required in the current profile. |
 | `Bikebox`    | `TypeOfParkingRef = LU:CFL:TypeOfParking:BIKEBOX` | Used because no standard NeTEx `ParkingType` value clearly represents a secure bicycle box facility.                                  |
 
 Kiss & Rail SHALL NOT be represented as a parking type because it is a tariff rule, not a physical parking object.
@@ -945,6 +945,10 @@ Smartparking SHALL NOT be represented as:
 
 In NeTEx, the presence of real-time occupancy data SHOULD be represented using `RealTimeOccupancyAvailable` when applicable.
 
+`RealTimeOccupancyAvailable` indicates whether dynamic occupancy information is available for the parking. It does not carry the dynamic occupancy value itself.
+
+Dynamic parking status and occupancy information, where published, are provided through SIRI-FM. Static parking characteristics such as `TotalCapacity` remain published in NeTEx.
+
 Availability information may be available:
 
 - globally for the whole `Parking`;
@@ -1331,7 +1335,7 @@ Bikebox identifiers SHALL remain stable over time and SHALL NOT change when the 
 
 ### Naming rule
 
-The `Name` of a bikebox parking SHALL contain the public or operational label of the bikebox location.
+The `Name` of a bikebox parking SHALL contain the bikebox location label provided by the authoritative source system.
 
 Current examples:
 
@@ -1373,7 +1377,7 @@ For bikebox parkings, the following fields SHALL be provided:
 |---------------------|-------------|------------------------|
 | `@id` | 1..1 | Stable identifier following the current CFL bikebox pattern, e.g. `LU:CFL:Parking:Bikebox:BK-1`. |
 | `version` | 1..1 | Current value: `1`. |
-| `Name/Text` | 1..1 | Public or operational bikebox location label, e.g. `LUX01 - Sandweiler-Contern, Gare Nord`. |
+|`Name/Text` | 1..1 | Bikebox location label provided by the authoritative source system, e.g. `LUX01 - Sandweiler-Contern, Gare Nord`. |
 | `Description/Text` | 1..1 | Current standard description of secure access conditions. |
 | `Centroid/Location/Longitude` | 1..1 | Mandatory WGS84 longitude. |
 | `Centroid/Location/Latitude` | 1..1 | Mandatory WGS84 latitude. |
@@ -1382,7 +1386,7 @@ For bikebox parkings, the following fields SHALL be provided:
 | `placeEquipments/VehicleReleaseEquipment` | 1..1 | Access-control equipment container currently provided for each bikebox. |
 | `placeEquipments/VehicleReleaseEquipment/RemoteControl` | 1..1 | Current value: `false`. |
 | `TypeOfParkingRef` | 1..1 | Must reference `LU:CFL:TypeOfParking:BIKEBOX` with `versionRef="1"`. |
-| `TotalCapacity` | 1..1 | Current value: `32` for the bikeboxes shown in the current dataset. |
+| `TotalCapacity` | 1..1 | Total number of bicycle parking spaces for the Bikebox. The value is provided individually for each Bikebox. |
 | `ParkingPaymentProcess` | 1..1 | Current value: `free`. |
 | `ParkingReservation` | 1..1 | Current value: `registrationRequired`. |
 | `parkingProperties/ParkingProperties` | 1..1 | One `ParkingProperties` element currently provided per bikebox. |
@@ -1481,6 +1485,9 @@ Unlike earlier drafts of this profile, `BookingUrl` is not considered mandatory 
 - `BookingUrl` MAY be provided, but is not mandatory unless reliable source data is available.
 - Equipment information MAY be provided through `placeEquipments`.
 
+* Static Bikebox characteristics, including `TotalCapacity`, are published in NeTEx.
+* Dynamic operational status and occupancy information, when available, are published through SIRI-FM.
+* The corresponding SIRI-FM `FacilityRef` SHALL use the identifier of the NeTEx `Parking` object.
 ---
 
 ### XML example
