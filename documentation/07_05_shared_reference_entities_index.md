@@ -24,14 +24,13 @@ Each shared entity used in the CFL MVP is described in a dedicated subsection be
 
 1. [Codespace](#codespace)
 2. [Operator](#operator)
-3. [Branding](#branding)
-4. [Shared calendar entities (ServiceCalendarFrame)](#shared-calendar-entities-servicecalendarframe)
+3. [Shared calendar entities (ServiceCalendarFrame)](#shared-calendar-entities-servicecalendarframe)
    - [DayType (ServiceCalendarFrame)](#daytype-servicecalendarframe)
    - [OperatingPeriod (ServiceCalendarFrame)](#operatingperiod-servicecalendarframe)
    - [DayTypeAssignment (ServiceCalendarFrame)](#daytypeassignment-servicecalendarframe)
-5. [TypeOfParking (ResourceFrame)](#typeofparking-resourceframe)
-6. [Optional / future shared entities in `resource.xml`](#optional--future-shared-entities-in-resourcexml)
-7. [Scope limitations and summary](#scope-limitations-and-summary)
+4. [TypeOfParking (ResourceFrame)](#typeofparking-resourceframe)
+5. [Optional / future shared entities in `resource.xml`](#optional--future-shared-entities-in-resourcexml)
+6. [Scope limitations and summary](#scope-limitations-and-summary)
 
 ---
 
@@ -136,64 +135,6 @@ In the CFL NeTEx MVP, a single Operator is defined and reused across all Lines a
 - All Line and service entities reference this Operator using `OperatorRef`.
 - Additional Operators (e.g., CFL bus, CFL Flex) may be introduced in later extensions or in multi-operator publications.
 - Operator identifiers are stable and never reused.
-
----
-
-## Branding
-
-### Functional description
-
-**Branding** defines visual identity information that may be associated with service structures in order to support consistent passenger-facing presentation (e.g. colours, logos).
-
-In the CFL NeTEx MVP, Branding is used to represent a **single colour per `GroupOfLines`**.  
-Lines inherit the colour through their membership in a `GroupOfLines`.
-
----
-
-### Elements and attributes retained in the CFL MVP
-
-| Element / Attribute | Description | Cardinality (CFL MVP) | Notes / Constraints |
-|---------------------|-------------|------------------------|---------------------|
-| `@id` | Identifier of the Branding | 1..1 | Stable identifier. |
-| `Name` | Branding name | 1..1 | Human-readable label (typically aligned with the target `GroupOfLines`). |
-| `Description` | Description of branding | 0..1 | Optional. |
-| `Colour` *(or equivalent presentation element in CEN NeTEx 2.0)* | Primary colour | 0..1 | Used in CFL MVP to publish the group colour. Source format is `#RRGGBB`; published value SHALL follow the format required by the schema. |
-
-#### Notes
-- The exact XML element used to carry the colour depends on the CEN NeTEx 2.0 schema structure (e.g. direct `Colour` element or a presentation sub-structure). The CFL MVP uses the schema-supported standard element; no extension is used.
-
----
-
-### CFL-specific modelling rules
-
-- Branding entities are defined **once** in the ResourceFrame of `resource.xml`.
-- CFL defines **one Branding per GroupOfLines** to represent the passenger-facing group colour.
-- Each `GroupOfLines` SHALL reference exactly one Branding (group-level colouring).
-- Lines SHALL NOT carry colours directly in the MVP; they inherit the colour through their `GroupOfLines` membership.
-- Colour values are maintained in source systems as `#RRGGBB`. The published value SHALL be transformed to the format expected by the XSD (typically `RRGGBB` without `#`).
-
----
-
-### XML examples (CFL pattern)
-
-#### Example 1 — Branding definition in `resource.xml`
-
-```xml
-<Branding id="CFL:Branding:GroupOfLines:L10" version="1">
-  <Name>Ligne 10</Name>
-  <!-- colour element name/location depends on the CEN NeTEx 2.0 schema -->
-  <Colour>009BD4</Colour>
-</Branding>
-```
-
-#### Example 2 — GroupOfLines referencing Branding (in service structure)
-
-```xml
-<GroupOfLines id="CFL:GroupOfLines:L10" version="1">
-  <Name>Ligne 10</Name>
-  <BrandingRef ref="CFL:Branding:GroupOfLines:L10"/>
-</GroupOfLines>
-```
 
 ---
 
