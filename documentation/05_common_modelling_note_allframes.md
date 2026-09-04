@@ -260,19 +260,32 @@ Rules:
 
 ---
 
-### 5.2.4 Languages
+### 5.2.4 Language handling for textual values
 
-The CFL MVP Profile allows names in the following languages when available:
+The CFL MVP Profile allows textual values in the following languages when available:
 
-- French (FR)  
-- German (DE)  
-- English (EN)  
-- Luxembourgish (LU) – optional  
+- French (`fr`)  
+- German (`de`)  
+- English (`en`)  
+- Luxembourgish (`lb`)
 
-Rules:  
-- If multiple language variants are provided, their meaning must remain equivalent.  
-- CFL may prioritise the language used in its customer information systems.  
-- In the LU Profile, language usage **shall** be coordinated across operators to ensure consistency.
+For textual elements based on NeTEx multilingual string structures, the language SHALL be indicated using the `lang` attribute on the `Text` element.
+
+Example:
+
+`<Text lang="en">...</Text>`
+
+When several language variants are provided, one `Text` element SHALL be used for each language.
+
+The `lang` attribute SHALL use the applicable ISO language code.
+
+Rules:
+
+- If multiple language variants are provided, their meaning SHALL remain equivalent.
+- The language of each textual value SHALL be identified through `Text/@lang`.
+- CFL MAY prioritise the language used in its customer information systems where only one language is available.
+- The profile does not require all textual values to be provided in all supported languages unless explicitly stated for a given element.
+- In the future LU Profile, language usage SHALL be coordinated across operators to ensure consistency.
 
 ---
 
