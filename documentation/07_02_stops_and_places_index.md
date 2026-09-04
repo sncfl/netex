@@ -1149,6 +1149,20 @@ Note: in the CFL P+R context, payment via the P+R app is understood as a combine
 
 ---
 
+### Relationship with StopPlace and other sites
+
+A `Parking` MAY exist as a standalone site.
+
+When a stable and authoritative relationship exists between a `Parking` and a public transport `StopPlace`, the relationship SHALL be represented using a `SiteConnection`.
+
+The `SiteConnection` SHALL reference the relevant `Parking` at one end and the corresponding `StopPlace` at the other end.
+
+Where more detailed data is available, the connection MAY reference more specific site components, such as a `ParkingEntrance`, `StopPlaceEntrance` or `Quay`.
+
+A relationship SHALL NOT be created solely on the basis of geographical proximity.
+
+---
+
 ### XML example: P+R parking with level-based capacity and global special place categories
 
 ⚠️ *Illustrative only — not real CFL production data.*
