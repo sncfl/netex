@@ -131,7 +131,7 @@ A **Quay** represents a physical boarding or alighting point within a StopPlace.
 For rail, this corresponds to a **platform** (e.g., “Platform 1”), a boarding edge, or a clearly identifiable passenger access point.
 
 A Quay is:
-- A **child element of a StopPlace**,
+- A **physical component associated with a StopPlace.**,
 - A physical infrastructure object referenced when quay-level precision is required,
 - Referenced via `QuayRef` in assignment structures (PassengerStopAssignment optional; VehicleJourneyStopAssignment optional)..
 
@@ -148,7 +148,7 @@ Each Quay belongs to **exactly one** StopPlace.
 | `PublicCode` | Public-facing platform code | 0..1 | If used, must be unique within the StopPlace. |
 | `Description` | Additional textual info | 0..1 | Optional; avoid operational notes. |
 | `Centroid/Location` | Coordinates of the quay | 0..1 | Optional in MVP; may be added in WP3. |
-| `ParentSiteRef` | Reference to parent StopPlace | 1..1 | Must reference the enclosing StopPlace. |
+| `SiteRef` | Reference to the StopPlace to which the Quay belongs | 1..1 | Must reference the enclosing StopPlace. |
 | `QuayType` | Type of quay or platform | 0..1 | If used: `platform`, `bay`, etc. (NeTEx enumeration values). |
 
 #### Notes
@@ -176,7 +176,7 @@ Each Quay belongs to **exactly one** StopPlace.
   - Unchanged if the platform is renamed.
 
 #### Relationship to StopPlace
-- A Quay **must** have a `ParentSiteRef` pointing to its StopPlace.  
+- A Quay **SHALL** have a `SiteRef` pointing to the StopPlace to which it belongs.
 - Every StopPlace must contain one or more Quays.
 
 ---
@@ -193,7 +193,7 @@ Each Quay belongs to **exactly one** StopPlace.
         <Text xml:lang="en">Platform 1</Text>
     </Name>
     <PublicCode>1</PublicCode>
-    <ParentSiteRef ref="LU:CFL:StopPlace:SP00032"/>
+    <SiteRef ref="LU:CFL:StopPlace:SP00032"/>
 </Quay>
 ```
 
