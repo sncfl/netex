@@ -1387,6 +1387,7 @@ For bikebox parkings, the following fields SHALL be provided:
 | `placeEquipments/VehicleReleaseEquipment/RemoteControl` | 1..1 | Current value: `false`. |
 | `TypeOfParkingRef` | 1..1 | Must reference `LU:CFL:TypeOfParking:BIKEBOX` with `versionRef="1"`. |
 | `TotalCapacity` | 1..1 | Total number of bicycle parking spaces for the Bikebox. The value is provided individually for each Bikebox. |
+| `RealTimeOccupancyAvailable` | 1..1 | Indicates whether the Bikebox can provide dynamic occupancy information. `true` when a real-time occupancy source is available, otherwise `false`. |
 | `ParkingPaymentProcess` | 1..1 | Current value: `free`. |
 | `ParkingReservation` | 1..1 | Current value: `registrationRequired`. |
 | `parkingProperties/ParkingProperties` | 1..1 | One `ParkingProperties` element currently provided per bikebox. |
@@ -1488,6 +1489,10 @@ Unlike earlier drafts of this profile, `BookingUrl` is not considered mandatory 
 * Static Bikebox characteristics, including `TotalCapacity`, are published in NeTEx.
 * Dynamic operational status and occupancy information, when available, are published through SIRI-FM.
 * The corresponding SIRI-FM `FacilityRef` SHALL use the identifier of the NeTEx `Parking` object.
+* `RealTimeOccupancyAvailable` SHALL be provided for each Bikebox.
+* `RealTimeOccupancyAvailable = true` indicates that dynamic occupancy information can be provided for the Bikebox.
+* `RealTimeOccupancyAvailable = false` indicates that no dynamic occupancy information is available for the Bikebox.
+* The value indicates the availability of occupancy monitoring only; the actual dynamic occupancy value is published through SIRI-FM.
 ---
 
 ### XML example
@@ -1518,6 +1523,7 @@ Unlike earlier drafts of this profile, `BookingUrl` is not considered mandatory 
   </placeEquipments>
   <TypeOfParkingRef ref="LU:CFL:TypeOfParking:BIKEBOX" versionRef="1"/>
   <TotalCapacity>32</TotalCapacity>
+  <RealTimeOccupancyAvailable>true</RealTimeOccupancyAvailable>
   <ParkingPaymentProcess>free</ParkingPaymentProcess>
   <ParkingReservation>registrationRequired</ParkingReservation>
   <parkingProperties>
